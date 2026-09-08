@@ -1,0 +1,422 @@
+---
+title: "Lecture 19: Experimentation"
+subtitle: STA1000 - Data Analytics and Metrics
+---
+
+## Previously ...
+
+Attribution models disagree because they are all assumptions. An experiment
+replaces the assumption with evidence, and then charges you for it in sample
+size.
+
+## Learning Outcomes
+
+By the end of this lecture you will be able to:
+
+- Design an A/B test on your own site, and pre-register it
+- Explain sampling variability using your own traffic volumes
+- Compute the sample size a decision would require, and react honestly
+- Read a test result, including a null result, without over-claiming
+
+# 1. Why Experiments
+
+## Selection Effects Are Large. Treatment Effects Are Small.
+
+The most useful rule of thumb in applied marketing:
+
+. . .
+
+**Differences between groups of people are usually large. Differences caused by
+what you did to them are usually small.**
+
+. . .
+
+So any comparison of two groups you did not randomise is measuring mostly
+selection. The people who clicked the email differ from the people who did not,
+in ways that dwarf whatever the email did.
+
+. . .
+
+Randomisation is the only tool that removes selection by construction rather
+than by assumption.
+
+::: {.callout-note appearance="minimal"}
+Name the exceptions: where are treatment effects genuinely large? Price changes
+and giving things away for free are two. What do they have in common?
+:::
+
+## What Randomisation Buys You
+
+It makes the two groups **exchangeable in expectation** on everything, including
+the things you did not measure and did not think of.
+
+. . .
+
+That is the entire trick, and nothing else in analytics does it. Every control
+variable in Lecture 20's regression can only adjust for confounders you named.
+
+. . .
+
+**What it does not buy you**: precision. Randomisation removes bias. Sample size
+removes noise. They are separate problems and a small randomised test is
+unbiased and useless.
+
+## Exogenous Variation, and Why Firms Pay For It
+
+The reason a price experiment is worth running rather than just analysing
+historical prices: **historical prices moved for reasons**.
+
+. . .
+
+Prices rose when demand was strong, or when costs rose, or when a competitor
+exited. Regress quantity on those prices and you measure the reasons, not the
+price effect. Sometimes you find that raising prices increases sales.
+
+. . .
+
+An experiment creates price variation that is unrelated to everything else. That
+is what "exogenous" means and it is the scarce commodity.
+
+<!-- Speaker notes: this is the cleanest available motivation for randomisation
+     and it lands better than the medical framing, because they can see the
+     mechanism. Keep it to five minutes; the full endogeneity treatment belongs
+     in a different module. -->
+
+## Experiments and Models Are Complements
+
+Firms that only run experiments learn what happened at the two prices they
+tested.
+
+. . .
+
+Firms that only model learn a lot, conditional on assumptions nobody can check.
+
+. . .
+
+**Together**: the experiment identifies the effect, the model extends it to
+prices you did not test and to segments you could not power separately.
+
+. . .
+
+And the practical warning: price experiments are **visible**. Competitors,
+customers, suppliers and distributors can all see them, and can all react. An
+experiment is not a private act.
+
+# 2. Design
+
+## The One-Thing Rule
+
+Change one thing, or you learn nothing about which thing worked.
+
+. . .
+
+The counter-argument is real: changing one button colour is cheap and almost
+always produces a null result, because the effect is tiny relative to the noise.
+
+. . .
+
+**So change one thing, and make it a big one.** At portfolio volume, the only
+tests worth running are tests of changes you would be nervous about.
+
+## Hypothesis Before Data
+
+A testable statement, with a direction, a metric, and a number, written **before
+the test runs**:
+
+> "Moving the enquiry form above the fold will increase the session-to-enquiry
+> rate by at least 20% relative. Primary metric: session key event rate.
+> Guardrail: bounce rate must not rise by more than 5 points."
+
+. . .
+
+This is the same pre-registration habit as the success statement in Lecture 2,
+and it is what stops the analysis in Lecture 8 where you picked two segments
+before looking.
+
+## Choosing the Metric
+
+**Primary metric**: one. Chosen in advance. The test succeeds or fails on it.
+
+. . .
+
+**Guardrail metrics**: two or three things that must not get worse. You do not
+test them, you watch them.
+
+. . .
+
+**Everything else**: exploratory, and reported as exploratory.
+
+. . .
+
+Test twenty metrics and report the winner and you have not run an experiment,
+you have run a search. At the conventional 5% threshold, twenty independent
+metrics produce a "significant" result by chance about two thirds of the time.
+
+::: {.callout-note appearance="minimal"}
+This is Lecture 8's segment-hypothesis trap in a more formal costume. Why is it
+worse here than it was there?
+:::
+
+# 3. Sampling Variability
+
+## Why Two Identical Pages Give Different Numbers
+
+<!-- Speaker notes: this is the heart of the module's statistics content, and
+     the only place students can feel it, because the n is their own. Run the
+     simulation live with their real weekly traffic. Ask for predictions first,
+     out loud, before running it. -->
+
+Run the same page against itself. Split the traffic randomly. The two halves
+will not report the same conversion rate.
+
+. . .
+
+Not because anything differs. Because 40 coin flips do not come out 20-20.
+
+```{.python}
+import numpy as np
+rng = np.random.default_rng(0)
+n, p = 40, 0.05
+sim = [rng.binomial(n, p)/n - rng.binomial(n, p)/n for _ in range(10000)]
+np.percentile(sim, [2.5, 97.5])
+```
+
+. . .
+
+With $n = 40$ per arm and a true 5% rate in both, the observed difference lands
+anywhere within roughly ±10 percentage points. **A "doubling" is entirely
+ordinary when nothing whatsoever has happened.**
+
+## Where the Variation Comes From {.smaller}
+
+![Source: [DS701 Tools for Data Science, Boston University](https://github.com/tools4ds/DS701-Course-Notes)](./figures/external/ds701_galton_bean_machine.png){fig-align="center" height="340px"}
+
+*Galton's bean machine. Every bead follows the same rules and no two columns
+end up the same height. That is your A/A test.*
+
+
+## Confidence Intervals First
+
+> "Between −3 and +9 percentage points."
+
+says considerably more than
+
+> "p = 0.31."
+
+. . .
+
+The interval reports **what the data can rule out**. It shows that a large
+positive effect is still consistent with your result, and so is a small negative
+one, which is the honest state of knowledge.
+
+. . .
+
+**Report the interval. Then, if you must, the p-value.**
+
+## What a p-value Is Not
+
+- **Not** the probability that your hypothesis is true
+- **Not** the probability the result is due to chance
+- **Not** a measure of effect size: a tiny effect on huge traffic gives a tiny p
+- **Not** a licence to stop the test
+
+. . .
+
+It is the probability of seeing data at least this extreme **if nothing were
+happening**. That is a narrow, conditional statement, and every over-claim in
+marketing analytics comes from widening it.
+
+## Peeking
+
+Checking the test every day and stopping when it looks good **inflates the false
+positive rate**, badly. The nominal 5% becomes 20% or worse depending on how
+often you look.
+
+. . .
+
+The intuition: the difference wanders. Given enough looks, it will wander across
+the significance threshold at some point, and you have arranged to stop
+precisely then.
+
+. . .
+
+**Fix the duration in advance**, from the power calculation, and look at the end.
+Or use a sequential testing method built for peeking, and say that you did.
+
+## Regression to the Mean
+
+The variant "won" in a week when the baseline was unusually bad.
+
+. . .
+
+Extremes are followed by less extreme values, for no reason other than that
+extremes are partly luck. This is why firing the coach after a bad season
+appears to work, and why the herbal remedy started after a terrible winter
+appears to work.
+
+. . .
+
+**In marketing**: any decision triggered by an unusually bad period will look
+successful. Any test started because "conversion collapsed last week" is
+measuring the recovery that was coming anyway.
+
+::: {.callout-note appearance="minimal"}
+Does randomisation protect you from this? Both arms run in the same weeks, so
+what exactly is protected, and what is not?
+:::
+
+# 4. Reality on a Small Site
+
+## Power
+
+To detect a 20% relative lift on a 3% base rate (3.0% versus 3.6%), at 80% power
+and 5% significance, you need roughly **14,000 sessions per arm**.
+
+. . .
+
+Your portfolio produces perhaps 40 sessions a week.
+
+. . .
+
+$$\frac{2 \times 14{,}000}{40} \approx 700 \text{ weeks}$$
+
+. . .
+
+**Thirteen years.** Compute it live with the room's actual traffic. The answer is
+uncomfortable and the discomfort is the lesson.
+
+## What to Do Instead
+
+1. **Test bigger changes.** Effect size is in the numerator. A whole new landing
+   page can move a rate by 50%; a button colour cannot
+2. **Move up the funnel.** Click-through on a link happens 30 times more often
+   than an enquiry. Test on the frequent event, and be explicit that it is a
+   proxy
+3. **Run longer, and accept the seasonality** you have bought
+4. **Change the question.** Five user interviews will tell you more about your
+   enquiry form than an underpowered A/B test, and you can say why
+
+. . .
+
+**Or run it and report the interval.** An honest wide interval is a legitimate
+deliverable in this module.
+
+## Reporting a Null Result
+
+"No detectable difference, 95% CI −4 to +6 points, n = 380 per arm" is a
+**finding**. It says the effect, if any, is not large.
+
+. . .
+
+"The variant won, 8% versus 5%" on n = 30 is not a finding. It is a coin flip
+with a conclusion attached.
+
+. . .
+
+**Documented judgement beats undocumented certainty.** The marking here rewards
+the student who computed the power, found it impossible, ran the test anyway and
+reported honestly, over the one who declared a winner.
+
+## Exercise {background="#43464B"}
+
+On your own portfolio:
+
+1. Write a hypothesis with a direction, a primary metric and a guardrail
+2. Compute the sample size needed for a 20% relative lift on your base rate
+3. Compare it to your actual weekly traffic and state how long the test would
+   take
+4. Decide what you will do about that, and write the decision down
+5. Run the test anyway, and report the confidence interval rather than a winner
+
+**30 minutes**
+
+# 5. AI and the Temptation to Over-Claim
+
+## AI This Block: An analyst you interrogate
+
+Where we are on the module's AI spine, introduced in Lecture 10:
+
+> **An analyst you interrogate**
+
+## It Will Not Stop You
+
+<!-- Speaker notes: run this live. Give an assistant a fake result on n=30 and
+     watch it write a confident, well-structured recommendation with next steps.
+     It is the most persuasive demonstration in the whole module. Then run the
+     fixed prompt on the same numbers. -->
+
+> "Variant B converted at 8% versus 5% for A, 30 sessions each. What should I
+> do?"
+
+. . .
+
+You will get a recommendation. Probably a well-organised one, with next steps and
+a note about continuing to monitor.
+
+. . .
+
+It will rarely volunteer, unprompted, that 30 sessions cannot support any
+conclusion at all.
+
+## The Prompt That Fixes It
+
+> "Before recommending anything, compute the confidence interval for the
+> difference in proportions, state the minimum detectable effect at this sample
+> size, and tell me whether this sample can support a conclusion."
+
+. . .
+
+Same numbers, entirely different answer.
+
+. . .
+
+**The obligation to ask is yours.** That is the single sentence to take out of
+this lecture, and it generalises well past A/B tests.
+
+## Using It Properly {.smaller}
+
+:::: {.columns}
+::: {.column width="45%"}
+**Reliable**
+
+- Power and sample-size calculations
+- Simulation code for the peeking demonstration
+- Explaining what a confidence interval means, in client language
+- Listing the guardrail metrics you forgot
+:::
+::: {.column width="45%"}
+**Never**
+
+- Deciding whether to stop the test
+- Judging whether the effect is practically important
+- Telling you whether the randomisation actually worked
+- Choosing the primary metric after seeing the data
+:::
+::::
+
+## Exercise {background="#43464B"}
+
+1. Give an assistant your real test result and ask for a recommendation
+2. Then ask for the confidence interval and the minimum detectable effect
+3. Compare the two answers and write what changed
+4. Ask it to compute your required sample size, and check its arithmetic against
+   an online calculator
+
+**15 minutes**
+
+## Going Further
+
+- Kohavi, Tang and Xu, *Trustworthy Online Controlled Experiments* — the
+  practitioner's book; the chapters on peeking and on metric choice especially
+- Johari, Koomen, Pekelis and Walsh (2017), *Peeking at A/B Tests* — what
+  sequential testing actually fixes
+- Gelman and Loken (2013), *The Garden of Forking Paths* — why you do not need
+  to cheat to get a false positive
+
+## Next Lecture
+
+Regression, as a way of asking which levers move the number when you cannot run
+the experiment.
+
+**Prepare**: bring your joined traffic-and-spend table from Lecture 12. We
+model it.

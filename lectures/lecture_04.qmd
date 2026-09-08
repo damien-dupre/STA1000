@@ -1,0 +1,128 @@
+---
+title: "Lecture 4: What Tracking Data Actually Is"
+subtitle: STA1000 - Data Analytics and Metrics
+---
+
+## Previously ...
+
+Your site now sends events to GA4. That makes the next set of questions
+concrete rather than abstract:
+
+- What exactly is being recorded?
+- Who owns it?
+- What are you legally obliged to do about it?
+
+## Learning Outcomes
+
+By the end of this lecture you will be able to:
+
+- Describe tracking data as events and parameters
+- Distinguish structured from unstructured sources
+- Distinguish first-party from third-party data
+- Apply consent and GDPR requirements to your own site
+
+# 1. The Shape of Tracking Data
+
+## Events and Parameters
+
+TODO: an event is a verb, a parameter is an adjective. Show one raw GA4 event
+payload and decompose it.
+
+## Structured versus Unstructured
+
+TODO: the GA4 export is structured; reviews, comments, captions and support
+tickets are not. Lecture 14 returns to the unstructured half.
+
+## Hit-Level, Session-Level, User-Level
+
+TODO: the three grains, and why a metric changes meaning at each grain.
+
+# 2. Who Owns the Data
+
+## First, Second and Third Party
+
+TODO: define each with a marketing example. Note the deprecation pressure on
+third-party cookies and what that changed.
+
+## The Identity Problem
+
+TODO: cross-device, logged-out users, why "users" is an estimate.
+
+# 3. Consent and GDPR
+
+## The Cookie Banner Is Now Your Problem
+
+<!-- Speaker notes: this is the pedagogical pivot of the block. Students who
+     have to publish a banner on their own live site stop treating GDPR as an
+     exam topic. -->
+
+TODO: lawful basis, consent before non-essential cookies, the practical
+implications of consent mode for your numbers.
+
+## What GDPR Requires of You Specifically
+
+TODO: privacy notice, banner, data retention setting in GA4, IP anonymisation,
+the right to erasure and what it means for an analytics property.
+
+## What They Do With It {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_ftc_surveillance_pricing.png){fig-align="center" height="350px"}
+
+*The FTC's 2025 study on surveillance pricing. This is the far end of the same
+pipeline your cookie banner sits at the front of.*
+
+
+## Consent Bias
+
+TODO: if 30% of visitors decline, your data is a non-random sample. This is the
+first appearance of a theme that returns in Lecture 19.
+
+## Exercise {background="#43464B"}
+
+For your own site:
+
+1. Publish a consent banner and a privacy notice
+2. List every cookie or identifier your site sets, and its purpose
+3. Set your GA4 data retention explicitly and justify the choice
+4. Estimate what proportion of your traffic you expect to lose to declined consent
+
+**20 minutes**
+
+# 4. AI and the Law
+
+## AI This Block: Chat
+
+Where we are on the module's AI spine, set out in Lecture 1 and named properly in Lecture 10:
+
+> **Chat**
+
+## Do Not Take Legal Advice From a Chatbot
+
+<!-- Speaker notes: the one place in the module where the honest answer is
+     "verify against the primary source, every time". -->
+
+TODO: assistants are confidently wrong about GDPR. They mix up jurisdictions,
+cite repealed provisions, and invent article numbers.
+
+## What It Is Genuinely Good For
+
+TODO: expand.
+
+- **Drafting** a privacy notice you then check against the DPC's guidance
+- **Explaining** a concept so you can go and confirm it
+- **Listing** what your cookie banner should cover, as a starting checklist
+
+Never: telling you whether your specific setup is lawful.
+
+## Exercise {background="#43464B"}
+
+1. Ask an assistant to draft a privacy notice for your site
+2. Check three of its claims against the Data Protection Commission's own guidance
+   at <https://www.dataprotection.ie>
+3. Record what it got wrong
+
+**15 minutes**
+
+## Next Lecture
+
+Block 2 begins: we connect Tableau to the data you have started to collect.

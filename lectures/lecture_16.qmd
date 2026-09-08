@@ -1,0 +1,509 @@
+---
+title: "Lecture 16: Core Marketing Metrics"
+subtitle: STA1000 - Data Analytics and Metrics
+---
+
+## Previously ...
+
+You can produce almost any number. Block 4 is about which numbers a decision
+turns on.
+
+## Learning Outcomes
+
+By the end of this lecture you will be able to:
+
+- Decompose revenue into the factors marketing can move
+- Calculate acquisition cost, lifetime value, ROAS and contribution
+- Explain the relationship between them, and which one a CFO recognises
+- Identify when a metric is being gamed, including by you
+
+# 1. Which Number Is the Business
+
+## Two Laws
+
+**First law**: no customers, no business.
+
+No customers → no revenue → no profit → no business.
+
+. . .
+
+**Second law**: more customers, more profit.
+
+. . .
+
+The second is an empirical tendency rather than a logical necessity. Individual
+customers can be unprofitable, and we will spend part of this lecture on the
+ones who are.
+
+::: {.callout-note appearance="minimal"}
+Which functions in a business can afford to ignore customers? Whose budget is
+justified by a number that is not a customer count?
+:::
+
+## Revenue, Decomposed
+
+Any brand's revenue can be written as a chain of ratios:
+
+$$\text{Revenue} = \underbrace{\text{stores}}_{\text{distribution}} \times
+\underbrace{\frac{\text{customers}}{\text{store}}}_{\text{reach}} \times
+\underbrace{\frac{\text{transactions}}{\text{customer}}}_{\text{frequency}} \times
+\underbrace{\frac{\text{spend}}{\text{transaction}}}_{\text{basket}}$$
+
+. . .
+
+Four levers. Marketing teams argue endlessly about which one to pull.
+
+::: {.callout-note appearance="minimal"}
+Before the next slide: which of the four do you expect to explain most of the
+variation in revenue across firms?
+:::
+
+## The Answer Is Customer Count
+
+Work on the full US Visa transaction panel, over a trillion dollars of spending
+across 32 billion transactions, regressed each factor against merchant revenue.
+
+. . .
+
+**Unique customers per store explains 68 to 84% of the variation in merchant
+revenue.** Far more than transaction frequency or basket size, and the result
+holds across sectors.
+
+. . .
+
+This is why serious firms measure at the **customer level** rather than the
+store, visit or transaction level. It is also why the metrics in the rest of
+this lecture are all customer metrics.
+
+<!-- Speaker notes: the students' instinct is usually basket size, because that
+     is the lever a marketer feels in control of. The result reframes the whole
+     block: acquisition and retention dominate, and everything else is trim. -->
+
+## Vocabulary, Fixed Now
+
+| Level | Unit | Typical metric |
+|---|---|---|
+| Market | The category | Size, growth, share |
+| Customer | A person | CAC, LTV, retention, RFM |
+| Product | A SKU or service | Margin, attach rate |
+| Transaction | An order | AOV, units per order |
+
+. . .
+
+**Most bad marketing arguments are two people using metrics from different
+levels.** "Our AOV is up" and "our customer count is down" can both be true, and
+only one of them decides whether the business survives.
+
+# 2. Cost
+
+## Customer Acquisition Cost
+
+$$\text{CAC} = \frac{\text{acquisition spend}}{\text{new customers acquired}}$$
+
+. . .
+
+**The numerator is an argument.** Media only? Media plus agency fees? Plus the
+salaries of the people who made the ads? Plus the discount you gave to close the
+first sale?
+
+. . .
+
+Every one of those is defensible and they produce numbers that differ by a
+factor of three. **State the definition beside the number, every time.**
+
+## Blended and Paid CAC {.smaller}
+
+:::: {.columns}
+::: {.column width="45%"}
+**Blended CAC**
+
+All spend ÷ all new customers, organic ones included.
+
+Flatters you. Useful for asking "what does growth cost us overall".
+:::
+::: {.column width="45%"}
+**Paid CAC**
+
+Paid spend ÷ customers attributed to paid.
+
+Honest about the marginal channel. Depends entirely on attribution, which is
+Lecture 18's problem.
+:::
+::::
+
+. . .
+
+Reporting blended CAC while making a decision about paid spend is one of the
+most common and most expensive confusions in the discipline.
+
+## Cost per What
+
+CPM, CPC, CPA, CPL: the same spend divided by a different denominator.
+
+. . .
+
+Each choice of denominator is a **strategic claim** about what you are buying:
+
+- **CPM** claims you are buying attention
+- **CPC** claims you are buying visits
+- **CPA** claims you are buying customers
+- **CPL** claims you are buying the chance of a conversation
+
+. . .
+
+A channel can be cheap on one and ruinous on the next. The ranking of your
+channels changes with the denominator, which is why everyone quotes the
+denominator that flatters their channel.
+
+# 3. Value
+
+## Lifetime Value
+
+Start simple:
+
+$$\text{LTV} = \text{AOV} \times \text{frequency} \times \text{lifespan} \times \text{margin}$$
+
+. . .
+
+Then say it properly, with retention and the cost of capital:
+
+$$\text{CLV} = \sum_{t=0}^{T} \frac{m_t \, r^t}{(1+i)^t}$$
+
+$m_t$ = contribution margin in period $t$, $r$ = retention probability, $i$ =
+cost of capital, $T$ = horizon.
+
+. . .
+
+$m$ and $r$ are **observable in past data**. The values you put in the formula
+are **predictions**. That distinction is the whole subject.
+
+## A Worked Example {.smaller}
+
+A tennis club:
+
+- Annual membership fee: €300
+- Average additional spend per member per year: €100
+- Contribution margin on that additional spend: 60%
+- Annual retention: 80%. Cost of capital: 15%
+
+. . .
+
+$m = 300 + 0.6 \times 100 = 360$
+
+. . .
+
+| Horizon | CLV |
+|---|---|
+| $T=1$ | €360 |
+| $T=2$ | $360 + \frac{360 \times 0.8}{1.15} =$ €610 |
+| $T=3$ | $360\left(1 + \frac{0.8}{1.15} + \frac{0.64}{1.3225}\right) =$ €785 |
+
+. . .
+
+Notice how quickly it asymptotes. **Extending the horizon adds less than people
+expect**, and adds prediction error faster than it adds value.
+
+## The Horizon Is a Judgement Call
+
+$T$ is conventionally set to three years, for no better reason than convention.
+
+. . .
+
+Amazon has long argued that a seven-year horizon lets it justify investments
+competitors cannot match. That is a real strategic advantage and it comes
+entirely from a choice of $T$.
+
+. . .
+
+**The horizon, the retention rate and the discount rate are all assumptions.**
+Change any one and the answer moves. Report the three, and report the answer at
+two horizons.
+
+::: {.callout-note appearance="minimal"}
+A longer horizon makes more marketing spend look justified. Who in an
+organisation benefits from choosing a longer $T$, and who checks?
+:::
+
+## Using CLV to Decide
+
+A campaign is worth running if $\text{CAC} < \text{CLV}$, with two caveats
+attached.
+
+. . .
+
+**The tennis club and the billboard.** €20,000 for a billboard seen by 100,000
+people, expected conversion 0.1%.
+
+. . .
+
+Customers acquired: $100{,}000 \times 0.001 = 100$.
+
+CAC = $20{,}000 / 100 =$ **€200**.
+
+. . .
+
+Below the one-year CLV of €360. On paper, a clear yes.
+
+## The Two Caveats
+
+**One.** The rule holds only if the newly acquired customers have CLV at least
+equal to the existing average. Cheaply acquired customers usually do not: the
+people a discount brings in are the people a discount brings in.
+
+. . .
+
+**Two.** Nobody believes the 0.1%. So firms impose a **fudge factor**, requiring
+$\text{CLV} > f \times \text{CAC}$ with $f$ typically 3 or 7.
+
+. . .
+
+The 3:1 rule of thumb you will read on marketing blogs **is that fudge factor**,
+detached from its reasoning and presented as a law. It is a speed bump against
+optimistic conversion forecasts, not a target to hit.
+
+::: {.callout-note appearance="minimal"}
+How confident are you in a 0.1% conversion prediction for a billboard? Can you
+get your money back if it underperforms? Are there better uses of €20,000? Those
+three questions are what the fudge factor is standing in for.
+:::
+
+## Payback Period
+
+Often more useful than the ratio, because it is about **cash** rather than
+theory.
+
+. . .
+
+"We recover CAC in four months" is a statement a finance director can act on.
+"Our LTV:CAC is 3.2" requires them to accept your retention assumption, your
+horizon and your discount rate first.
+
+. . .
+
+At a payback of 18 months, a growing company runs out of money while being
+profitable on paper. This is the most common way a well-measured business dies.
+
+## CLV Cautions
+
+- **Identity is mismeasured.** Can you link the same person across two cards,
+  two devices, two email addresses? Every failure to link splits one loyal
+  customer into two churned ones and destroys your retention estimate
+- **CLV is predictive, not prescriptive.** It contains no model of *why* anyone
+  buys. It cannot tell you what to change
+- **It can be self-fulfilling.** Treat a customer as low value, give them a worse
+  experience, and watch them behave like a low-value customer
+
+. . .
+
+The guiding principle: **using CLV to create more value for the customer
+benefits everyone. Using it purely to extract margin sets your interests against
+theirs**, and customers eventually notice.
+
+## Firing Customers
+
+In the 2000s consultancies published claims that 20 to 30% of customers were
+unprofitable, and firing them sounded free.
+
+. . .
+
+Firms tried it: paying cardholders to close accounts, quietly withdrawing
+promotions, minimum balances and fees designed to drive accounts away,
+suspending frequent returners.
+
+. . .
+
+Concentration can be extreme. In published work on online gambling, roughly 3%
+of customers generated half of net revenue, and the top 5% of winners cost
+operators around a fifth of it.
+
+. . .
+
+**Customers talk to each other.** The better move is usually to redesign the
+offer and the pricing so unprofitable customers either become profitable or
+select themselves out, rather than being shown the door.
+
+# 4. Return
+
+## ROAS
+
+$$\text{ROAS} = \frac{\text{revenue attributed to ads}}{\text{ad spend}}$$
+
+Simple, universal, comparable across campaigns, and misleading in three separate
+ways at once.
+
+## Why ROAS Is Not Profit
+
+<!-- Speaker notes: a 4x ROAS on a product with a 20% margin is a loss. This
+     single point is the most commercially useful thing in the lecture. Make
+     them compute it rather than showing them. -->
+
+A campaign returns **4x ROAS**. €10,000 spend, €40,000 revenue. Everyone is
+delighted.
+
+. . .
+
+The product carries a **20% contribution margin**.
+
+. . .
+
+Gross contribution: $40{,}000 \times 0.20 = €8{,}000$.
+
+Media cost: €10,000.
+
+. . .
+
+**Result: a loss of €2,000.** The break-even ROAS on a 20% margin is 5x, and
+nobody in the room knew it.
+
+::: {.callout-note appearance="minimal"}
+Break-even ROAS is $1/\text{margin}$. What is yours? If you do not know your
+contribution margin, what exactly does your ROAS target mean?
+:::
+
+## Contribution Margin
+
+$$\text{Contribution} = \text{revenue} - \text{variable costs} - \text{media}$$
+
+. . .
+
+Revenue minus the costs that scale with the sale: goods, payment fees, delivery,
+returns, support. Then media.
+
+. . .
+
+**This is the number a CFO recognises**, and translating your ROAS into it is the
+single most useful thing you can do to be taken seriously outside the marketing
+function.
+
+## Incrementality
+
+A brand-search campaign reports 12x ROAS. It bids on your own company name.
+
+. . .
+
+Most of those people were going to arrive anyway. The campaign is charging you
+for traffic you already had.
+
+. . .
+
+**Incrementality asks the only question that matters**: what would have happened
+if we had not run this? ROAS cannot answer it, attribution models cannot answer
+it, and Lectures 18 and 19 are about the two ways to try.
+
+# 5. Gaming
+
+## Every Metric Becomes a Target {.smaller}
+
+Goodhart's law: when a measure becomes a target, it stops being a good measure.
+
+In marketing, specifically:
+
+- **Bidding on your own brand terms**, which buys traffic you had, at excellent
+  reported ROAS
+- **Retargeting cart abandoners** and claiming the sale they were going to
+  complete
+- **Counting assisted conversions** in every channel that touched them, so the
+  channel totals exceed the actual conversions
+- **Moving the attribution window** until the number improves
+- **Redefining "new customer"** near the end of the quarter
+
+. . .
+
+None of these requires dishonesty. Each is a defensible choice made repeatedly
+in the same direction.
+
+::: {.callout-note appearance="minimal"}
+Which of these could you do to your own portfolio, honestly, and improve every
+number in your final report? Is there a check that would catch it?
+:::
+
+## Exercise {background="#43464B"}
+
+For a business of your choice, or your portfolio:
+
+1. Calculate CAC and CLV with every assumption written down
+2. Compute CLV at $T=1$ and $T=3$ and say how much the horizon is worth
+3. Compute ROAS, then break-even ROAS, then contribution for the same campaign
+4. Identify the assumption your conclusion is most sensitive to
+5. Describe how someone could make this campaign look excellent while losing
+   money
+
+**25 minutes**
+
+# 6. AI as Devil's Advocate
+
+## AI This Block: An analyst you interrogate
+
+Where we are on the module's AI spine, introduced in Lecture 10:
+
+> **An analyst you interrogate**
+
+## The Block 4 Step on the Spine
+
+From here on, the useful prompt is not "do this" but **"tell me why I am
+wrong"**.
+
+> "I am reporting a 4.2x ROAS on this campaign and recommending we increase
+> spend. Argue against that recommendation. Assume I have not thought about
+> margin, incrementality or the quality of the customers this channel acquires."
+
+. . .
+
+Naming the objections you have already considered forces it past the obvious
+three and into the ones you have not.
+
+## Why This Works
+
+The standard objections to a marketing metric are **well documented**, which
+means a broadly-read assistant reproduces them reliably and quickly.
+
+. . .
+
+What it cannot know is which objection applies to **your** numbers: your margin,
+your channel mix, your customers, your data.
+
+. . .
+
+**You supply the context, it supplies the checklist.** That division of labour is
+the whole of block 4.
+
+## Where It Will Be Confidently Wrong
+
+- It will accept your CAC definition without asking what is in the numerator
+- It will quote the 3:1 LTV:CAC rule as though it were a finding rather than a
+  fudge factor
+- It will not notice that your retention rate came from 12 users
+- It will produce a beautifully argued case against a number you typed in wrong
+
+::: {.callout-note appearance="minimal"}
+It will argue whichever side you ask it to, with equal fluency. What does that
+tell you about how much weight its agreement should carry?
+:::
+
+## Exercise {background="#43464B"}
+
+1. Compute CAC, CLV and ROAS for a campaign
+2. Ask an assistant to argue that your conclusion is wrong
+3. Identify which of its objections actually applies to your numbers, and which
+   are generic
+4. Recompute with the applicable objection addressed
+5. Then ask it to argue the **opposite** case and notice how good that one also
+   sounds
+
+**15 minutes**
+
+## Going Further
+
+- Einav, Klenow, Klopack, Levin, Levin and Best (2021), *Customers and Retail
+  Growth* (NBER 29561) — the decomposition and the customer-count result
+- Farris, Bendle, Pfeifer and Reibstein, *Marketing Metrics* — the reference
+  work; read the chapters on CLV and on margin
+- Gupta and Lehmann, *Managing Customers as Investments* — CLV as an asset
+- MIT Sloan Management Review (2024), *Firing the Right Customers Is Good
+  Business*
+
+## Next Lecture
+
+Where the traffic you paid for actually goes: funnel and conversion analysis.
+
+**Prepare**: bring your contribution margin, or the reason you cannot get it.

@@ -1,0 +1,43 @@
+/*-- scss:rules --*/
+
+// Rules required by the LLM material adapted from
+// avvorstenbosch/Masterclass-LLMs-for-Data-Science (style.scss).
+// Only the classes lecture_01 actually uses are reproduced here, so the
+// metropolis theme is otherwise untouched.
+
+// Full-bleed background-image slides: fit the whole image on screen.
+.full-bg-slide .slide-background-content {
+	background-size: 100% auto !important;
+	background-repeat: no-repeat;
+	background-position: center center !important;
+}
+
+// Fragments laid out side by side rather than stacked.
+.inline-fragment {
+	display: flex;
+}
+
+.inline-fragment p {
+	padding-right: 10px;
+	padding-left: 10px;
+	padding-top: 4px;
+}
+
+// The embedded ChatGPT transcript iframe.
+.iframe-chatgpt {
+	height: 650px;
+	width: 500px;
+	border: 0;
+	background-color: antiquewhite;
+	border-radius: 12px;
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+}
+
+// Inline accent used throughout the LLM and agentic AI slides.
+.highlighted-text {
+	color: #f7c420;
+	font-weight: bold;
+	padding: 2px 5px;
+}

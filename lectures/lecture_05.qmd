@@ -1,0 +1,352 @@
+---
+title: "Lecture 5: Tableau I - Connecting to the Data"
+subtitle: STA1000 - Data Analytics and Metrics
+---
+
+## Previously ...
+
+- You have a live site
+- It emits events with parameters
+- You have a consent banner and a statement of success
+
+Now we look at what has actually arrived.
+
+## Learning Outcomes
+
+By the end of this lecture you will be able to:
+
+- Export GA4 data in a form Tableau can consume
+- State the **grain** of a table before you build anything on it
+- Distinguish dimensions from measures, and say why the distinction is not cosmetic
+- Interrogate the **provenance** of a dataset you did not collect yourself
+
+# 1. Before the Tool: Provenance
+
+## Where Did This Table Come From?
+
+**Provenance** describes the people, systems and decisions involved in
+producing, transforming and sharing a dataset.
+
+. . .
+
+It determines quality, reliability and trustworthiness. It is also the part of
+an analysis nobody puts on a slide.
+
+. . .
+
+**Treat every provenance claim as a hypothesis to be verified in the data**, not
+as documentation to be trusted. Sometimes the documentation is a marketing
+document.
+
+::: {.callout-note appearance="minimal"}
+You wrote the measurement plan for your own site three weeks ago. Can you still
+say, without checking, what your `key_event` counts include?
+:::
+
+## GIGO
+
+Garbage In, Garbage Out. The oldest principle in analytics and still the one
+that costs the most.
+
+. . .
+
+Your advantage in this module is unusual: **you are your own data source.** You
+can answer provenance questions about your site that no analyst can answer about
+a client's.
+
+. . .
+
+Use it. By Lecture 15 you will be documenting cleaning decisions, and the
+students who know their own tagging history will finish that lecture in twenty
+minutes.
+
+## When Is Zero Not Zero?
+
+<!-- Speaker notes: this is the single most useful habit to install early. Take
+     the crime-map example if they need something outside marketing: a map of
+     police reports shows almost nothing on the university campus, because
+     campus crime is reported to a different force. The blank area is not
+     safety, it is a reporting boundary. -->
+
+Three different things arrive in your export looking identical:
+
+:::: {.columns}
+::: {.column width="30%"}
+**A true zero**
+
+Nobody converted on Tuesday.
+:::
+::: {.column width="30%"}
+**A missing value**
+
+The tag did not fire on Tuesday.
+:::
+::: {.column width="30%"}
+**A boundary**
+
+Tuesday's visitors declined consent.
+:::
+::::
+
+. . .
+
+Tableau will happily plot all three as a point at zero.
+
+::: {.callout-note appearance="minimal"}
+Which of the three would you be most likely to miss on your own site? What check
+would catch it?
+:::
+
+# 2. Getting Data Out of GA4
+
+## Three Routes Out {.smaller}
+
+| Route | Live? | Effort | Ceiling |
+|---|---|---|---|
+| Report export to CSV | No, a snapshot | Minutes | Thresholding, sampling, aggregated fields only |
+| Looker Studio connector | Yes | Low | Not Tableau, and not our tool |
+| BigQuery export | Yes, event-level | An afternoon of setup | Effectively none, free tier is ample |
+
+. . .
+
+**Our default is the CSV export**, because it is the one you can repeat weekly
+without help. We name BigQuery so you know the ceiling you are working under,
+and so you can say the word in an interview.
+
+::: {.callout-note appearance="minimal"}
+The CSV route gives you rows GA4 has already aggregated. BigQuery gives you one
+row per event. Which questions can only be asked at the second grain?
+:::
+
+## Data Thresholding
+
+GA4 withholds rows when the numbers are small enough to identify someone,
+particularly when Google Signals is on.
+
+. . .
+
+The rows do not appear with a warning. They simply are not there, and your
+totals will not reconcile.
+
+. . .
+
+**On a portfolio site with 40 sessions a week, this is not an edge case.** It is
+the normal case. Check the data-quality icon on every report you export.
+
+## The Export You Will Use {.smaller}
+
+Reports → Acquisition → Traffic acquisition, then Share → Download CSV.
+
+Set before exporting:
+
+1. **Date range**: from your site's first tagged day to yesterday. Not "last 28
+   days", which will silently change meaning every week you re-export.
+2. **Dimensions**: session source / medium, session campaign, device category,
+   country, landing page.
+3. **Metrics**: sessions, engaged sessions, average engagement time, key events,
+   session key event rate.
+4. **Rows**: raise the row limit. The default truncates and does not tell you.
+
+. . .
+
+Save every export with the date you pulled it in the filename. You will re-pull,
+and you will need to know which is which.
+
+# 3. Grain, Dimensions and Measures
+
+## Say the Grain Out Loud
+
+**The grain is what one row is.** Before any chart, finish this sentence: "one
+row in this table is one ______".
+
+. . .
+
+GA4 gives you at least three grains, and mixes them freely in the interface:
+
+- **User level**: one row per person (as far as a cookie can tell)
+- **Session level**: one row per visit
+- **Event level**: one row per thing that happened
+
+. . .
+
+Nearly every wrong number in a marketing dashboard is a metric from one grain
+divided by a metric from another.
+
+::: {.callout-note appearance="minimal"}
+"Conversion rate" is a ratio. Name three different numbers that phrase could
+mean on your own site, depending on the grain of the numerator and denominator.
+:::
+
+## Dimensions versus Measures {.smaller}
+
+:::: {.columns}
+::: {.column width="45%"}
+**Dimension**
+
+Slices. Blue in Tableau.
+
+Answers "for which group?"
+
+`sessionSource`, `deviceCategory`, `country`, `landingPage`
+:::
+::: {.column width="45%"}
+**Measure**
+
+Aggregates. Green in Tableau.
+
+Answers "how much?"
+
+`sessions`, `keyEvents`, `engagedSessions`
+:::
+::::
+
+. . .
+
+Tableau guesses when it connects. It guesses from the data type, so a postcode
+becomes a measure and Tableau offers you the average postcode.
+
+## The Fields That Are Already Aggregated {.smaller}
+
+| GA4 field | Tableau's guess | What it actually is |
+|---|---|---|
+| `sessions` | Measure | A count. Safe to sum |
+| `keyEvents` | Measure | A count. Safe to sum |
+| `averageSessionDuration` | Measure | **Already a mean.** Never sum, never average |
+| `sessionKeyEventRate` | Measure | **Already a ratio.** Never average |
+| `deviceCategory` | Dimension | Correct |
+
+. . .
+
+**You cannot average an average.** Averaging the mean session duration of mobile
+and desktop gives every device equal weight regardless of how many sessions each
+had.
+
+## The Trap, With Numbers {.smaller}
+
+:::: {.columns}
+::: {.column width="45%"}
+| Device | Sessions | Mean duration |
+|---|---|---|
+| Mobile | 900 | 30s |
+| Desktop | 100 | 300s |
+:::
+::: {.column width="45%"}
+**Averaging the averages**
+
+(30 + 300) / 2 = **165s**
+
+**The true mean**
+
+(900×30 + 100×300) / 1000 = **57s**
+:::
+::::
+
+. . .
+
+A factor of three, from one plausible-looking drag and drop.
+
+::: {.callout-note appearance="minimal"}
+The fix is to export a numerator and a denominator and divide them in Tableau,
+never to export the ratio. What does that mean for the export you set up in
+part 2?
+:::
+
+<!-- Speaker notes: this slide is the whole point of the lecture. If they take
+     one thing away, it is "export counts, not rates". Lecture 6 then attacks
+     the mean itself. -->
+
+# 4. First Views
+
+## Live Demo {background="#43464B"}
+
+1. Connect to the CSV. Watch Tableau assign blue and green, and fix two of them
+2. Sessions over time, week not day, so the shape is visible at portfolio volume
+3. Break by channel. Note the long tail
+4. Break by device. Add the session count as a label next to every rate
+5. Break by landing page, and find a page nobody has ever landed on
+
+## Exercise {background="#43464B"}
+
+Connect Tableau to your own export and build:
+
+1. Sessions over time
+2. Sessions by device category, **with counts shown beside every rate**
+3. Sessions by source / medium
+4. State the grain of your table in one sentence, written down
+5. One view that surprised you, with a sentence saying why
+
+**25 minutes**
+
+# 5. AI for Getting Data Out
+
+## AI This Block: Chat with context
+
+Where we are on the module's AI spine, set out in Lecture 1 and named properly
+in Lecture 10:
+
+> **Chat with context**
+
+## Attach the Export, Not a Description of It
+
+This block's step on the AI spine: **stop describing your data and start
+attaching it.**
+
+. . .
+
+A description of your data is your model of your data. Attaching the file
+removes your model from the loop, which is the point, because your model is what
+you are trying to check.
+
+## A Prompt Worth Reusing
+
+> "Here are the first 20 rows of a GA4 export [attached]. Tell me the grain of
+> this table, which columns are dimensions and which are measures, and which
+> measures are already averages or rates that I must not aggregate again."
+
+. . .
+
+Then the follow-up that does the real work:
+
+> "Which of the columns you just called measures would give a wrong answer if I
+> summed it, and what should I export instead?"
+
+## Where It Will Be Wrong
+
+- It will not know your thresholding. It sees rows, not the rows that were
+  withheld
+- It will read `sessionKeyEventRate` correctly and `conversion_rate_v2`, which
+  you named yourself, however it likes
+- It will infer the grain from the columns. If your export mixes grains, it will
+  confidently pick one
+
+::: {.callout-note appearance="minimal"}
+Verification here is not reading its answer and nodding. It is checking one
+column against the GA4 reference, and one row against your own site. Which row
+would you check?
+:::
+
+## Exercise {background="#43464B"}
+
+1. Attach your export and run the prompt above
+2. Check its answer against the GA4 dimension and metric reference
+3. Note any column it misclassified, and whether the misclassification would
+   have changed a number
+4. Ask it what is missing from the export that you would need to compute
+   conversion rate correctly
+
+**10 minutes**
+
+## Going Further
+
+- Google, *GA4 Dimensions and metrics reference* — the authority on which fields
+  are already aggregated
+- Google, *Data thresholding in GA4* — read this before you reconcile totals
+- *Analytics Academy: Digital Analytics Fundamentals* — the in-class test is
+  based on this, and lectures 3 to 5 cover its ground
+
+## Next Lecture
+
+Your first views contain averages. Next lecture we ask whether any of them mean
+anything.
+
+**Prepare**: bring your export and the mean and median of one metric on it.

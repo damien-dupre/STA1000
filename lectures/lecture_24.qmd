@@ -1,0 +1,121 @@
+---
+title: "Lecture 24: Presentation and Synthesis"
+subtitle: STA1000 - Data Analytics and Metrics
+---
+
+## The Whole Module in One Slide
+
+TODO: the arc. Build a thing, measure it, describe it, analyse it, value it,
+frame it, present it.
+
+- **Lectures 1-4**: you caused the data to exist
+- **Lectures 5-9**: you learned to see it
+- **Lectures 11-15**: you learned to compute with it, and to distrust it
+- **Lectures 16-20**: you learned what it is worth and what it proves
+- **Lectures 21-23**: you learned to put it in front of someone who pays
+
+## Learning Outcomes
+
+By the end of this lecture you will be able to:
+
+- Present an analytics finding to a non-technical audience
+- Defend your methodology under questioning
+- Reflect on the limits of your own analysis
+
+# 1. Presenting
+
+## The Structure
+
+TODO: finding first, then evidence, then method, then caveats. The opposite of
+the order you did the work in.
+
+## Ten Minutes, Three Points
+
+TODO: what a client remembers.
+
+## Presenting Uncertainty
+
+TODO: how to say "we do not know" without losing the room. Ranges, not points.
+
+## Anticipating the Hard Question
+
+TODO: rehearse the three questions you least want to be asked.
+
+# 2. Assessment Briefing
+
+## The Portfolio Deliverable
+
+TODO: components, weighting, deadline, submission format.
+
+## The Marking Criteria
+
+TODO: rubric walk-through. Emphasise that documented judgement scores above
+undocumented certainty.
+
+# 3. Presentations
+
+## Student Presentations {background="#43464B"}
+
+TODO: schedule, 10 minutes plus 5 for questions.
+
+Peer feedback prompt for each presentation:
+
+1. What was the single finding?
+2. What evidence supported it?
+3. What was the biggest unstated assumption?
+
+# Synthesis
+
+## What This Module Was Actually About
+
+TODO: not GA4, not Tableau, not Python. All three will change. The transferable
+skill is deciding what is worth measuring and being honest about what the
+measurement can support.
+
+# AI and What You Submit
+
+## Disclosure, One More Time
+
+TODO: restate and enforce.
+
+Every submission carries three sentences:
+
+1. Which tools you used
+2. What you used them for
+3. What you changed after checking
+
+. . .
+
+Nobody loses marks for using AI. People lose marks for numbers they cannot
+defend.
+
+## The Question You Will Be Asked
+
+TODO: rehearse it.
+
+> "How do you know that is right?"
+
+. . .
+
+Acceptable answers name a check: a figure reconciled against GA4, a hand-computed
+case, a row count that did not change.
+
+. . .
+
+Unacceptable answers name a tool.
+
+## What Actually Transfers
+
+TODO: close the loop opened in Lecture 10.
+
+The tools in this module will all change. GA4 will be replaced, Tableau will be
+replaced, and the assistants will get better every few months.
+
+. . .
+
+**What does not change is the ability to say why a number is trustworthy.** That
+was the module.
+
+## Where to Go Next
+
+TODO: certifications, further modules, reading, and the datasets to practise on.

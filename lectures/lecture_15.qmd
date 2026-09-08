@@ -1,0 +1,120 @@
+---
+title: "Lecture 15: Cleaning and the Audit Trail"
+subtitle: STA1000 - Data Analytics and Metrics
+---
+
+## Previously ...
+
+Four lectures of analysis. All of it assumed the data was real.
+
+## Learning Outcomes
+
+By the end of this lecture you will be able to:
+
+- Identify bot traffic, self-referrals and spam in a GA4 property
+- Apply exclusions without destroying the record of what you excluded
+- Document the judgement calls behind a cleaned dataset
+
+# 1. What Contaminates Marketing Data
+
+## Bots and Crawlers
+
+TODO: GA4's known-bot filtering and what it misses. Signatures: zero duration,
+single page, odd hours, one hostname.
+
+## Self-Referrals
+
+TODO: your own domain appearing as a source. Cause and fix.
+
+## Internal Traffic
+
+TODO: you reloading your own site 40 times while building it. This will be in
+every student's data.
+
+## Referral Spam and Ghost Traffic
+
+TODO: hostname filtering as the durable defence.
+
+## Development and Test Events
+
+TODO: events fired while you were testing your tags in Lecture 3.
+
+# 2. Cleaning Without Lying
+
+## The Cardinal Rule
+
+<!-- Speaker notes: the difference between cleaning and fabrication is the
+     audit trail, not the operation. -->
+
+TODO: never modify the raw export. Every exclusion is a documented step in a
+script that runs from raw to clean.
+
+## The Cleaning Log
+
+TODO: a template table: rule, rationale, rows removed, date applied, decided by.
+
+| Rule | Rationale | Rows removed | Applied |
+|---|---|---|---|
+| Exclude `hostname != mysite.com` | Ghost spam | 412 | 2026-01-14 |
+| Exclude sessions before launch date | Test events | 87 | 2026-01-14 |
+
+## Reproducible Cleaning
+
+TODO: raw -> script -> clean, versioned. The Quarto/notebook habit from BAA1030.
+
+## Judgement Calls Are Not Errors
+
+TODO: reasonable analysts will disagree on outlier handling. What is not
+acceptable is that the reader cannot tell what you did.
+
+# 3. Practice
+
+## Exercise {background="#43464B"}
+
+On your own property:
+
+1. Configure internal traffic filtering and a hostname filter
+2. Write a cleaning script from raw export to clean dataset
+3. Produce a cleaning log with at least four documented rules
+4. Report your key metric before and after cleaning, and explain the gap
+
+**30 minutes**
+
+# 4. AI and the Audit Trail
+
+## AI This Block: Agentic coding
+
+Where we are on the module's AI spine, introduced in Lecture 10:
+
+> **Agentic coding**
+
+## AI-Written Steps Are Still Your Steps
+
+TODO: the cleaning log does not care who wrote the rule. Every exclusion needs a
+rationale you can defend.
+
+## The Extra Column
+
+TODO: add one column to the Lecture 15 cleaning log template.
+
+| Rule | Rationale | Rows removed | Applied | Source |
+|---|---|---|---|---|
+| Exclude hostname != mysite.com | Ghost spam | 412 | 2026-01-14 | Written by me |
+| Exclude sessions < 1s | Bot signature | 88 | 2026-01-14 | Agent-suggested, verified |
+
+## The Rule
+
+TODO: expand. An agent may **propose** an exclusion. Only you may **accept** one,
+and acceptance means you can say why in one sentence.
+
+## Exercise {background="#43464B"}
+
+1. Ask an agent to propose cleaning rules for your export
+2. Accept the ones you can justify, reject the rest
+3. Record the rejected ones and your reason, which is also part of the trail
+
+**15 minutes**
+
+## Next Lecture
+
+Block 4: the metrics a marketing decision actually turns on.

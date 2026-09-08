@@ -1,0 +1,119 @@
+---
+title: "Lecture 21: Marketing Performance Measurement Frameworks"
+subtitle: STA1000 - Data Analytics and Metrics
+---
+
+## Previously ...
+
+Four blocks of individual metrics. A board does not want a list of metrics.
+It wants a structure.
+
+## Learning Outcomes
+
+By the end of this lecture you will be able to:
+
+- Describe the Balanced Scorecard and its marketing application
+- Compare it to later frameworks (OKR, North Star, the marketing funnel scorecard)
+- Select and defend a framework for a given organisation
+
+# 1. Why a Framework
+
+## The Metric Sprawl Problem
+
+TODO: a GA4 property exposes hundreds of metrics. Without a structure, the
+report becomes a data dump and the client picks the flattering number.
+
+## What a Framework Does
+
+TODO: selects, hierarchies, connects the metric to a stated objective, and
+forces trade-offs to be visible.
+
+# 2. The Balanced Scorecard
+
+## Kaplan and Norton
+
+TODO: origin, the argument against purely financial measurement.
+
+## The Four Perspectives
+
+TODO: expand each with a marketing metric.
+
+| Perspective | Question | Marketing metric |
+|---|---|---|
+| Financial | How do we look to shareholders? | Contribution, ROAS |
+| Customer | How do customers see us? | NPS, retention, share of wallet |
+| Internal process | What must we excel at? | Campaign cycle time, lead response |
+| Learning and growth | Can we keep improving? | Test velocity, skills, data quality |
+
+## Strategy Maps
+
+TODO: causal chains between perspectives. Learning drives process drives
+customer drives financial.
+
+## Criticisms
+
+TODO: static, top-down, slow to update, treats causality as assumed.
+
+# 3. Successors
+
+## OKRs
+
+TODO: objective plus key results. Faster cadence, more focus, weaker on
+trade-offs.
+
+## The North Star Metric
+
+TODO: one number, and the input metrics beneath it. Attractive and dangerous.
+
+## Marketing-Specific Scorecards
+
+TODO: funnel-stage scorecards, the Marketing Accountability Standards Board
+line of work, brand plus performance dashboards.
+
+## Choosing
+
+TODO: a decision aid. Organisation size, cadence, data maturity, who reads it.
+
+## Exercise {background="#43464B"}
+
+For your portfolio, or a company you know:
+
+1. Build a four-perspective scorecard with two metrics per perspective
+2. Draw the strategy map linking them
+3. Identify which links are assumed rather than measured
+4. Say which framework you would actually recommend, and why
+
+**25 minutes**
+
+# 4. AI for Framework Selection
+
+## AI This Block: A producer
+
+Where we are on the module's AI spine, introduced in Lecture 10:
+
+> **A producer**
+
+## Comparing Frameworks Is a Reading Task
+
+TODO: this is well-documented territory and assistants handle it well.
+
+> "Compare the Balanced Scorecard and OKRs for a 12-person Irish e-commerce
+> business with one marketing hire. Which fits and why?"
+
+## Where to Be Careful
+
+TODO: expand. It will produce a fluent answer for any framework you name,
+including ones that do not fit. Ask it to argue for the option it rejected.
+
+## Exercise {background="#43464B"}
+
+1. Describe an organisation and ask for a framework recommendation
+2. Ask it to argue the opposite case
+3. Decide yourself, and write the sentence that justifies it
+
+**15 minutes**
+
+## Next Lecture
+
+The perspective every framework has and every dashboard forgets:
+sustainability and non-financial performance.

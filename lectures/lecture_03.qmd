@@ -1,0 +1,425 @@
+---
+title: "Lecture 3: Measurement Plan and Implementation"
+subtitle: STA1000 - Data Analytics and Metrics
+---
+
+## Previously ...
+
+You have:
+
+- A site, or nearly one
+- A statement of what success would look like
+
+. . .
+
+Today we turn that sentence into machinery: a measurement plan, a GA4 property,
+events, key events and UTM tags.
+
+. . .
+
+**By the end of today your site will be recording data.**
+
+## Learning Outcomes
+
+By the end of this lecture you will be able to:
+
+- Write a measurement plan that connects an objective to a recorded event
+- Create and configure a GA4 property
+- Define custom events with parameters, and mark key events
+- Tag inbound links with UTM parameters consistently
+
+# 1. The Measurement Plan
+
+## Plan Before Tag
+
+The most common failure in marketing analytics is tagging first.
+
+. . .
+
+You end up with 200 events, no idea which matter, and a report nobody reads.
+
+. . .
+
+**The measurement plan is one page. It is written before you touch GA4.**
+
+## The Structure
+
+Each row goes: objective, question, metric, event, parameter.
+
+| Objective | Question | Metric | Event | Parameters |
+|---|---|---|---|---|
+| Get enquiries | Are people contacting me? | Enquiries / week | `generate_lead` | `form_location` |
+| Show work | Is anyone reading case studies? | Engaged reads | `read_case_study` | `case_id`, `scroll_pct` |
+| Reach | Where do visitors come from? | Sessions by channel | (automatic) | `source`, `medium` |
+
+## Working Backwards
+
+The plan is written right to left in practice:
+
+. . .
+
+1. Start with the **decision** you want to support
+2. State the **question** that decision turns on
+3. Choose the **metric** that answers it
+4. Identify the **event** that produces the metric
+5. List the **parameters** you need to slice it
+
+. . .
+
+If you cannot get from a proposed event back to a decision, do not implement it.
+
+## Objectives Are Not Metrics
+
+:::: {.columns}
+::: {.column width="45%"}
+**Not an objective**
+
+- "Increase engagement"
+- "Improve the funnel"
+- "Grow the brand"
+
+These cannot be recorded, so they cannot be tested.
+:::
+::: {.column width="45%"}
+**An objective**
+
+- "Get 5 enquiries a month from the contact form"
+- "Have half of case study visitors reach the bottom of the page"
+
+These name an action, a count and a period.
+:::
+::::
+
+## Exercise {background="#43464B"}
+
+Write the first three rows of your own measurement plan.
+
+Use the four answers you brought from Lecture 1:
+
+- What the site is for
+- Who visits
+- What action counts as a win
+- What number tells you it works
+
+One row per objective. Do not write more than four rows.
+
+**10 minutes**
+
+# 2. Setting Up GA4
+
+## The Object Model
+
+GA4's hierarchy, which is not the same as Universal Analytics:
+
+```
+Account
+└── Property          <- your site lives here
+    └── Data stream   <- one per platform (web, iOS, Android)
+        └── Events    <- everything GA4 records is an event
+```
+
+. . .
+
+There are no "goals" and no "views". There are events, and some events are
+marked as key events.
+
+## Creating the Property
+
+Walk through, live:
+
+1. `analytics.google.com` → Admin → Create property
+2. Property name, **reporting time zone (Dublin)**, currency (EUR)
+3. Business details, objectives
+4. Create a **Web** data stream with your site URL
+5. Copy the measurement ID: `G-XXXXXXXXXX`
+
+. . .
+
+**Set the time zone correctly now.** Changing it later does not restate
+historical data, and your weekly cohorts in Lecture 13 will be wrong.
+
+## Installing the Tag
+
+The Google tag goes in `<head>`, on every page.
+
+```{.html}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
+```
+
+. . .
+
+In Quarto, this goes in `_quarto.yml` under `format: html: include-in-header`,
+so it is applied to every page from one place.
+
+## Verifying It
+
+Do not assume it worked.
+
+. . .
+
+- **Realtime report**: load your own site, see yourself appear
+- **DebugView**: install the GA Debugger extension, watch individual events
+- **Tag Assistant**: confirms the tag fires and reports its configuration
+
+. . .
+
+**A tag that fires on the homepage but not on the contact page is the single
+most common cause of a "broken funnel" in Lecture 17.** Check every page.
+
+# 3. Events and Parameters
+
+## Automatic Events
+
+GA4 collects some events without configuration:
+
+- `page_view`
+- `session_start`, `first_visit`
+- `scroll` (90% depth)
+- `click` (outbound links)
+- `file_download`
+- `video_start`, `video_progress`, `video_complete`
+
+. . .
+
+Enhanced measurement covers most of these. **Check which are on** in your data
+stream settings, because they are the ones you get for free.
+
+## Custom Events
+
+For anything specific to your site, you send your own:
+
+```{.html}
+<button onclick="gtag('event', 'generate_lead', {
+    'form_location': 'contact_page',
+    'enquiry_type': 'freelance'
+});">Send enquiry</button>
+```
+
+. . .
+
+The event name is a **verb**. The parameters are the **adjectives** that let you
+slice it later.
+
+## Naming Conventions
+
+Decide once, apply everywhere:
+
+:::: {.columns}
+::: {.column width="45%"}
+**Do**
+
+- `snake_case` throughout
+- Verb-object: `read_case_study`
+- Use GA4's recommended names where one fits (`generate_lead`, `sign_up`,
+  `purchase`)
+- Parameter names shared across events
+:::
+::: {.column width="45%"}
+**Do not**
+
+- `ContactFormSubmitted`
+- `contact-form-submit`
+- `button_click_1`
+- A different name for the same action on two pages
+:::
+::::
+
+. . .
+
+**You cannot rename an event retroactively.** Historical data keeps the old name.
+
+## Parameters and Custom Dimensions
+
+A parameter sent with an event is **not** automatically reportable.
+
+. . .
+
+To use `form_location` as a dimension in a report, register it:
+
+Admin → Custom definitions → Create custom dimension → Event-scoped →
+Parameter name `form_location`
+
+. . .
+
+Registration is **not retroactive** either. Register before you need it.
+
+## Key Events
+
+What used to be called conversions.
+
+. . .
+
+Admin → Events → toggle **Mark as key event** on the event that represents your
+objective.
+
+. . .
+
+Keep it to **one or two**. If everything is a key event, the conversion rate in
+every report becomes meaningless, and the funnel in Lecture 17 has no top.
+
+## Limits Worth Knowing
+
+- 500 distinct event names per property
+- 25 parameters per event
+- 50 event-scoped custom dimensions
+- Event names are case-sensitive: `Sign_Up` and `sign_up` are two events
+
+. . .
+
+These are generous. You will not hit them. The case sensitivity will catch you.
+
+# 4. UTM Parameters
+
+## The Problem UTMs Solve
+
+GA4 can see the referring domain. It cannot see:
+
+- Which newsletter the click came from
+- Which of your three LinkedIn posts
+- Whether a link was in the bio or in a comment
+
+. . .
+
+Unless you tell it, in the URL.
+
+## The Five Parameters
+
+| Parameter | Answers | Example |
+|---|---|---|
+| `utm_source` | Which platform? | `linkedin` |
+| `utm_medium` | Which type? | `social` |
+| `utm_campaign` | Which effort? | `portfolio_launch` |
+| `utm_content` | Which variant? | `bio_link` |
+| `utm_term` | Which keyword? | `data_analyst_dublin` |
+
+. . .
+
+Source, medium and campaign are the ones you will actually use.
+
+## A Tagged URL
+
+```
+https://mysite.ie/work/?utm_source=linkedin&utm_medium=social&utm_campaign=portfolio_launch&utm_content=bio_link
+```
+
+. . .
+
+Build these with the Campaign URL Builder rather than by hand:
+
+<https://ga-dev-tools.google/campaign-url-builder/>
+
+## Consistency Is the Whole Point
+
+UTM values are **case-sensitive and free text**. GA4 will happily report:
+
+```
+LinkedIn / Social
+linkedin / social
+Linkedin / social
+linkedin / Social
+```
+
+. . .
+
+as four separate channels.
+
+. . .
+
+**Write your conventions in a spreadsheet before your first campaign.** All
+lowercase, no spaces, a fixed vocabulary for medium. This spreadsheet is what
+you will join to in Lecture 12.
+
+## What Not to Tag
+
+<!-- Speaker notes: this is the classic self-referral mistake and it will
+     appear in student data if not pre-empted. -->
+
+**Never put UTM parameters on internal links.**
+
+. . .
+
+Tagging a link from your own homepage to your own contact page starts a new
+session and attributes it to yourself. Your acquisition report then says your
+best traffic source is your own site.
+
+. . .
+
+We will find the damage in Lecture 15.
+
+## Exercise {background="#43464B"}
+
+Complete your implementation:
+
+1. Install the tag and confirm it fires on **every** page in Realtime
+2. Implement at least two custom events with at least one parameter each
+3. Register those parameters as custom dimensions
+4. Mark one event as a key event
+5. Build three tagged URLs for wherever you will share the site, and write your
+   naming conventions into a spreadsheet
+
+**25 minutes, finish before next lecture**
+
+# 5. AI for the Measurement Plan
+
+## What to Delegate Here
+
+TODO: expand with a live demonstration.
+
+Safe and useful:
+
+- Generating the `gtag` snippet for a custom event with parameters
+- Reviewing your event names against GA4's recommended names
+- Turning your objective into candidate questions and metrics
+- Explaining what a GA4 setting does
+
+## What Not to Delegate
+
+**The objective.** An assistant will invent a plausible one, and you will spend
+the semester measuring something you do not care about.
+
+. . .
+
+**The decision about what counts as a key event.** That is a commercial
+judgement about your own site.
+
+. . .
+
+**Verification.** It cannot see your Realtime report. Only you can confirm the
+tag fires on every page.
+
+## A Prompt That Earns Its Place
+
+> "Here is my measurement plan [paste your table]. For each row, tell me whether
+> the event I have chosen can actually produce the metric I have named, and flag
+> any parameter I will need but have not listed."
+
+. . .
+
+This catches the most expensive error in the whole block: **an event that cannot
+answer the question it was created for**, discovered in Lecture 17 when your
+funnel has no middle.
+
+## Exercise {background="#43464B"}
+
+1. Run the prompt above on your own measurement plan
+2. Ask it to generate the `gtag` call for your key event
+3. Implement it, then verify in DebugView that the parameters arrive
+4. Note one thing it got wrong about GA4
+
+**15 minutes**
+
+## Next Lecture
+
+Your site is now recording data about people. We look at what that data actually
+is, who owns it, and what the law requires of you.
+
+. . .
+
+**The cookie banner is now your problem.**

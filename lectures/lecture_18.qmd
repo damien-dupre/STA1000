@@ -1,0 +1,386 @@
+---
+title: "Lecture 18: Attribution"
+subtitle: STA1000 - Data Analytics and Metrics
+---
+
+## Previously ...
+
+You can measure what a conversion is worth (Lecture 16) and where people drop
+off (Lecture 17).
+
+. . .
+
+One question remains, and it is the one that decides budgets:
+
+. . .
+
+> **Which touchpoint gets the credit?**
+
+## The Setup
+
+A visitor:
+
+1. Sees an Instagram post
+2. Two days later, searches your brand name and clicks the organic result
+3. A week later, clicks a paid search ad
+4. Converts
+
+. . .
+
+Four touchpoints. One conversion. **How do you split the credit?**
+
+. . .
+
+There is no correct answer. There are only models, and models are assumptions.
+
+## Learning Outcomes
+
+By the end of this lecture you will be able to:
+
+- Describe the main attribution models and what each assumes
+- Explain why models disagree, and by how much
+- Judge which model suits a given business
+- Distinguish attribution from incrementality
+
+# 1. Rule-Based Models
+
+## Last Click
+
+All credit to the final touchpoint before conversion.
+
+:::: {.columns}
+::: {.column width="45%"}
+**Why it survived**
+
+- Simple to compute
+- Requires no cross-session tracking
+- Auditable, reproducible, hard to game accidentally
+:::
+::: {.column width="45%"}
+**What it assumes**
+
+That nothing before the last click mattered.
+
+Which systematically over-credits brand search, retargeting and email, and
+under-credits everything at the top.
+:::
+::::
+
+. . .
+
+Still the default in most reporting, and still the model most budget decisions
+are quietly made on.
+
+## First Click
+
+All credit to the first touchpoint.
+
+. . .
+
+The mirror image: over-credits discovery, ignores everything that closed the sale.
+
+. . .
+
+Useful mainly as a **contrast case**. Running both first and last click and
+comparing is more informative than either alone.
+
+## Linear, Time Decay, Position Based
+
+:::: {.columns}
+::: {.column width="30%"}
+**Linear**
+
+Equal credit to all touchpoints.
+
+Assumes every contact mattered the same. At least it is neutral.
+:::
+::: {.column width="30%"}
+**Time decay**
+
+More credit the closer to conversion.
+
+Assumes recency equals influence. Reasonable for short cycles, wrong for long ones.
+:::
+::: {.column width="30%"}
+**Position based**
+
+40% first, 40% last, 20% split between.
+
+Assumes discovery and closing matter most. The 40/40/20 is arbitrary.
+:::
+::::
+
+. . .
+
+Notice that each of these encodes a **theory of how marketing works**, chosen
+before any data was seen.
+
+## The Honest Description
+
+A rule-based attribution model is a **budgeting convention**, not a measurement.
+
+. . .
+
+It divides credit according to a rule you picked. Changing the rule changes the
+answer without any change in the world.
+
+# 2. Data-Driven Attribution
+
+## What It Does
+
+GA4's default model. Rather than applying a fixed rule, it compares:
+
+- Conversion paths that **included** a touchpoint
+- Conversion paths that **did not**
+
+. . .
+
+and assigns credit in proportion to the estimated marginal contribution, using a
+Shapley-value style approach borrowed from cooperative game theory.
+
+## Why It Is Better
+
+- Credit is derived from your data, not from a rule
+- It can detect that a channel appears in many paths but changes few outcomes
+- It adapts as behaviour changes
+
+. . .
+
+It is, genuinely, a better answer to the question "which channels appear in
+paths that convert".
+
+## Why It Is Not the Answer
+
+<!-- Speaker notes: students will take DDA as the "correct" model because it is
+     the default and it sounds scientific. Push hard here. -->
+
+. . .
+
+**It is still correlational.** It compares paths that happened. It does not
+compare a world where you advertised to one where you did not.
+
+. . .
+
+**It is a black box.** You cannot audit it, reproduce it, or explain it to a
+client in detail.
+
+. . .
+
+**It needs volume.** GA4 requires substantial conversion data before DDA is
+available. Your portfolio will not qualify.
+
+. . .
+
+**It cannot see what it cannot track.** Which is the next section.
+
+## What No Model Can See
+
+- Touchpoints where consent was declined (Lecture 4)
+- Cross-device journeys with no login
+- Offline exposure: outdoor, print, radio, word of mouth
+- Views without clicks: the Instagram post they saw and never tapped
+- Anyone using a browser that blocks the tag
+
+. . .
+
+**Attribution models divide credit among the touchpoints you happened to
+record.** Everything else gets zero by construction.
+
+## What Sits Between the Ad and the Click {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_display_lumascape.png){fig-align="center" height="340px"}
+
+*The display advertising LUMAscape. Your attribution model sees the two ends
+of this and none of the middle.*
+
+
+# 3. Why the Models Disagree
+
+## A Worked Comparison
+
+Same 100 conversions, five models:
+
+| Channel | Last click | First click | Linear | Time decay | Data-driven |
+|---|---|---|---|---|---|
+| Paid search | 42 | 18 | 27 | 35 | 24 |
+| Organic search | 24 | 21 | 23 | 24 | 22 |
+| Social | 9 | 34 | 21 | 14 | 27 |
+| Email | 19 | 6 | 15 | 18 | 13 |
+| Direct | 6 | 21 | 14 | 9 | 14 |
+
+. . .
+
+**Social gets 9 conversions or 34, depending on which column you read.** Nothing
+about the world changed.
+
+## The Practical Consequence
+
+Whoever chooses the model chooses the budget.
+
+. . .
+
+This is why attribution arguments in agencies are rarely technical arguments.
+
+. . .
+
+The defensible position is not "my model is right". It is: **here is the range
+across models, here is why they differ, and here is the decision that is robust
+across all of them.**
+
+## Report the Range
+
+TODO: worked example of a decision that holds under every model, and one that
+flips.
+
+If cutting social spend is correct under last click and disastrous under first
+click, **you do not have an answer**. You have a question that needs an
+experiment.
+
+# 4. Beyond Attribution
+
+## The Incrementality Question
+
+Attribution asks: **of the conversions that happened, who gets credit?**
+
+. . .
+
+The business question is different: **how many of these conversions would have
+happened anyway?**
+
+. . .
+
+Brand search converts at 30% and shows a 12x ROAS. Most of those people were
+already going to buy. Attribution cannot tell you that. It was never designed to.
+
+## How Incrementality Is Actually Measured
+
+- **Geo holdouts**: turn a channel off in one region, compare
+- **Audience holdouts**: withhold a campaign from a randomised group
+- **Ghost ads / PSA tests**: serve a placebo to the control group
+- **Marketing mix modelling**: regress outcomes on spend at aggregate level
+
+. . .
+
+Every one of these is an **experiment or a model**, not an attribution report.
+Lectures 19 and 19.
+
+## Media Mix Modelling
+
+TODO: expand briefly. Aggregate, privacy-resilient, no user-level tracking
+needed, weak on short-term tactics, needs years of data. Its revival is a direct
+consequence of the tracking restrictions from Lecture 4.
+
+## Where the Money Went {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_programmatic_ad_revenue.png){fig-align="center" height="340px"}
+
+*Almost all growth in digital advertising is programmatic, which is to say
+automated, auctioned, and hard to attribute.*
+
+
+## Where This Leaves You
+
+For your portfolio:
+
+- You will not have enough conversions for data-driven attribution
+- You will probably not have multi-touch paths at all
+- **Say so.** Report last click, state the limitation, and explain what you would
+  do with more volume
+
+. . .
+
+That is a stronger answer than a confident multi-touch analysis on eight
+conversions.
+
+# Live Demo
+
+## Exercise {background="#43464B"}
+
+Using the supplied multi-touch path dataset:
+
+```{.python}
+import pandas as pd
+paths = pd.read_csv("conversion_paths.csv")
+paths.head()
+```
+
+1. Compute last-click and first-click credit per channel
+2. Compute linear credit
+3. Produce the comparison table
+4. Identify the channel whose credit varies most across models
+
+**20 minutes**
+
+## Exercise {background="#43464B"}
+
+Then, in prose:
+
+1. You are the analyst. The client wants to cut the social budget by half, based
+   on the last-click report. Write the three sentences you would say.
+2. Name the experiment that would actually answer the question.
+3. State what you would need in order to run it, and whether this client could.
+
+**15 minutes**
+
+# 5. Asking AI to Argue Each Model
+
+## An Ideal Use Case
+
+<!-- Speaker notes: attribution is contested, well documented, and has no
+     correct answer. That is exactly the shape of question where an assistant
+     generating the competing cases is more useful than one giving an answer. -->
+
+Attribution arguments are arguments. An assistant is good at producing the case
+for a position it does not hold.
+
+. . .
+
+> "Argue that we should credit social with these conversions. Then argue that we
+> should not. Then tell me what evidence would settle it."
+
+## Where It Helps
+
+- Producing the case each stakeholder would make for their own channel
+- Explaining Shapley-value attribution in language a client will follow
+- Writing the code for the model comparison table
+- Listing what your data cannot see
+
+## Where It Will Mislead You
+
+**It will pick a model if you ask it to.** It has no basis for doing so. The
+choice depends on your business, your sales cycle and your channel mix, none of
+which it knows.
+
+. . .
+
+**It will not volunteer that your sample is too small** for multi-touch analysis
+unless you ask.
+
+. . .
+
+**It will describe data-driven attribution as more rigorous** without noting that
+it is still correlational. Lecture 18's whole argument.
+
+## The Prompt Worth Keeping
+
+> "Here is my conversion path data [attached]. Build the comparison table across
+> last click, first click, linear and time decay. Then tell me which budget
+> decisions are the same under all four models, and which flip."
+
+. . .
+
+That last clause is the analysis. The table is just arithmetic.
+
+## Exercise {background="#43464B"}
+
+1. Have an assistant produce your model comparison table
+2. Ask it which decisions are robust across models and which are not
+3. Check one channel's last-click credit by hand
+4. Ask it to argue for the model you did not choose, and note the best point it makes
+
+**15 minutes**
+
+## Next Lecture
+
+The experiment. We design an A/B test on your own portfolio, and meet the
+reason most marketing tests conclude nothing: **there were never enough people.**

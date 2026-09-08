@@ -1,0 +1,386 @@
+---
+title: "Lecture 7: Tableau II - Calculated Fields and Breakdowns"
+subtitle: STA1000 - Data Analytics and Metrics
+---
+
+## Previously ...
+
+You can describe a single variable honestly. Now we combine variables, which is
+where the interesting mistakes live.
+
+## Learning Outcomes
+
+By the end of this lecture you will be able to:
+
+- Write calculated fields, including level-of-detail expressions
+- Build channel and device breakdowns you can defend to a client
+- Recognise Simpson's paradox in a marketing breakdown
+- Construct a first cohort triangle from your own traffic
+
+# 1. Calculated Fields
+
+## Row Level versus Aggregate {.smaller}
+
+:::: {.columns}
+::: {.column width="45%"}
+**Row-level calculation**
+
+Evaluated once per row, before aggregation.
+
+`[Key Events] / [Sessions]`
+
+computed row by row, then summed, gives you the **average of the rates**.
+:::
+::: {.column width="45%"}
+**Aggregate calculation**
+
+Evaluated after aggregation.
+
+`SUM([Key Events]) / SUM([Sessions])`
+
+gives you the **rate of the totals**, which is almost always what you meant.
+:::
+::::
+
+. . .
+
+Lecture 6's "you cannot average an average", in Tableau syntax.
+
+::: {.callout-note appearance="minimal"}
+Under what circumstances would the average of the rates be the number you
+actually want? What would you have to believe about the rows?
+:::
+
+## Conditional Logic
+
+Your source / medium values are a mess. They are supposed to be. Grouping them
+into named channels is the first calculated field everyone writes.
+
+```
+IF CONTAINS([Source], "google") AND [Medium] = "cpc" THEN "Paid Search"
+ELSEIF [Medium] = "organic" THEN "Organic Search"
+ELSEIF CONTAINS([Source], "linkedin")
+    OR CONTAINS([Source], "instagram")
+    OR [Source] = "t.co" THEN "Social"
+ELSEIF [Medium] = "email" THEN "Email"
+ELSEIF [Medium] = "referral" THEN "Referral"
+ELSEIF [Source] = "(direct)" THEN "Direct"
+ELSE "Other"
+END
+```
+
+. . .
+
+**Then check the size of "Other".** If it holds more than a few percent of your
+sessions, your grouping is hiding something rather than simplifying it.
+
+## The Grouping Is an Argument
+
+<!-- Speaker notes: the point to labour. A channel grouping is not a technical
+     artefact, it is a claim about which traffic sources are the same kind of
+     thing. Two analysts group differently and produce different strategies from
+     identical data. Nobody ever asks to see the CASE statement. -->
+
+A channel grouping asserts that these sources are the same kind of traffic and
+those are different.
+
+. . .
+
+Put `t.co` in Social and paid X campaigns become invisible. Put `(direct)` in
+its own channel and you have quietly labelled "we could not tell" as a marketing
+channel with a budget line.
+
+. . .
+
+**Every channel report anyone has ever shown you rests on a CASE statement you
+did not see.** Keep yours in your measurement plan.
+
+## Level of Detail Expressions
+
+An LOD expression computes at a grain other than the one in the view. It is how
+Tableau lets you say "per user, regardless of what is on the rows".
+
+```
+{ FIXED [User ID] : MIN([Date]) }
+```
+
+Each user's first-touch date, available on every row for that user.
+
+. . .
+
+This one expression is the building block of every cohort view you will ever
+build, and of the triangle chart at the end of this lecture.
+
+::: {.callout-note appearance="minimal"}
+`{FIXED}` ignores the filters on the view; `{INCLUDE}` and `{EXCLUDE}` do not.
+On a cohort chart, why does that difference decide whether your cohort sizes
+change when someone clicks a filter?
+:::
+
+# 2. Breakdowns That Mean Something
+
+## Channel
+
+From source / medium to a grouping you can defend, then the two questions:
+
+1. Does each channel behave differently on the metric you care about?
+2. Could you spend differently against each one tomorrow?
+
+. . .
+
+If both answers are no, you have built a nicer-looking version of the same
+number.
+
+## Device
+
+Device is a segment, not a curiosity. The mobile conversion gap is one of the
+most consistent findings in digital marketing, and it is usually a **design**
+finding rather than an audience one.
+
+. . .
+
+At portfolio volume, expect the gap to be visible and the sample to be too small
+to size it. Both facts belong in the report.
+
+## Simpson's Paradox
+
+<!-- Speaker notes: worth ten minutes of its own. A channel can look worse
+     overall and better within every device category. Once they have seen it
+     with numbers they never quite trust an aggregate again, which is the
+     desired state. -->
+
+A channel can convert **worse overall** and **better within every single device
+category**.
+
+. . .
+
+Not a paradox, and not rare. It happens whenever the segments differ in both
+their base rate and their share of the traffic.
+
+## Simpson's Paradox, With Numbers {.smaller}
+
+:::: {.columns}
+::: {.column width="45%"}
+**Mobile**
+
+| Channel | Sessions | Conv. | Rate |
+|---|---|---|---|
+| Email | 900 | 45 | **5.0%** |
+| Social | 100 | 4 | 4.0% |
+:::
+::: {.column width="45%"}
+**Desktop**
+
+| Channel | Sessions | Conv. | Rate |
+|---|---|---|---|
+| Email | 100 | 12 | **12.0%** |
+| Social | 900 | 99 | 11.0% |
+:::
+::::
+
+. . .
+
+**Combined**: Email 57 / 1000 = 5.7%. Social 103 / 1000 = **10.3%**.
+
+. . .
+
+Email wins on mobile, wins on desktop, and loses overall, because email traffic
+is mostly mobile and mobile converts badly.
+
+::: {.callout-note appearance="minimal"}
+Which number goes in the client deck? Neither is wrong.
+:::
+
+## What to Do About It
+
+You cannot fix Simpson's paradox with a better chart. You can only decide which
+question you are answering.
+
+. . .
+
+- **"Which channel should I buy more of?"** needs the breakdown, because the mix
+  is part of what you are buying
+- **"Which channel converts better for the same kind of visitor?"** needs the
+  within-device rates
+- **"What happened last month?"** needs both, and the mix shift is often the
+  entire story
+
+. . .
+
+**Always show the sizes.** The paradox is invisible without the counts, which is
+Lecture 6's rule 2 arriving with consequences.
+
+# 3. Cohorts
+
+## What a Cohort Is
+
+A **cohort** is the set of users first seen in the same period, followed
+forward.
+
+. . .
+
+A **segment** is a group defined by an attribute, measured now.
+
+. . .
+
+Cohorts are the only honest way to ask whether things are getting better,
+because they hold acquisition date constant. An overall retention rate mixes
+this month's new users with users acquired two years ago.
+
+## The C Matrix {.smaller}
+
+Let $C(t, t')$ be the number of users acquired in period $t$ who are still
+active in period $t' \ge t$.
+
+- $C(t,t)$ is simply the users acquired in $t$: the cohort's size
+- $C(t,t')$ is weakly decreasing in $t'$: cohorts only shrink
+- $C(\cdot,t)$ is everyone active in $t$, which is roughly what drives revenue
+- The difference between consecutive columns is attrition
+
+. . .
+
+Startups call the picture of this matrix a **triangle retention chart**. It is
+the single most informative chart about a subscription or repeat-purchase
+business, and it is the thing investors ask for.
+
+::: {.callout-note appearance="minimal"}
+Whether you label the columns with calendar months or with months-since-signup
+changes the shape of the chart completely. Which labelling answers "is our
+product getting better?" and which answers "how was March?"
+:::
+
+## The Cohort Matrix, Drawn {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_cohort_c_matrix.png){fig-align="center" height="350px"}
+
+*Rows are acquisition cohorts, columns are periods since acquisition. Reading
+across a row is a survival curve; reading down a column is a calendar snapshot.*
+
+
+## Building One in Tableau
+
+1. `{ FIXED [User ID] : MIN([Date]) }` → first-touch date
+2. `DATETRUNC('week', [First Touch])` → cohort label, on rows
+3. `DATEDIFF('week', [First Touch], [Date])` → periods since acquisition, on
+   columns
+4. `COUNTD([User ID])` → the cell value
+5. Divide by the cohort's own week-0 count for a percentage, and keep the raw
+   count as a label
+
+. . .
+
+Column 0 is 100% by construction. If it is not, your first-touch field is wrong.
+
+## What One Looks Like With Real Data {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_cohort_retention_heatmap.png){fig-align="center" height="350px"}
+
+*The triangle is not missing data. Recent cohorts simply have not lived long enough.*
+
+
+## The Portfolio Caveat
+
+Your site may produce cohorts of four people.
+
+. . .
+
+Build it anyway. The mechanics are the same at four users and four million, and
+the discipline of writing "cohort n = 4" beside a percentage is the thing being
+assessed.
+
+. . .
+
+**Documented judgement beats undocumented certainty**, including when the
+judgement is "this chart cannot support a conclusion".
+
+## Exercise {background="#43464B"}
+
+In Tableau, on your own data:
+
+1. Write a channel grouping calculated field, and report the share in "Other"
+2. Build a channel-by-device matrix of sessions and key events, counts visible
+3. Check whether any channel shows Simpson's paradox across device
+4. Create a first-touch date LOD field
+5. Produce a weekly cohort triangle of returning users, with cohort sizes shown
+
+**25 minutes**
+
+# 4. Vibe Coding Tableau Calculations
+
+## AI This Block: Chat with context
+
+Where we are on the module's AI spine, set out in Lecture 1 and named properly
+in Lecture 10:
+
+> **Chat with context**
+
+## Calculated Fields Are Ideal for This
+
+Tableau's calculation language is verbose, thoroughly documented and heavily
+represented in training data. Assistants write it well, and the cost of a wrong
+answer is visible immediately.
+
+> "Write a Tableau calculated field that groups source and medium into Paid
+> Search, Organic Search, Social, Email, Referral and Direct. My Source values
+> include google, bing, linkedin.com, t.co, l.instagram.com and (direct)."
+
+. . .
+
+Give it your **actual** source values. Pasted from the data, not remembered.
+
+## LOD Expressions Especially
+
+> "Write a FIXED LOD expression giving each user's first session date, and a
+> second field giving the number of weeks between a row's date and that user's
+> first session date."
+
+. . .
+
+**Then check it.** Not by reading it:
+
+- Does the row count change after adding the field? It should not
+- Does one user you can trace by hand get the date you expect?
+- Is column 0 of the cohort chart exactly 100%?
+
+## The Delegation Boundary
+
+The assistant should write the **syntax**. You must own the **grouping**,
+because the grouping is the argument.
+
+. . .
+
+Ask it for a channel grouping and it will produce a sensible industry-standard
+one. Sensible and industry-standard is not the same as right for a one-page
+portfolio site with three traffic sources, one of which is your own phone.
+
+::: {.callout-note appearance="minimal"}
+Delegate the typing, keep the deciding. On this lecture's material, exactly
+which decisions are yours?
+:::
+
+## Exercise {background="#43464B"}
+
+1. Generate your channel grouping with an assistant, giving it your real source
+   values
+2. Generate the first-touch LOD field
+3. Verify both against five rows you check by hand
+4. Find one source value the grouping puts in the wrong bucket, and say what it
+   would have cost you
+5. Change one grouping decision on purpose and note which conclusion moves
+
+**15 minutes**
+
+## Going Further
+
+- Sequoia, *Retention* — the triangle chart as investors read it
+- Tableau, *Level of Detail Expressions* whitepaper — FIXED, INCLUDE, EXCLUDE
+  and the order of operations
+- Wagner (1982), *Simpson's Paradox in Real Life* — short, and mostly about
+  medicine, which makes the marketing case land harder
+
+## Next Lecture
+
+Segmentation: of all the splits you can now build, which ones actually pay.
+
+**Prepare**: bring your channel-by-device matrix. We will test its segments
+against three criteria.

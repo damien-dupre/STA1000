@@ -1,0 +1,116 @@
+---
+title: "Lecture 2: Build the Site"
+subtitle: STA1000 - Data Analytics and Metrics
+---
+
+## Previously ...
+
+We established that:
+
+- Analytics earns its keep only when it changes a decision
+- "Big data" is a claim about volume, not about value
+- The portfolio is the object of study for the whole module
+
+Today we build the thing we are going to measure.
+
+## Learning Outcomes
+
+By the end of this lecture you will be able to:
+
+- Build a small multi-page site suitable for tracking
+- Identify the user actions on that site that carry commercial meaning
+- Write a statement of success **before** any tracking exists
+
+# 1. Why Build Before Measuring
+
+## The Problem with Borrowed Data
+
+<!-- Speaker notes: the standard analytics module hands students a clean sample
+     dataset. Students learn the tool but never learn the judgement, because
+     they never had to decide what was worth recording. -->
+
+TODO: contrast a supplied dataset with data you caused to exist.
+
+## The Portfolio as a Business
+
+TODO: frame the portfolio site as a business with an objective (enquiries,
+sign-ups, downloads), not as a CV.
+
+# 2. Site Structure
+
+## Minimum Viable Structure
+
+TODO: home / work / about / contact, plus one page that exists purely to be a
+conversion (a form, a download, a booking link).
+
+## Tooling Options
+
+TODO: compare options and pick a default for the cohort.
+
+- Static site (Quarto, GitHub Pages) - free, versioned, editable
+- Hosted builder (Wix, Squarespace, Carrd) - faster, less control over tags
+- Constraint to flag: you must be able to inject a tag into `<head>`
+
+## Live Demo {background="#43464B"}
+
+TODO: build the skeleton live.
+
+# 3. Defining Success Before Tracking
+
+## The Pre-Registration Habit
+
+TODO: write down what a good month looks like, in numbers, before any data
+arrives. Borrow the logic of pre-registration from experimental science.
+
+## Success Statement Template
+
+TODO: template with target, timeframe, and the action that counts.
+
+## Exercise {background="#43464B"}
+
+Write a one-paragraph success statement for your own portfolio:
+
+1. Who is the site for?
+2. What single action would count as a success?
+3. How many of those would make one month a good month?
+4. What would make you conclude the site is not working?
+
+**15 minutes**
+
+# 4. Vibe Coding Your Site
+
+## AI This Block: Chat
+
+Where we are on the module's AI spine, set out in Lecture 1 and named properly in Lecture 10:
+
+> **Chat**
+
+## Building a Site by Describing It
+
+TODO: an assistant will produce a working Quarto or HTML site from a description
+faster than you can write one. Use it, then read every line before publishing.
+
+**Prompt that works:**
+
+> "Create a four-page Quarto website: home, work, about, contact. The contact
+> page has a form. Give me the `_quarto.yml` and one page as an example."
+
+## What You Must Still Decide Yourself
+
+TODO: expand.
+
+- What the site is **for**, which no assistant can tell you
+- Which action counts as a conversion
+- Whether the page it generated actually loads a tag in `<head>`
+
+## Exercise {background="#43464B"}
+
+1. Generate a site skeleton by describing it to an assistant
+2. Read the output and list two things you would change
+3. Confirm you can edit the `<head>` of every page, which Lecture 3 needs
+
+**10 minutes**
+
+## Next Lecture
+
+We turn that success statement into a measurement plan, and into GA4 events.

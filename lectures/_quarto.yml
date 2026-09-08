@@ -1,0 +1,28 @@
+project:
+  type: default
+  render:
+    - "*.qmd"
+
+author: "Damien Dupré"
+
+# Uncomment when a deck contains executable {python} chunks.
+# Code shown for reading uses ```{.python}, which needs no kernel.
+# jupyter: python3
+
+format:
+  revealjs:
+    theme: [theme/metropolis.scss, styles.scss]
+    toc-depth: 1
+    chalkboard: false
+    menu: true
+    slide-number: true
+    preview-links: auto
+
+title-slide-attributes:
+    data-background-iframe: colored-particles/index.html
+
+preload-iframes: true
+
+execute:
+  echo: true
+  warning: false

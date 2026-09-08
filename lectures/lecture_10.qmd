@@ -1,0 +1,401 @@
+---
+title: "Lecture 10: From Chat to Agent"
+subtitle: STA1000 - Data Analytics and Metrics
+---
+
+## Previously ...
+
+Nine sessions. You have used an AI assistant in every one of them:
+
+- To explain a concept you had just met
+- To draft a consent banner and a privacy notice
+- To write Tableau calculated fields
+- To critique your own charts
+
+. . .
+
+Today we stop using it incidentally and name what is actually happening.
+
+## Why Here
+
+Block 3 is called "Python as the marketer's power tool".
+
+. . .
+
+In 2026, the power tool is not Python. It is **Python plus something that writes
+Python**.
+
+. . .
+
+Pretending otherwise would teach you a version of the job that no longer exists.
+Teaching it without teaching verification would be worse.
+
+## Learning Outcomes
+
+By the end of this lecture you will be able to:
+
+- Distinguish chat, chat with context, and agentic use
+- Choose the right mode for a given analytics task
+- Verify AI-produced analysis rather than trusting it
+- State what an agent must not be given access to, and why
+
+# 1. Three Modes
+
+## The Progression
+
+:::: {.columns}
+::: {.column width="30%"}
+**Chat**
+
+You ask, it answers in words or code. It cannot see your data. You copy, paste
+and run.
+
+*The assistant knows things.*
+:::
+::: {.column width="30%"}
+**Chat with context**
+
+You attach a file, a screenshot, an export. It answers about **your** data.
+
+*The assistant knows your situation.*
+:::
+::: {.column width="30%"}
+**Agent**
+
+It runs code, reads the result, notices the error, fixes it, and repeats until
+done.
+
+*The assistant does the work.*
+:::
+::::
+
+. . .
+
+Each mode is more capable than the last, and each removes one more of your
+opportunities to notice that it is wrong.
+
+## Mode 1: Chat
+
+What you have mostly been doing.
+
+> "What is the difference between a session and a user in GA4?"
+
+> "Write a Tableau calculated field that groups source and medium into channels."
+
+. . .
+
+**Strengths**: fast, cheap, no setup, safe. It cannot damage anything because it
+cannot touch anything.
+
+. . .
+
+**Limits**: it does not know your column names, your row counts, or that your
+date field is stored as text.
+
+## Mode 2: Chat With Context
+
+You give it the situation.
+
+> "Here is the first 20 rows of my GA4 export [attached]. The `date` column is
+> reading as text. Write the pandas to fix it and tell me what to check
+> afterwards."
+
+. . .
+
+**This is the single biggest upgrade available to you**, and most people never
+make it. They keep asking generic questions and getting generic answers.
+
+. . .
+
+**Limits**: it sees a sample, not the dataset. It cannot run anything, so it
+cannot know whether its answer worked.
+
+## Mode 3: Agent
+
+The assistant is given tools: a Python environment, a filesystem, sometimes a
+browser.
+
+. . .
+
+You state a goal. It writes code, runs it, reads the traceback, corrects itself,
+and continues.
+
+> "Load ga4_export.csv, clean the date and numeric columns, and report sessions
+> and conversion rate by channel and week. Tell me anything that looks wrong."
+
+. . .
+
+**This is genuinely different in kind.** The loop of run-observe-correct is the
+one you will be doing by hand from next lecture onwards.
+
+## One Model, Many Inputs and Outputs {.smaller}
+
+![Source: [Masterclass: LLMs for Data Science](https://github.com/avvorstenbosch/Masterclass-LLMs-for-Data-Science) (CC BY-NC-SA 4.0)](./figures/external/mcllm_multimodal_llm.png){fig-align="center" height="255px"}
+
+*Text, image, audio in; text, image, audio out. The agent wraps a loop and a
+set of tools around this.*
+
+
+## What Makes an Agent an Agent
+
+Three ingredients:
+
+1. **Tools**: it can execute, not only emit text
+2. **A loop**: it observes the result and acts again
+3. **Some autonomy**: it decides the next step without asking you each time
+
+. . .
+
+Remove any one and you are back to chat.
+
+. . .
+
+The third ingredient is where the risk lives.
+
+## Where You Will Meet Them
+
+- **Notebook assistants**: Colab's Gemini, Copilot in Jupyter
+- **Coding agents**: Claude Code, Cursor, Codex
+- **Chat with code execution**: Claude and ChatGPT running Python on an uploaded file
+- **Inside the platforms**: GA4's and Meta's own automated insights
+
+. . .
+
+For this module, **Claude** is the default in worked examples. ChatGPT and
+GitHub Copilot do the same things with different names. The mode matters, the
+brand does not.
+
+## Why This Is a Marketing Question {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_zuckerberg_advertising.png){fig-align="center" height="350px"}
+
+
+# 2. The Spine of This Module
+
+## One Step Per Block
+
+<!-- Speaker notes: this slide is the reason the lecture exists here. Put it up
+     again at the start of each block so students can see where they are. -->
+
+| Block | Lectures | AI mode | What you use it for |
+|---|---|---|---|
+| 1 Build the lab | 1-4 | Chat | A tutor. Ask it to explain, not to do |
+| 2 See the data | 5-9 | Chat with context | Attach your export. Calculated fields, chart critique |
+| 3 Python | 10-15 | Agentic coding | It writes and runs the analysis with you |
+| 4 Metrics | 16-20 | An analyst you interrogate | Ask it to argue the other side |
+| 5 Communication | 21-24 | A producer | Drafts the dashboard spec, the report, the deck |
+
+. . .
+
+Notice what is constant: **you own the judgement at every step.**
+
+## The Direction of Travel
+
+Each block hands more execution to the machine and keeps more verification with
+you.
+
+. . .
+
+That is not a compromise. It is the actual job description of an analyst who
+uses these tools well.
+
+# 3. Verification
+
+## The Only Skill That Matters
+
+An AI assistant is a **confident** producer of plausible work.
+
+. . .
+
+Plausible and correct are different, and the gap is invisible from the output
+alone.
+
+. . .
+
+Everything in this section is about closing that gap cheaply.
+
+## The Four Checks
+
+**1. Shape.** Did the number of rows change when it should not have? Is the
+output the grain you asked for?
+
+. . .
+
+**2. Extremes.** Look at the largest and smallest values. Nonsense hides in the
+tails, not in the head of the table.
+
+. . .
+
+**3. A known case.** Pick one channel or one week you can compute by hand or read
+off GA4. Does it match?
+
+. . .
+
+**4. Reproduce.** Restart and run all. Then run it on last month's data.
+
+## Verification Is Not Reading the Code
+
+Reading the code catches syntax and obvious logic errors.
+
+. . .
+
+It does not catch:
+
+- The right operation on the wrong column
+- A join that silently dropped 40% of rows
+- A filter that excluded exactly the cases you cared about
+- A correct calculation of a metric that answers a different question
+
+. . .
+
+**Only checking the output against something you already know catches those.**
+
+## The Failure Mode You Will Actually Have
+
+<!-- Speaker notes: worth dwelling on. This is not hypothetical, it happens to
+     every student who submits agent-assisted work. -->
+
+You ask for conversion rate by channel. The agent produces a table. It looks
+right. It is formatted nicely. You put it in your report.
+
+. . .
+
+It computed key events divided by **users**, not by **sessions**.
+
+. . .
+
+Every number is wrong by a consistent factor, the ranking happens to be
+unchanged, and nothing about the output looks suspicious.
+
+. . .
+
+**The definition, not the code, was wrong.** No amount of reading the Python
+would have caught it. Checking one channel against GA4 would have.
+
+## Ask for the Assumptions
+
+A cheap habit that catches a lot:
+
+> "Before you write the code, list the assumptions you are making about the
+> data and the metric definitions."
+
+. . .
+
+The assumptions are where the errors are, and they are much faster to read than
+the code.
+
+## Exercise {background="#43464B"}
+
+Use an agent (Claude, ChatGPT with code execution, or Colab's assistant) on your
+own GA4 export:
+
+> "Load this export, clean it, and report sessions and key events by channel and
+> by week. List your assumptions before you start."
+
+Then, without looking at the code:
+
+1. Check the total sessions against your GA4 report
+2. Check one channel and one week by hand
+3. Find the largest and smallest values and ask whether they make sense
+4. Write down one assumption it made that you would have made differently
+
+**20 minutes**
+
+# 4. Limits, Cost and Safety
+
+## What Agents Are Bad At
+
+- **Small samples**: it will report a difference on n = 12 with no hesitation
+- **Your context**: it does not know your consent decline rate or that you tested
+  your own tags for a week
+- **Domain definitions**: sessions, users, key events, engaged sessions. It will
+  pick a plausible one
+- **Saying "I do not know"**: it will produce an answer regardless
+
+. . .
+
+Every one of these is a thing you learned to worry about in Lectures 4, 6 and 8.
+That is why this lecture is here and not in week one: you can now tell when the
+answer is wrong.
+
+## How Far They Can Actually Go {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_metr_three_fits.png){fig-align="center" height="320px"}
+
+*Task length completed at 50% reliability, with three fits to the same data.
+The disagreement after 2026 is the honest part of the picture.*
+
+
+## What Not to Give an Agent
+
+**Write access to your live GA4 property.** Configuration changes are not
+reversible and historical data does not restate. Lectures 3 and 4 explained why.
+
+. . .
+
+**Your live site, unsupervised.** A broken tag costs you weeks of data.
+
+. . .
+
+**Personal data.** Your GA4 export is pseudonymous, but a comments dataset with
+names in it is not. Lecture 4 applies to what you paste into a chat window.
+
+. . .
+
+**Client credentials.** Ever.
+
+## Who Gains, Who Loses {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_genai_effects_table.png){fig-align="center" height="350px"}
+
+*Most studies find generative AI narrows the gap between high and low
+performers. A few find the opposite. Note which tasks are which.*
+
+
+## Cost
+
+Agents are not free, in money or in time.
+
+. . .
+
+A long agentic session on a small dataset can cost more than doing it yourself,
+and a wrong answer you then have to debug costs far more.
+
+. . .
+
+**Rule of thumb**: chat for questions, context for one-off analysis, agents for
+work you will repeat or work large enough that the loop pays for itself.
+
+## Disclosure
+
+For this module:
+
+- **You may use AI for anything.** There is no penalty and no need to hide it.
+- **You must say what you used it for.** One short section in your notebook or
+  report: which tasks, which tool, what you changed.
+- **You are responsible for every number you submit.** "The AI produced it" is
+  not a defence, in this module or in a job.
+
+. . .
+
+This is the same principle as the measurement plan in Lecture 3, and the one the
+cleaning log will formalise in Lecture 15. The reader must be able to tell what
+you did.
+
+## Exercise {background="#43464B"}
+
+In pairs, one of you plays the client.
+
+1. The analyst presents a finding produced with an agent
+2. The client asks: "how do you know that is right?"
+3. The analyst answers without saying "the AI did it"
+4. Swap
+
+Then write, for your own portfolio work, the three sentences of your AI use
+disclosure.
+
+**15 minutes**
+
+## Next Lecture
+
+Python I. You now know what you are doing when you let something else write it.

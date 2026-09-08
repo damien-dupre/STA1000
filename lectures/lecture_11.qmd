@@ -1,0 +1,451 @@
+---
+title: "Lecture 11: Python I - Notebooks and pandas"
+subtitle: STA1000 - Data Analytics and Metrics
+---
+
+## Previously ...
+
+Five sessions in Tableau. You can now:
+
+- Connect to a GA4 export
+- Distinguish dimensions from measures
+- Write calculated fields and level-of-detail expressions
+- Build segments, cohorts and stakeholder-ready views
+
+. . .
+
+Today we start doing the things Tableau makes awkward.
+
+## Why Move to Python
+
+:::: {.columns}
+::: {.column width="45%"}
+**Tableau is better at**
+
+- Exploring visually
+- Sharing with non-analysts
+- Interactive dashboards
+- Speed of first look
+:::
+::: {.column width="45%"}
+**Python is better at**
+
+- Reproducibility: the script is the record
+- Joins across many tables
+- Cohort, retention and RFM logic
+- Text and unstructured data
+- Anything you will do more than twice
+:::
+::::
+
+. . .
+
+You need both. Lectures 23 and 23 come back to Tableau for the deliverable.
+
+## Learning Outcomes
+
+By the end of this lecture you will be able to:
+
+- Work in a Colab notebook
+- Load your own GA4 export into a pandas DataFrame
+- Inspect, select and filter a DataFrame
+- Produce a first summary of your own traffic in code
+
+# 1. Notebooks
+
+## Google Colab
+
+In your browser:
+
+1. Keep these slides open in one tab to copy from
+2. In another tab, go to <https://colab.research.google.com>
+   - Sign in with your DCU or personal Google account
+   - File → New notebook
+
+. . .
+
+Nothing to install. It runs on Google's machines and saves to your Drive.
+
+## How a Notebook Works
+
+A notebook is a sequence of **cells**.
+
+- **Code cells** run Python and show the output beneath
+- **Text cells** hold markdown: your commentary, which is not optional
+
+. . .
+
+`Shift + Enter` runs the current cell and moves to the next.
+
+## The One Thing That Will Bite You
+
+Cells run **in the order you run them**, not in the order they appear.
+
+. . .
+
+A notebook that works for you may not work for the person you send it to,
+because you ran cell 8 before cell 5.
+
+. . .
+
+**Before you submit anything: Runtime → Restart and run all.** If it fails, it
+was never working.
+
+## Documenting as You Go
+
+The notebook is the audit trail we formalise in Lecture 15.
+
+. . .
+
+Every analysis cell gets a text cell above it saying **what question it answers**,
+and a text cell below saying **what you concluded**.
+
+. . .
+
+A notebook of 40 code cells and no prose is not an analysis, it is a transcript.
+
+# 2. pandas
+
+## Importing
+
+```{.python}
+import pandas as pd
+```
+
+. . .
+
+`pd` is the universal alias. Every example you find online assumes it.
+
+## The DataFrame
+
+A DataFrame is a table: named columns, indexed rows, each column one type.
+
+. . .
+
+Think of a well-behaved spreadsheet with the following rules enforced:
+
+- Every column has one name
+- Every column holds one kind of thing
+- Every row is one observation
+
+. . .
+
+That last point is the definition of tidy data, and your GA4 export mostly obeys it.
+
+## Loading Your Export
+
+From a file you uploaded to Colab:
+
+```{.python}
+ga4 = pd.read_csv("ga4_export.csv")
+```
+
+. . .
+
+From a URL, which is more reproducible:
+
+```{.python}
+ga4 = pd.read_csv("https://raw.githubusercontent.com/user/repo/main/ga4_export.csv")
+```
+
+. . .
+
+GA4 CSV exports carry several header lines before the table. Skip them:
+
+```{.python}
+ga4 = pd.read_csv("ga4_export.csv", skiprows=9)
+```
+
+## Looking at It First
+
+Always, in this order:
+
+```{.python}
+ga4.shape       # (rows, columns)
+ga4.head()      # first five rows
+ga4.dtypes      # what type is each column
+ga4.info()      # types plus non-null counts
+ga4.describe()  # numeric summaries
+```
+
+. . .
+
+`ga4.dtypes` is the one people skip and regret. A date read as text, or sessions
+read as text because of a thousands separator, will silently break everything
+downstream.
+
+## Fixing Types
+
+```{.python}
+ga4["date"] = pd.to_datetime(ga4["date"], format="%Y%m%d")
+ga4["sessions"] = pd.to_numeric(ga4["sessions"], errors="coerce")
+```
+
+. . .
+
+`errors="coerce"` turns unparseable values into `NaN` rather than raising.
+Then count them, because a silent `NaN` is a lie:
+
+```{.python}
+ga4["sessions"].isna().sum()
+```
+
+# 3. Selecting and Filtering
+
+## Columns
+
+```{.python}
+ga4["sessions"]                          # one column, a Series
+ga4[["date", "sessions", "channel"]]     # several columns, a DataFrame
+```
+
+. . .
+
+Single brackets give you a Series, double brackets give you a DataFrame. This
+distinction causes more confusion than it should.
+
+## Rows
+
+Filtering uses a boolean condition:
+
+```{.python}
+ga4[ga4["channel"] == "Organic Search"]
+ga4[ga4["sessions"] > 10]
+```
+
+. . .
+
+Combine with `&` (and) and `|` (or), **with brackets around each condition**:
+
+```{.python}
+ga4[(ga4["channel"] == "Organic Search") & (ga4["sessions"] > 10)]
+```
+
+. . .
+
+Python's `and` / `or` do not work here. This is not negotiable and it is not
+your fault.
+
+## Chaining
+
+The readable pattern, which is the one we will keep using:
+
+```{.python}
+(ga4
+  .query("channel == 'Organic Search'")
+  .sort_values("sessions", ascending=False)
+  .head(10)
+)
+```
+
+. . .
+
+Wrap the chain in brackets, one operation per line. Read it top to bottom as a
+sentence.
+
+## New Columns
+
+```{.python}
+ga4 = ga4.assign(
+    conversion_rate = lambda d: d["key_events"] / d["sessions"],
+    is_mobile = lambda d: d["device"] == "mobile"
+)
+```
+
+. . .
+
+`assign` with a `lambda` keeps the chain intact and avoids modifying the
+original object in place, which is what makes a notebook reproducible.
+
+## A First Summary
+
+```{.python}
+(ga4
+  .groupby("channel")
+  .agg(sessions=("sessions", "sum"),
+       key_events=("key_events", "sum"))
+  .assign(cvr=lambda d: d["key_events"] / d["sessions"])
+  .sort_values("sessions", ascending=False)
+)
+```
+
+. . .
+
+We take `groupby` properly next lecture. For now, notice it is the same
+split-apply-combine idea as a Tableau breakdown, written down.
+
+# Live Demo
+
+## Exercise {background="#43464B"}
+
+Open a notebook and, with your own GA4 export:
+
+```{.python}
+import pandas as pd
+ga4 = pd.read_csv("____", skiprows=__)
+
+ga4.shape
+ga4.dtypes
+ga4.head()
+```
+
+1. Load your export and report its shape
+2. Fix any column whose type is wrong, and count the values that failed to parse
+3. Filter to a single channel and report total lectures 4. Add a conversion rate column
+
+**15 minutes**
+
+## Exercise {background="#43464B"}
+
+Now write the prose:
+
+1. Above each code cell, a sentence saying what question it answers
+2. Below each, a sentence saying what you found
+3. Restart and run all
+4. Note one thing that is easier here than in Tableau, and one that is harder
+
+**10 minutes**
+
+# 4. A Note on Libraries
+
+## pandas, polars, and what you will meet
+
+This module uses **pandas**, because it is what marketing teams, tutorials and
+AI assistants all assume.
+
+. . .
+
+You will meet **polars** elsewhere (including in BAA1030). It is faster and its
+syntax is arguably cleaner. The concepts transfer directly: filter, select,
+with_columns, group_by, agg.
+
+. . .
+
+Learning the ideas matters more than learning the library. The library will
+change.
+
+# 5. Vibe Coding with pandas
+
+## AI This Block: Agentic Coding
+
+Where we are on the module's AI spine, introduced in Lecture 10:
+
+> **The assistant writes and runs the code with you.**
+
+Lecture 10 covered the modes and the verification discipline. This section is
+the pandas-specific version.
+
+## What Vibe Coding Is
+
+Describing the transformation you want in words and letting an assistant write
+the pandas.
+
+. . .
+
+It works well here because:
+
+- The chained syntax reads top to bottom, so it is easy to verify
+- pandas is heavily represented in training data, so the code is usually idiomatic
+- You can check the output shape immediately
+
+. . .
+
+It does **not** mean running code you have not checked.
+
+## In Practice
+
+**Step 1:** Describe the goal, naming your data
+
+> "From a pandas DataFrame called `ga4` with columns `date`, `channel`,
+> `sessions` and `key_events`, compute sessions and conversion rate per channel
+> for the last 8 weeks, sorted by sessions."
+
+. . .
+
+**Step 2:** The assistant produces code
+
+```{.python}
+(ga4
+  .query("date >= @cutoff")
+  .groupby("channel")
+  .agg(sessions=("sessions", "sum"),
+       key_events=("key_events", "sum"))
+  .assign(cvr=lambda d: d.key_events / d.sessions)
+  .sort_values("sessions", ascending=False)
+)
+```
+
+**Step 3:** Read it, run it, check the total against GA4
+
+## Tips
+
+:::: {.columns}
+::: {.column width="45%"}
+**Good prompts are specific:**
+
+- Name the DataFrame and the exact column names
+- Say pandas, or you may get polars or SQL
+- State the grain you want out
+- Say what to do with missing values
+
+**A good prompt:**
+
+> "Using pandas, on `ga4` with columns `date`, `channel`, `sessions`, add a
+> column `week` from `date` and return sessions per channel per week as a wide
+> table."
+:::
+::: {.column width="45%"}
+**Common pitfalls:**
+
+- Not naming the library, so you get a different one
+- Column names that do not match your export
+- Accepting a `SettingWithCopyWarning` without reading it
+- Chained operations that silently drop rows
+
+**Always check:**
+
+- Did the row count change when it should not have?
+- Are the totals the same as before the transformation?
+- Does one known channel match GA4?
+:::
+::::
+
+## The pandas-Specific Trap
+
+<!-- Speaker notes: this is the one that costs students marks, because the
+     output looks fine. -->
+
+An assistant will happily write a `groupby` that drops your `NaN` groups without
+mentioning it.
+
+. . .
+
+`groupby` excludes missing keys by default. If 15% of your sessions have no
+channel recorded, they vanish from the table and the totals no longer reconcile.
+
+. . .
+
+**Check your total against the ungrouped total. Every time.**
+
+## Exercise {background="#43464B"}
+
+Use an assistant to generate pandas for these, on your own export. **Read the
+code before running it.**
+
+1. *"Using pandas, on a DataFrame `ga4`, add a `week` column from `date` and
+   return total sessions per week."*
+2. *"Using pandas, return the top 5 channels by conversion rate, but only
+   channels with at least 30 sessions."*
+3. Run both, then check that the weekly totals sum to your overall total
+4. Note whether either dropped rows without telling you
+
+**15 minutes**
+
+## Next Lecture
+
+Grouping properly, and joining your traffic to ad spend and content metadata.
+
+. . .
+
+That is where the interesting metrics start, because GA4 alone cannot tell you
+what anything cost.

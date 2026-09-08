@@ -1,0 +1,374 @@
+---
+title: "Lecture 8: Comparison and Segmentation"
+subtitle: STA1000 - Data Analytics and Metrics
+---
+
+## Previously ...
+
+You can slice the data many ways. Most slices are noise. Today: which ones pay.
+
+## Learning Outcomes
+
+By the end of this lecture you will be able to:
+
+- Explain what customer heterogeneity is and which kinds of it predict behaviour
+- Judge a segment against measurability, substantiality and actionability
+- Compare new versus returning, source / medium, device and geography honestly
+- Recognise when a segment difference is too small to act on
+
+# 1. Heterogeneity
+
+## Customers Differ. On What? {.smaller}
+
+"Heterogeneity" is a long word for the fact that customers differ. The question
+that matters is **on which dimension**.
+
+:::: {.columns}
+::: {.column width="45%"}
+**Predicts behaviour well**
+
+- Product needs: usage intensity, frequency, context
+- Prior experience with the category
+- Information: what they already know
+- Occasion and context
+:::
+::: {.column width="45%"}
+**Predicts behaviour weakly**
+
+- Demographics: age, gender, income
+- Location, in most categories
+- Stated attitudes
+- Psychographics
+:::
+::::
+
+. . .
+
+**Needs beat demographics, by a distance**, and by more than marketers expect.
+
+## You Are Not Your Customer {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_computer_skills_distribution.png){fig-align="center" height="340px"}
+
+*Computer skills across OECD countries. Somewhere under 10% of people are at
+Level 3. Everyone in this room is one of them.*
+
+
+## So Why Does Everyone Segment by Demographics? {.smaller}
+
+<!-- Speaker notes: this is the good bit, because they have all been taught
+     demographic personas on another module and nobody has told them the
+     evidence is weak. Handle it as "here is why the default persists", not
+     "your other module is wrong". -->
+
+Three honest reasons:
+
+1. Demographics are **easily measurable**, and often the only thing you can buy
+2. They are **visually perceivable**, so people believe they understand them
+3. Many people **identify themselves** in those terms
+
+. . .
+
+None of those is "they predict purchasing".
+
+. . .
+
+**The exceptions are real**: makeup, nappies, sports kit and footwear are
+categories where demographics correlate strongly with needs. Notice what those
+categories have in common.
+
+::: {.callout-note appearance="minimal"}
+Is segmenting by gender sexist? Literally, yes: it treats people differently by
+a protected characteristic. When is that acceptable, and who decides? Does your
+answer change between a nappy brand and a car insurer?
+:::
+
+## A Segmentation Someone Published {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_firefox_personas.png){fig-align="center" height="320px"}
+
+*Mozilla's Firefox user types. Note that each one is written so a product
+team could act on it. That is the test.*
+
+
+## The Circularity Trap
+
+Suppose you segment your visitors by which product they bought.
+
+. . .
+
+**This gets you nowhere.** You have used the outcome as the input. The segments
+are defined by the thing you were trying to predict, so they predict it
+perfectly and tell you nothing about who to target next.
+
+. . .
+
+The same error in your own portfolio: segmenting by "converted" and "did not
+convert", then reporting that the converters converted more.
+
+::: {.callout-note appearance="minimal"}
+Where is the boundary? "Visitors who viewed the pricing page" is close to the
+outcome but not the outcome. Is it a usable segment?
+:::
+
+## How to Pick Attributes
+
+You want to segment on attributes that drive sales, retention or profit. Six
+routes to candidates, roughly in order of cost:
+
+1. Theory and experience
+2. Consulting the people who talk to customers
+3. Your own database, explored
+4. Market research
+5. Finding out what competitors are doing
+6. Letting the data pick, with a clustering or a heterogeneous-choice model
+
+. . .
+
+Route 6 is where k-means and its relatives live. We reach it properly in
+Lecture 13, on your own users. It is last on this list for a reason.
+
+## Segmentation as a Process, Not a Chart {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_segmentation_process.png){fig-align="center" height="265px"}
+
+
+# 2. What Makes a Segment Worth Having
+
+## The Three Tests
+
+**Measurable.** You can identify who is in the segment, from data you actually
+have, at the moment you need to act.
+
+. . .
+
+**Substantial.** The segment is large enough to be worth serving. Small can be
+fine, and a niche can sustain a business, but there is a floor below which the
+operation cannot pay for itself.
+
+. . .
+
+**Actionable.** You could do something different for this segment tomorrow. If
+the answer is "nothing we could change", it is a description, not a segment.
+
+::: {.callout-note appearance="minimal"}
+Add a fourth test: **different**. The segments must actually behave differently
+on the metric you care about. Which of the four does a typical marketing persona
+deck usually fail?
+:::
+
+## Measurable, and the Trap Inside It
+
+A segment that is measurable **after the fact** but not **at the point of
+action** is useless for targeting.
+
+. . .
+
+"High-lifetime-value customers" is measurable in your database in two years'
+time. Whether you can identify one on their first visit is a different, harder
+and more valuable question.
+
+. . .
+
+This is the whole business of a customer data platform, and its four jobs:
+collect, unify, comprehend, activate. **Activation is where most of them fail.**
+
+## Measurable, and Worth Measuring {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_yield_by_fico_score.png){fig-align="center" height="340px"}
+
+*Portfolio yield by credit score. The middle 36% of accounts are
+indistinguishable. The segments that matter are at the edges.*
+
+
+## Substantial, and Small Numbers
+
+<!-- Speaker notes: with a student portfolio getting 40 sessions a week, most
+     segment differences are noise. Name it now rather than letting them
+     over-interpret in the portfolio. Lecture 19 gives them the tools; here they
+     only need the instinct. -->
+
+A 100% conversion rate on 2 sessions.
+
+. . .
+
+A segment that converts at 8% versus one at 4%, on 25 sessions each: that is two
+conversions versus one.
+
+. . .
+
+**Rate differences on small denominators are almost always noise.** You will not
+have the tools to say how much until Lecture 19. Until then, the rule is: put
+the denominator on the slide and let the room see it.
+
+## Actionable
+
+Segments that regularly fail this test on a portfolio site:
+
+- **Browser version.** You are not building a version-specific experience
+- **Screen resolution.** Unless it is a responsive-design bug, in which case it
+  is a bug, not a segment
+- **Hour of day**, at low volume. Interesting, unactionable, and unstable
+- **Country**, when you serve one city
+
+. . .
+
+Naming a segment you deliberately did not pursue, and why, is worth more marks
+than a fourth chart of one you did.
+
+# 3. The Standard Comparisons
+
+## New versus Returning
+
+Different funnels, different intent, different appropriate metrics.
+
+. . .
+
+A blended conversion rate over both describes nobody: it is a weighted average
+of a first-visit rate and a considered-return rate, and it moves whenever the
+mix moves, without either underlying rate changing.
+
+. . .
+
+**This is Lecture 7's Simpson's paradox in its most common marketing costume.**
+
+## Source and Medium
+
+Intent varies more by source than by almost anything else you can measure.
+
+. . .
+
+Someone arriving from a search for your service and someone arriving from a
+social feed are at different points of the same journey, and comparing their
+conversion rates as though they were competing channels is a category error that
+still shapes budgets.
+
+::: {.callout-note appearance="minimal"}
+Your own site: which of your sources reflect intent, and which reflect
+interruption? Should they ever appear in the same bar chart?
+:::
+
+## Geography and Device
+
+**Geography** is genuinely useful for a business with regional operations, and
+mostly noise for a student portfolio. Say so in the report rather than producing
+a map because Tableau makes maps easy.
+
+. . .
+
+**Device** we covered in Lecture 7. The addition here: a device gap is
+actionable in a way most segments are not, because you can change the design
+this week.
+
+## The Consent Segment You Cannot See
+
+Your declined-consent visitors are a segment. They are invisible, they are
+probably not random, and every comparison you make excludes them.
+
+. . .
+
+Lecture 4 established this. It matters here because **segmentation on consented
+data is segmentation of the consenting**.
+
+. . .
+
+If privacy-conscious visitors differ in ways related to your outcome, and there
+is evidence they do, then every segment comparison in your portfolio carries the
+same unmeasured bias.
+
+::: {.callout-note appearance="minimal"}
+Does that make the analysis worthless, or does it make one sentence mandatory?
+What is the sentence?
+:::
+
+# 4. In Practice
+
+## Live Demo {background="#43464B"}
+
+1. Segment comparison view in Tableau, rates with counts alongside
+2. New versus returning on the key event, then the mix shift over time that
+   explains the blended rate
+3. A segment that looks striking, with n shown, and the room deciding whether to
+   believe it
+4. Writing the caveat sentence together
+
+## Exercise {background="#43464B"}
+
+On your own data:
+
+1. Build a new versus returning comparison on your key event
+2. Add the raw counts next to every rate
+3. Identify one segment that passes all four tests, and one that fails, naming
+   the test it fails
+4. Write what you would do differently for the segment that passes
+5. Write the sentence about who is missing from all of it
+
+**20 minutes**
+
+# 5. AI for Segment Hypotheses
+
+## AI This Block: Chat with context
+
+Where we are on the module's AI spine, set out in Lecture 1 and named properly
+in Lecture 10:
+
+> **Chat with context**
+
+## Generating Candidates, Not Conclusions
+
+Use it to widen the list of segments worth considering, then apply the tests
+yourself.
+
+> "I run a portfolio site for a freelance designer in Dublin. What visitor
+> segments might behave differently on an enquiry form? Rank them by how likely
+> they are to matter at 200 sessions a month, and say which I could actually
+> identify in a GA4 export."
+
+. . .
+
+The second clause is the one that turns a generic list into a usable one.
+
+## The Trap
+
+<!-- Speaker notes: it will happily propose twelve segments, and testing twelve
+     segments on small traffic guarantees a spurious finding. This is the
+     multiple-comparisons problem arriving three lectures before they have the
+     vocabulary for it. Plant it here, pay it off in 19. -->
+
+More hypotheses means more chances to find noise.
+
+. . .
+
+Test twelve segments on 200 sessions and something will look significant. Not
+because it is, but because you looked twelve times.
+
+. . .
+
+**Pick two before you look.** Write them down. This is the same pre-registration
+discipline as the success statement in Lecture 2, and it will return in
+Lecture 19.
+
+## Exercise {background="#43464B"}
+
+1. Generate ten candidate segments
+2. Reject eight using measurable / substantial / actionable / different
+3. Say what made the surviving two different
+4. Commit to which two you will test, in writing, **before** you build the view
+
+**10 minutes**
+
+## Going Further
+
+- Kotler and Keller, *Marketing Management*, ch. on STP — the canonical criteria,
+  worth reading critically against today's evidence
+- Yankelovich and Meer (2006), *Rediscovering Market Segmentation*, HBR — why so
+  much segmentation produces nothing
+- Sharp, *How Brands Grow*, ch. 9 — the sceptical case against segmentation
+  altogether, which you should be able to answer
+
+## Next Lecture
+
+Turning views into something a client can read, and being critiqued on it.
+
+**Prepare**: bring one chart from your workbook that you are pleased with. It
+will be pulled apart.

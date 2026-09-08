@@ -1,0 +1,128 @@
+---
+title: "Lecture 17: Funnel and Conversion Analysis"
+subtitle: STA1000 - Data Analytics and Metrics
+---
+
+## Previously ...
+
+You know what a conversion is worth. Now: where do people stop?
+
+## Learning Outcomes
+
+By the end of this lecture you will be able to:
+
+- Define a funnel from your own site's events
+- Compute step conversion and drop-off rates
+- Distinguish a leak worth fixing from noise
+
+# 1. Defining the Funnel
+
+## From Events to Steps
+
+TODO: the events you defined in Lecture 3 become funnel steps. If you cannot
+build a funnel, your measurement plan was wrong.
+
+## The Funnel, As Everyone Draws It {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_purchase_funnel.png){fig-align="center" height="340px"}
+
+*Probably the most reused framework in marketing analytics. Its value is that
+each step names a decision someone can act on.*
+
+
+## Open versus Closed Funnels
+
+TODO: does a user have to enter at step one? GA4's exploration defaults and
+what they assume.
+
+## Time Windows
+
+TODO: a funnel is meaningless without a window. Same session, 7 days, 30 days.
+
+# 2. Reading a Funnel
+
+## Step Rate versus Overall Rate
+
+TODO: the two denominators, and how reports mix them.
+
+## Where the Big Number Is
+
+TODO: a 5-point improvement on a step with 1000 users beats a 40-point
+improvement on a step with 20.
+
+## Segmented Funnels
+
+TODO: the aggregate funnel usually hides the real story. Split by device and by
+channel and the leak moves.
+
+## What People Actually Do At Each Step {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_ecommerce_analytics_bubbles.png){fig-align="center" height="340px"}
+
+*Techniques used against funnel goals, by difficulty and by value. Note how
+few of the high-value ones are hard.*
+
+
+# 3. Diagnosis
+
+## Is It a Leak or a Filter?
+
+<!-- Speaker notes: a drop-off between browsing and pricing is often the funnel
+     doing its job. Not every drop is a problem to solve. -->
+
+TODO: intent-qualifying steps versus friction steps.
+
+## Instrumentation Failure Looks Like a Leak
+
+TODO: 100% drop-off at step 3 is almost always a missing tag. Check the tag
+before you redesign the page.
+
+## Live Demo {background="#43464B"}
+
+TODO: build a funnel exploration in GA4, then reproduce it in Python from the
+export, and compare the numbers.
+
+## Exercise {background="#43464B"}
+
+On your own site:
+
+1. Define a three or four step funnel from your key events
+2. Compute step and overall conversion rates
+3. Segment by device and report where the leak moves
+4. Propose one change, and state what result would convince you it worked
+
+**25 minutes**
+
+# 4. AI for Funnel Diagnosis
+
+## AI This Block: An analyst you interrogate
+
+Where we are on the module's AI spine, introduced in Lecture 10:
+
+> **An analyst you interrogate**
+
+## Leak, Filter, or Broken Tag
+
+TODO: give it the step counts and ask for the three competing explanations
+before you pick one.
+
+> "My funnel is 400, 180, 175, 0. Give me every explanation for the final step,
+> ordered by how likely it is."
+
+## It Should Say "Check the Tag" First
+
+TODO: expand. If it goes straight to page redesign advice, that tells you
+something about how it was trained, not about your funnel.
+
+## Exercise {background="#43464B"}
+
+1. Give an assistant your funnel counts with no interpretation
+2. Ask for ranked explanations
+3. Check the instrumentation explanation first, whatever it ranked
+4. Note whether its ranking matched what you found
+
+**15 minutes**
+
+## Next Lecture
+
+Which channel gets the credit: attribution.

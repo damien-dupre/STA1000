@@ -1,0 +1,495 @@
+---
+title: "Lecture 20: Modelling for Decisions"
+subtitle: STA1000 - Data Analytics and Metrics
+---
+
+## Previously ...
+
+An experiment answers one question well, and you have just computed how long
+yours would take. A model asks many questions at once, less well, using data you
+already have.
+
+## Learning Outcomes
+
+By the end of this lecture you will be able to:
+
+- Fit and interpret a linear regression on marketing data
+- Read a coefficient as a lever rather than as an algebraic term
+- Model diminishing returns, and read an elasticity
+- State the conditions under which a coefficient is causal, and notice when they
+  fail
+
+# 1. Regression as a Question
+
+## The Question
+
+<!-- Speaker notes: frame the whole lecture as "which levers move the number and
+     by how much". No matrix algebra, no derivations, no normal equations. If
+     someone wants the maths, point at the reading. -->
+
+> "If I increase spend by €100, what happens to conversions, holding channel and
+> week constant?"
+
+. . .
+
+That is the entire lecture. Everything else is the machinery for answering it and
+the reasons to distrust the answer.
+
+## Where the Word Comes From
+
+Galton, measuring the heights of parents and children, found that tall parents
+have children **closer to average** than themselves.
+
+. . .
+
+He called it "regression to mediocrity". He fitted a straight line to it, and
+line-fitting inherited the name.
+
+. . .
+
+So "regression" names a **phenomenon** (Lecture 19's regression to the mean) and
+a **method**, and the connection between them is historical rather than logical.
+Knowing that saves a lot of confusion.
+
+## Galton's Original Question {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_height_weight_scatter.png){fig-align="center" height="340px"}
+
+*Should you model weight on height, or height on weight? The scatter does not
+tell you. The question you are asking does.*
+
+
+## The Model
+
+```{.python}
+import statsmodels.formula.api as smf
+
+model = smf.ols("conversions ~ spend + C(channel) + C(week)", data=df).fit()
+model.summary()
+```
+
+. . .
+
+`C(channel)` and `C(week)` create indicator variables for each category. The
+week terms absorb anything that moved every channel at once: a holiday, an
+outage, a competitor's campaign.
+
+. . .
+
+**Adding the week terms is the single most important line of this code**, and it
+is the one most often left out.
+
+## Reading the Output, In Order of Importance
+
+1. **The coefficient on spend**, in the units of the data. "Each additional €100
+   of spend is associated with 1.4 more conversions"
+2. **Its confidence interval.** "Between 0.3 and 2.5". This is the finding
+3. **The number of observations.** 30 rows and 12 predictors is not a model
+4. **R-squared**, last, and mostly ignore it
+
+. . .
+
+R-squared answers "how much of the variation did we describe", which is almost
+never the decision. A model with an R-squared of 0.2 and a tight, credible spend
+coefficient is more useful than the reverse.
+
+::: {.callout-note appearance="minimal"}
+Why does a high R-squared feel like success? Whose question does it answer?
+:::
+
+## Holding Constant
+
+"Controlling for channel" means: comparing weeks **within** the same channel,
+rather than across channels.
+
+. . .
+
+It does **not** mean the effect of channel has been removed from the world. It
+means the comparison no longer confuses "we spent more" with "we spent more on
+the expensive channel".
+
+. . .
+
+**You can only control for what you measured.** Everything else is still in
+there, quietly, inside the coefficient you are about to quote.
+
+# 2. Extensions Worth Knowing
+
+## Diminishing Returns
+
+The most useful non-linearity in marketing, and the one every media plan
+assumes:
+
+. . .
+
+The first €1,000 into a channel reaches the people most likely to respond. The
+tenth €1,000 reaches everyone else.
+
+```{.python}
+model = smf.ols("conversions ~ np.log1p(spend) + C(channel) + C(week)",
+                data=df).fit()
+```
+
+. . .
+
+A linear model extrapolated upward says spending €10 million produces 140,000
+conversions. **The linear model does not know the market is finite.** The log
+model at least bends.
+
+## Elasticity {.smaller}
+
+Take logs of both sides and the coefficient becomes an **elasticity**: the
+percentage change in the outcome for a 1% change in the input.
+
+$$\ln q = \alpha + \beta \ln p \quad \Longrightarrow \quad \beta = \frac{d \ln q}{d \ln p}$$
+
+. . .
+
+Scale-free, so it compares across channels, currencies and product lines. This
+is why economists reach for it and why it appears in every pricing conversation.
+
+. . .
+
+For price: demand is **elastic** if $\beta < -1$, **inelastic** if
+$-1 < \beta < 0$. Revenue is maximised at $\beta = -1$.
+
+. . .
+
+**The constant-elasticity form is popular because it is easy**, and it imposes a
+strong assumption: everyone has the same price sensitivity at every price. Often
+wrong, occasionally disastrously so.
+
+::: {.callout-note appearance="minimal"}
+If your demand is inelastic, you can raise revenue by raising prices. Why does
+that not mean you should?
+:::
+
+## Interaction
+
+Does spend work harder on mobile?
+
+```{.python}
+model = smf.ols("conversions ~ spend * C(device) + C(week)", data=df).fit()
+```
+
+. . .
+
+The interaction term asks whether the **slope** differs by group, not whether the
+**level** does. A main effect says mobile converts less; an interaction says
+money spent on mobile buys less.
+
+. . .
+
+They are different findings with different budget implications, and they are
+routinely confused.
+
+## Logistic Regression
+
+When the outcome is converted / did not convert, at the level of the individual
+session:
+
+```{.python}
+model = smf.logit("converted ~ C(channel) + C(device) + pages_viewed",
+                  data=sessions).fit()
+```
+
+. . .
+
+Coefficients are in log-odds, which nobody thinks in. Exponentiate to get an
+odds ratio, and say it in words:
+
+> "Sessions from email have about 1.8 times the odds of converting, compared to
+> direct, at the same device and page depth."
+
+. . .
+
+**An odds ratio is not a risk ratio.** At low base rates they are close, which is
+why the sloppiness usually survives, and at high base rates they are not.
+
+# 3. What Can Go Wrong
+
+## Correlation and Causation, Concretely
+
+Spend rises in December. So do conversions. So does everything.
+
+. . .
+
+Your regression, without week terms, reports that spend causes conversions. It
+is describing Christmas.
+
+. . .
+
+**Worse, and more specific to marketing**: budget follows performance. You spend
+more on the channel that is working. The regression then reports that spending
+causes the performance, when the causation ran the other way through the media
+planner.
+
+## Endogeneity, and Why Prices Are the Worst Case
+
+Prices are not set randomly. They rise when demand is strong, or when costs
+rise, or when a rival exits.
+
+. . .
+
+Regress quantity on observed price and you measure all of that at once. It is
+entirely possible to estimate that **raising prices increases sales**, and to be
+correctly reporting what happened.
+
+. . .
+
+**The fix is variation you did not cause and nobody chose**: an experiment
+(Lecture 19), a policy change, a cost shock, a competitor's mistake. Without
+some source of it, a coefficient is a correlation wearing a lab coat.
+
+::: {.callout-note appearance="minimal"}
+Is there anything in your own portfolio data that varied for a reason unrelated
+to your marketing? That is your best available natural experiment.
+:::
+
+## Endogeneity, With Numbers {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_endogeneity_demand_bias.png){fig-align="center" height="340px"}
+
+*The same data, two specifications. The naive regression says demand is nearly
+flat. It is not; the omitted competitor price was doing the work.*
+
+
+## Omitted Variables
+
+The formal name for the Christmas problem: something you did not include is
+driving both the input and the outcome.
+
+. . .
+
+Including a week term fixes seasonality. It fixes nothing about anything else.
+
+. . .
+
+**You cannot test for it.** You can only reason about it, name the candidates
+out loud, and say which ones you could not measure. That paragraph in your
+report is worth more than another model.
+
+## Multicollinearity
+
+Two channels whose budgets always move together. The model cannot tell them
+apart, so it splits the effect between them arbitrarily.
+
+. . .
+
+Symptoms: enormous standard errors, coefficients that flip sign when you add one
+variable, a model that predicts well and explains nothing.
+
+. . .
+
+**It is a data problem, not a modelling problem.** No estimator can separate two
+things that never moved separately.
+
+## Overfitting
+
+Twelve predictors, thirty rows. The model fits the noise beautifully and
+predicts nothing.
+
+. . .
+
+**Marketing datasets are usually small.** Weekly data for two years is 104 rows,
+and that is a mature business, not a portfolio site.
+
+. . .
+
+Adding a predictor **always** improves in-sample fit. In-sample fit is therefore
+not evidence of anything, and R-squared going up is not news.
+
+## Four Fits to the Same Points {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_overfitting.png){fig-align="center" height="340px"}
+
+*R-squared rises all the way across. Only one of these would survive contact
+with new data.*
+
+
+## Retrodiction and Cross-Validation {.smaller}
+
+**Retrodiction**: retrospective prediction. Hide some data, fit on the rest,
+predict the hidden part, measure the error.
+
+The algorithm:
+
+1. Split the data into $K$ folds at random
+2. Hold out fold $k$, fit on the other $K-1$, predict fold $k$, store the errors
+3. Repeat for every $k$, then for every candidate model
+4. Keep the model with the lowest average prediction error
+
+. . .
+
+**Two honest caveats.** Cross-validation is one input to model choice, not the
+criterion, and it matters most when prediction is the actual goal. And on
+marketing time series, random folds leak the future into the past: split by time
+instead.
+
+## How Cross-Validation Works {.smaller}
+
+![Source: [DS701 Tools for Data Science, Boston University](https://github.com/tools4ds/DS701-Course-Notes)](./figures/external/ds701_k_fold_cv.png){fig-align="center" height="310px"}
+
+*Hold out a fold, fit on the rest, score on the fold, rotate. Average the
+scores. This is the whole idea.*
+
+
+## Simpler Than You Think
+
+**Simple models perform similarly to complicated ones on small and medium
+data.** With enough data most flexible models converge to similar performance
+anyway.
+
+. . .
+
+Regularisation methods (lasso, ridge) penalise complexity on the theory that
+simpler models predict better out of sample. Worth knowing the names, and worth
+knowing they are a response to this same problem.
+
+. . .
+
+On 100 rows of marketing data, the argument for a neural network is almost never
+statistical.
+
+::: {.callout-note appearance="minimal"}
+If a simple model performs as well, what is the argument for the complicated
+one? Are there good ones?
+:::
+
+## The Trade-Off You Are Actually Making {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_bias_variance.png){fig-align="center" height="310px"}
+
+*Too simple and you underfit; too flexible and you fit the noise. The
+minimum of the error curve is not at either end.*
+
+
+## When to Trust a Coefficient
+
+A checklist, in order:
+
+1. Is the sign what theory would predict? If not, stop and find out why
+2. Is the interval narrow enough that both ends imply the same decision?
+3. Did you control for time, and did the coefficient survive it?
+4. Can you name the omitted variable that worries you most, and rule it out?
+5. Would the coefficient change a decision, at either end of its interval?
+6. **Or could you run the experiment from Lecture 19 instead?**
+
+. . .
+
+If you reach 6 and the answer is yes, the model was a way of avoiding the
+experiment.
+
+## The Misuse Question
+
+A model that predicts well can still be one you should not deploy.
+
+. . .
+
+Before acting on a customer-level model, ask: is it **effective, legal, moral,
+private, conspicuous**, and how will customers react if they notice?
+
+. . .
+
+The guiding principle, not a rule: **using data to genuinely serve a customer's
+interest is usually fine. Using private data against their interest can harm
+people, break laws and end a business.** GDPR is the version of this you are
+subject to, and Lecture 4 covered it.
+
+## Exercise {background="#43464B"}
+
+Using your joined traffic and spend data:
+
+1. Fit a regression of conversions on spend with channel and week controls
+2. Report the spend coefficient with its confidence interval, in plain English
+3. Refit with `log1p(spend)` and say which fits your beliefs about the world
+   better, and why
+4. Name one omitted variable that could be driving the result
+5. State what experiment would settle the question, and what it would cost in
+   weeks
+
+**30 minutes**
+
+# 4. AI for Model Criticism
+
+## AI This Block: An analyst you interrogate
+
+Where we are on the module's AI spine, introduced in Lecture 10:
+
+> **An analyst you interrogate**
+
+## Omitted Variables Are a Listing Problem
+
+Naming candidate confounders is exactly what a broadly-read assistant is good
+at, because it is recall over a large literature rather than judgement about your
+business.
+
+> "I regressed conversions on spend with channel and week controls, and got a
+> positive spend coefficient. List every variable that could be driving this
+> that I have not included. Order them by how likely they are to matter for a
+> small service business in Ireland."
+
+. . .
+
+Then the follow-up that does the work: **"which of those could I actually
+measure, and which would I have to argue about instead?"**
+
+## Reading the Output Together
+
+Pasting a `model.summary()` and asking for a plain-English reading is reliable,
+fast, and a good way to catch a misread coefficient.
+
+. . .
+
+Asking whether the result is **causal** is not. It cannot see your data
+generating process, it will accept your framing, and it will produce a
+well-structured paragraph either way.
+
+::: {.callout-note appearance="minimal"}
+It will tell you that correlation is not causation, and then interpret your
+coefficient causally three sentences later. Why is that failure so hard to
+notice?
+:::
+
+## What It Cannot Do
+
+- Know which of the confounders it listed is actually present in your business
+- Tell you whether your data can settle the question, unless you make it compute
+  something
+- Notice that your 30 rows cannot support 12 predictors, unless you ask
+- Choose the functional form on grounds other than fit
+
+. . .
+
+**You supply the context, it supplies the checklist.** Block 4's rule,
+unchanged.
+
+## Exercise {background="#43464B"}
+
+1. Fit your regression and paste the summary
+2. Ask for a plain-English reading of the spend coefficient, with its interval
+3. Ask for candidate omitted variables, ordered by plausibility
+4. Say which one you could actually measure
+5. Ask it to argue that your coefficient is **not** causal, and see whether its
+   argument is better than yours
+
+**15 minutes**
+
+## Going Further
+
+- Angrist and Pischke, *Mastering 'Metrics* — the causal question, without the
+  matrix algebra
+- Gelman and Hill, ch. 3 to 5 — how to read and present regression results like
+  a grown-up
+- Hastie, Tibshirani and Friedman, *Elements of Statistical Learning*, ch. 7 —
+  cross-validation and the bias-variance trade-off, if you want the real version
+- Tellis (2006), *Modeling Marketing Mix* — advertising elasticities, and why
+  they are smaller than anyone wants
+
+## Next Lecture
+
+Block 5: frameworks for putting all of this in front of a board, and the
+non-financial metrics that belong beside it.
+
+**Prepare**: pick one number from your portfolio you would defend to a sceptical
+client. You will be asked to.

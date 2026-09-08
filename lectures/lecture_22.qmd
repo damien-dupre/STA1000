@@ -1,0 +1,127 @@
+---
+title: "Lecture 22: Sustainability and Non-Financial Metrics"
+subtitle: STA1000 - Data Analytics and Metrics
+---
+
+## Previously ...
+
+The Balanced Scorecard argued that financial measures alone are insufficient.
+This lecture takes that argument where it now leads.
+
+<!-- Speaker notes: this lecture is the only home for LO6. Do not let it be
+     squeezed by an over-running dashboard build. -->
+
+## Learning Outcomes
+
+By the end of this lecture you will be able to:
+
+- Explain why marketing performance measurement now includes non-financial metrics
+- Identify relevant ESG and sustainability metrics for a marketing function
+- Evaluate a sustainability claim against its evidence
+
+# 1. Why This Is Now a Marketing Metrics Question
+
+## Regulation
+
+TODO: CSRD and its reach into Irish and EU companies, the Green Claims
+Directive, and the Advertising Standards Authority for Ireland's position on
+environmental claims. Check currency before teaching.
+
+## Stakeholders Beyond Shareholders
+
+TODO: employees, customers, procurement teams. B2B buyers now ask for this data
+in tenders.
+
+## Reputational Risk
+
+TODO: greenwashing enforcement as a marketing risk with a measurable cost.
+
+# 2. What Gets Measured
+
+## Environmental
+
+TODO: emissions of the marketing function itself. Scope 3 in advertising: media
+delivery, production, events, ad tech supply chain. Digital advertising's
+carbon cost per thousand impressions.
+
+## Social
+
+TODO: representation in creative, accessibility of digital assets, advertising
+placement standards, supplier diversity.
+
+## Governance
+
+TODO: data protection compliance as a governance metric. This connects back to
+Lecture 4 and closes the loop.
+
+## Metric Quality
+
+TODO: which of these are measured, which are estimated, and which are asserted.
+
+# 3. Judging a Claim
+
+## The Evidence Ladder
+
+TODO: from "we care about the planet" to an audited figure with a stated
+boundary and baseline.
+
+## Greenwashing Patterns
+
+TODO: unbounded claims, shifted baselines, offsets presented as reductions,
+selective scope, irrelevant precision.
+
+## Non-Financial Metrics in a Dashboard
+
+TODO: how to place these alongside ROAS without them being ignored. Same page,
+same visual weight, or they will not be read.
+
+## Exercise {background="#43464B"}
+
+Take a real brand's sustainability communication:
+
+1. List every quantitative claim it makes
+2. For each, identify the boundary, baseline and whether it is audited
+3. Rank the claims on the evidence ladder
+4. Design two non-financial metrics you would add to that brand's marketing dashboard
+
+**25 minutes**
+
+# 4. AI-Generated Sustainability Claims
+
+## AI This Block: A producer
+
+Where we are on the module's AI spine, introduced in Lecture 10:
+
+> **A producer**
+
+## The Greenwashing Machine
+
+<!-- Speaker notes: strong exercise. Students generate the fluent unfalsifiable
+     claim themselves, then have to fix it. -->
+
+TODO: ask an assistant to write sustainability copy for a brand and it will
+produce exactly the unbounded, baseline-free claims this lecture warns about.
+
+## Using It the Other Way
+
+TODO: expand. It is a good auditor of claims when pointed at them.
+
+> "For each quantitative claim in this text, identify the boundary, the baseline,
+> and whether it is verifiable. Flag anything unfalsifiable."
+
+## The Regulatory Point
+
+TODO: an AI-drafted claim is still your claim. The Green Claims Directive and
+the ASAI do not have an exemption for generated copy.
+
+## Exercise {background="#43464B"}
+
+1. Ask an assistant to write sustainability copy for a brand
+2. Audit its own output with the prompt above
+3. Rewrite one claim so it would survive scrutiny
+
+**15 minutes**
+
+## Next Lecture
+
+The dashboard build.
