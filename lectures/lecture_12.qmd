@@ -1,368 +1,410 @@
 ---
-title: "Lecture 12: Python II - Grouping and Joining"
+title: "Lecture 12: From Chat to Agent"
 subtitle: STA1000 - Data Analytics and Metrics
 ---
 
 ## Previously ...
 
-You can load your GA4 export into a notebook and look at it. Today we combine it
-with everything else, which is where marketing metrics actually come from.
+Eleven sessions. You have used an AI assistant in every one of them:
+
+- To explain a concept you had just met
+- To draft a consent banner and a privacy notice
+- To write Tableau calculated fields
+- To critique your own charts
+
+. . .
+
+Today we stop using it incidentally and name what is actually happening.
+
+## Why Here
+
+Block 3 is called "Python as the marketer's power tool".
+
+. . .
+
+In 2026, the power tool is not Python. It is **Python plus something that writes
+Python**.
+
+. . .
+
+Pretending otherwise would teach you a version of the job that no longer exists.
+Teaching it without teaching verification would be worse.
 
 ## Learning Outcomes
 
 By the end of this lecture you will be able to:
 
-- Aggregate with `groupby()` and named `agg()`
-- State the grain of a table before and after every operation
-- Join traffic data to ad spend or content metadata
-- Diagnose a join that has gone wrong, and prove that one has not
+- Distinguish chat, chat with context, and agentic use
+- Choose the right mode for a given analytics task
+- Verify AI-produced analysis rather than trusting it
+- State what an agent must not be given access to, and why
 
-# 1. Aggregation
+# 1. Three Modes
 
-## Split, Apply, Combine
+## The Progression
 
-Every aggregation is three steps, and naming them prevents most errors:
+:::: {layout="[1,1,1]"}
+::: {#first-column}
 
-1. **Split** the rows into groups by one or more keys
-2. **Apply** a function to each group independently
-3. **Combine** the results into a new table
+**Chat**
 
-. . .
+You ask, it answers in words or code. It cannot see your data. You copy, paste
+and run.
 
-The new table has a **different grain**. That is the whole point, and it is the
-thing people forget one line later.
+*The assistant knows things.*
 
-```{.python}
-(ga4
-  .groupby("channel")
-  .agg(sessions=("sessions", "sum"),
-       conversions=("key_events", "sum"))
-  .assign(cvr=lambda d: d.conversions / d.sessions)
-)
-```
-
-## Named Aggregation, and Why
-
-```{.python}
-.agg(sessions=("sessions", "sum"),
-     conversions=("key_events", "sum"),
-     first_seen=("date", "min"),
-     users=("user_id", "nunique"))
-```
-
-. . .
-
-One line per output column, each saying explicitly which input column and which
-function. No multi-level column index to unpack afterwards, and the code reads
-as a specification of the output table.
-
-. . .
-
-**Compute the rate after the aggregation, never before.** `conversions.sum() /
-sessions.sum()` is the rate of the totals. Averaging a per-row rate is Lecture 6
-returning in Python.
-
-::: {.callout-note appearance="minimal"}
-`nunique` on `user_id` and `sum` on `sessions` produce different numbers for the
-same group. Which one belongs in the denominator of a conversion rate, and does
-your answer depend on the question?
 :::
 
-## Multiple Grains From One Table
+::: {#second-column}
 
-```{.python}
-by_channel      = ga4.groupby("channel").agg(...)
-by_channel_week = ga4.groupby(["channel", "week"]).agg(...)
-by_channel_dev  = ga4.groupby(["channel", "device"]).agg(...)
-```
+**Chat with context**
 
-. . .
+You attach a file, a screenshot, an export. It answers about **your** data.
 
-Three tables, three grains, all correct, and they will not reconcile against
-each other unless you are careful about which rows each one includes.
+*The assistant knows your situation.*
 
-. . .
-
-**Write the grain in a comment above every aggregation.** One row is one
-______. It costs three seconds and it is the single highest-yield habit in this
-block.
-
-<!-- Speaker notes: make them do this literally in the exercise. The habit is
-     what carries into lecture 15's cleaning log, where the grain of the log
-     itself becomes a question. -->
-
-# 2. Joining
-
-## Why Joining Is the Whole Point
-
-<!-- Speaker notes: GA4 alone cannot tell you cost. Spend lives in the ad
-     platform. Content attributes live in a spreadsheet the marketer keeps.
-     Every interesting marketing metric is a join. -->
-
-GA4 knows what happened on your site. It does not know what anything cost.
-
-. . .
-
-The marketer always has three tables, held in three different places by three
-different systems:
-
-| Table | Grain | Lives in |
-|---|---|---|
-| Traffic | Session or event | GA4 |
-| Spend | Campaign × day | The ad platform |
-| Content | One row per page or post | A spreadsheet somebody maintains |
-
-. . .
-
-**Cost per acquisition, ROAS, content performance: every one of them is a
-join.** There is no single system that hands you the number.
-
-## Join Types, With the Marketing Case {.smaller}
-
-| Type | Keeps | Right when |
-|---|---|---|
-| `inner` | Rows matching in both | You need both sides to compute anything, and unmatched rows are meaningless |
-| `left` | All traffic rows | Traffic is the truth and spend is optional: organic sessions have no cost |
-| `right` | All spend rows | You want to find campaigns that spent money and produced no traffic |
-| `outer` | Everything | Diagnosis. Rarely the final answer |
-
-. . .
-
-**The `left` join is the default for a reason**, and it is also the one that
-silently produces nulls that become zeros that become a ROAS of infinity.
-
-## Inner and Outer, Drawn {.smaller}
-
-:::: {.columns}
-::: {.column width="48%"}
-**Inner join: only the matches**
-
-![](./figures/external/ubc_join_inner.png){fig-align="center" height="245px"}
 :::
-::: {.column width="48%"}
-**Outer join: everything, with NaN**
 
-![](./figures/external/ubc_join_outer.png){fig-align="center" height="245px"}
+::: {#third-column}
+
+**Agent**
+
+It runs code, reads the result, notices the error, fixes it, and repeats until
+done.
+
+*The assistant does the work.*
+
 :::
 ::::
 
-::: {style="font-size:0.55em;text-align:center;"}
-Source: [UBC MDS, Programming in Python for Data Science](https://github.com/UBC-MDS/programming-in-python-for-data-science)
-:::
+. . .
 
-*The NaN block on the right is the whole reason to check a join. It is also
-where your row count went.*
+Each mode is more capable than the last, and each removes one more of your
+opportunities to notice that it is wrong.
 
+## Mode 1: Chat
 
-## The Grain Contract {.smaller}
+What you have mostly been doing.
 
-Before a merge, answer three questions in writing:
+> "What is the difference between a session and a user in GA4?"
 
-1. What is the grain of the left table?
-2. What is the grain of the right table?
-3. What should the grain of the result be?
+> "Write a Tableau calculated field that groups source and medium into channels."
 
 . . .
 
-If the right table has more than one row per key, a `left` join **multiplies**
-your rows. Sessions get counted twice. Spend gets attributed twice. Revenue
-doubles.
+**Strengths**: fast, cheap, no setup, safe. It cannot damage anything because it
+cannot touch anything.
 
 . . .
 
-```{.python}
-merged = traffic.merge(spend, on="campaign", how="left",
-                       validate="many_to_one")
-```
+**Limits**: it does not know your column names, your row counts, or that your
+date field is stored as text.
+
+## Mode 2: Chat With Context
+
+You give it the situation.
+
+> "Here is the first 20 rows of my GA4 export [attached]. The `date` column is
+> reading as text. Write the pandas to fix it and tell me what to check
+> afterwards."
 
 . . .
 
-`validate` makes pandas raise an error instead of quietly producing a bigger
-table. **Use it on every merge.** It is one keyword and it catches the most
-expensive class of error in this module.
-
-::: {.callout-note appearance="minimal"}
-A many-to-many join between traffic and spend, both at campaign × day, with one
-duplicate day in the spend table. How many rows do you get, and which number in
-the final report is wrong?
-:::
-
-## Join Keys That Do Not Match
-
-`google / cpc` versus `Google Ads`. `Newsletter` versus `newsletter`.
-`/pricing` versus `/pricing/`. A campaign named `spring26` in GA4 and
-`Spring 2026` in the spend sheet.
+**This is the single biggest upgrade available to you**, and most people never
+make it. They keep asking generic questions and getting generic answers.
 
 . . .
 
-Case, whitespace, trailing slashes, and the human who typed the UTM by hand at
-11pm.
+**Limits**: it sees a sample, not the dataset. It cannot run anything, so it
+cannot know whether its answer worked.
+
+## Mode 3: Agent
+
+The assistant is given tools: a Python environment, a filesystem, sometimes a
+browser.
 
 . . .
 
-**This is where Lecture 3's tagging discipline pays off, or does not.** The
-students who wrote a UTM conventions sheet in week 3 spend five minutes here.
-The others spend the lecture.
+You state a goal. It writes code, runs it, reads the traceback, corrects itself,
+and continues.
 
-## Checking a Join
-
-```{.python}
-merged = traffic.merge(spend, on="campaign", how="left", indicator=True)
-merged["_merge"].value_counts()
-
-# the four numbers that matter
-len(traffic), len(spend), len(merged), merged["_merge"].eq("both").sum()
-```
+> "Load ga4_export.csv, clean the date and numeric columns, and report sessions
+> and conversion rate by channel and week. Tell me anything that looks wrong."
 
 . . .
 
-**The four-number check**, run after every join:
+**This is genuinely different in kind.** The loop of run-observe-correct is the
+one you will be doing by hand from next lecture onwards.
 
-1. Rows in, left side
-2. Rows in, right side
-3. Rows out
-4. Rows matched
+## One Model, Many Inputs and Outputs {.smaller}
 
-. . .
+![Source: [Masterclass: LLMs for Data Science](https://github.com/avvorstenbosch/Masterclass-LLMs-for-Data-Science) (CC BY-NC-SA 4.0)](./figures/external/mcllm_multimodal_llm.png){fig-align="center" height="255px"}
 
-If (3) is greater than (1) on a left join, you have fanned out. If (4) is much
-less than (1), your keys do not match. Neither will announce itself.
+*Text, image, audio in; text, image, audio out. The agent wraps a loop and a
+set of tools around this.*
 
-## Diagnosing the Mismatch
 
-```{.python}
-unmatched = merged.loc[merged["_merge"] == "left_only", "campaign"].unique()
-sorted(unmatched)[:20]
+## What Makes an Agent an Agent
 
-# then look at the other side
-sorted(spend["campaign"].unique())[:20]
-```
+Three ingredients:
+
+1. **Tools**: it can execute, not only emit text
+2. **A loop**: it observes the result and acts again
+3. **Some autonomy**: it decides the next step without asking you each time
 
 . . .
 
-**Look at the actual values, side by side.** Nine times in ten the answer is
-visible in ten seconds and invisible in any summary statistic.
+Remove any one and you are back to chat.
 
 . . .
 
-Then fix the key with a normalisation you can write down, not a manual mapping
-you cannot reproduce:
+The third ingredient is where the risk lives.
 
-```{.python}
-def norm(s):
-    return s.str.strip().str.lower().str.replace(r"\s+", " ", regex=True)
-```
+## Where You Will Meet Them
 
-::: {.callout-note appearance="minimal"}
-Normalising keys makes rows match. Under what circumstances does making rows
-match make the analysis worse?
-:::
+- **Notebook assistants**: Colab's Gemini, Copilot in Jupyter
+- **Coding agents**: Claude Code, Cursor, Codex
+- **Chat with code execution**: Claude and ChatGPT running Python on an uploaded file
+- **Inside the platforms**: GA4's and Meta's own automated insights
 
-# 3. Putting It Together
+. . .
 
-## Live Demo {background="#43464B"}
+For this module, **Claude** is the default in worked examples. ChatGPT and
+GitHub Copilot do the same things with different names. The mode matters, the
+brand does not.
 
-1. Traffic aggregated to campaign × week, grain written in a comment
-2. Spend read in at campaign × day, aggregated up to campaign × week first
-3. `merge` with `validate="one_to_one"`, which fails, because the spend sheet
-   has a duplicate row
-4. Find the duplicate, decide what to do about it, write the decision down
-5. Cost per session, and the campaigns with cost and no sessions
+## Why This Is a Marketing Question {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_zuckerberg_advertising.png){fig-align="center" height="350px"}
+
+
+# 2. The Spine of This Module
+
+## One Step Per Block {.smaller}
+
+<!-- Speaker notes: this slide is the reason the lecture exists here. Put it up
+     again at the start of each block so students can see where they are. -->
+
+| Block | Lectures | AI mode | Used as |
+|---|---|---|---|
+| 1 See the data | 1-7 | Chat with context | Attach the file, not a description |
+| 2 Build the lab | 8-11 | Chat | A tutor. Explain, do not do |
+| 3 Python | 12-17 | Agentic coding | It writes and runs the analysis |
+| 4 Metrics | 18-22 | An analyst you interrogate | Argue the other side |
+| 5 Communication | 23-24 | A producer | Drafts the spec, report, deck |
+
+. . .
+
+Block 2 steps **back**, deliberately: it is the one place where the decisions
+have to be yours. Everywhere else, **you own the judgement anyway.**
+
+## The Direction of Travel
+
+Each block hands more execution to the machine and keeps more verification with
+you.
+
+. . .
+
+That is not a compromise. It is the actual job description of an analyst who
+uses these tools well.
+
+# 3. Verification
+
+## The Only Skill That Matters
+
+An AI assistant is a **confident** producer of plausible work.
+
+. . .
+
+Plausible and correct are different, and the gap is invisible from the output
+alone.
+
+. . .
+
+Everything in this section is about closing that gap cheaply.
+
+## The Four Checks
+
+**1. Shape.** Did the number of rows change when it should not have? Is the
+output the grain you asked for?
+
+. . .
+
+**2. Extremes.** Look at the largest and smallest values. Nonsense hides in the
+tails, not in the head of the table.
+
+. . .
+
+**3. A known case.** Pick one channel or one week you can compute by hand or read
+off GA4. Does it match?
+
+. . .
+
+**4. Reproduce.** Restart and run all. Then run it on last month's data.
+
+## Verification Is Not Reading the Code
+
+Reading the code catches syntax and obvious logic errors.
+
+. . .
+
+It does not catch:
+
+- The right operation on the wrong column
+- A join that silently dropped 40% of rows
+- A filter that excluded exactly the cases you cared about
+- A correct calculation of a metric that answers a different question
+
+. . .
+
+**Only checking the output against something you already know catches those.**
+
+## The Failure Mode You Will Actually Have
+
+<!-- Speaker notes: worth dwelling on. This is not hypothetical, it happens to
+     every student who submits agent-assisted work. -->
+
+You ask for conversion rate by channel. The agent produces a table. It looks
+right. It is formatted nicely. You put it in your report.
+
+. . .
+
+It computed key events divided by **users**, not by **sessions**.
+
+. . .
+
+Every number is wrong by a consistent factor, the ranking happens to be
+unchanged, and nothing about the output looks suspicious.
+
+. . .
+
+**The definition, not the code, was wrong.** No amount of reading the Python
+would have caught it. Checking one channel against GA4 would have.
+
+## Ask for the Assumptions
+
+A cheap habit that catches a lot:
+
+> "Before you write the code, list the assumptions you are making about the
+> data and the metric definitions."
+
+. . .
+
+The assumptions are where the errors are, and they are much faster to read than
+the code.
+
+## Exercise {background="#43464B" .smaller}
+
+Use an agent (Claude, ChatGPT with code execution, or Colab's assistant) on your
+own GA4 export:
+
+> "Load this export, clean it, and report sessions and key events by channel and
+> by week. List your assumptions before you start."
+
+Then, without looking at the code:
+
+1. Check the total sessions against your GA4 report
+2. Check one channel and one week by hand
+3. Find the largest and smallest values and ask whether they make sense
+4. Write down one assumption it made that you would have made differently
+
+**20 minutes**
+
+# 4. Limits, Cost and Safety
+
+## What Agents Are Bad At
+
+- **Small samples**: it will report a difference on n = 12 with no hesitation
+- **Your context**: it does not know your consent decline rate or that you tested
+  your own tags for a week
+- **Domain definitions**: sessions, users, key events, engaged sessions. It will
+  pick a plausible one
+- **Saying "I do not know"**: it will produce an answer regardless
+
+. . .
+
+Every one of these is a thing you learned to worry about in Lectures 3, 5 and 10.
+That is why this lecture is here and not in week one: you can now tell when the
+answer is wrong.
+
+## How Far They Can Actually Go {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_metr_three_fits.png){fig-align="center" height="320px"}
+
+*Task length completed at 50% reliability, with three fits to the same data.
+The disagreement after 2026 is the honest part of the picture.*
+
+
+## What Not to Give an Agent
+
+**Write access to your live GA4 property.** Configuration changes are not
+reversible and historical data does not restate. Lectures 9 and 10 explained why.
+
+. . .
+
+**Your live site, unsupervised.** A broken tag costs you weeks of data.
+
+. . .
+
+**Personal data.** Your GA4 export is pseudonymous, but a comments dataset with
+names in it is not. Lecture 10 applies to what you paste into a chat window.
+
+. . .
+
+**Client credentials.** Ever.
+
+## Who Gains, Who Loses {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_genai_effects_table.png){fig-align="center" height="350px"}
+
+*Most studies find generative AI narrows the gap between high and low
+performers. A few find the opposite. Note which tasks are which.*
+
+
+## Cost
+
+Agents are not free, in money or in time.
+
+. . .
+
+A long agentic session on a small dataset can cost more than doing it yourself,
+and a wrong answer you then have to debug costs far more.
+
+. . .
+
+**Rule of thumb**: chat for questions, context for one-off analysis, agents for
+work you will repeat or work large enough that the loop pays for itself.
+
+## Disclosure
+
+For this module:
+
+- **You may use AI for anything.** There is no penalty and no need to hide it.
+- **You must say what you used it for.** One short section in your notebook or
+  report: which tasks, which tool, what you changed.
+- **You are responsible for every number you submit.** "The AI produced it" is
+  not a defence, in this module or in a job.
+
+. . .
+
+This is the same principle as the measurement plan in Lecture 9, and the one the
+cleaning log will formalise in Lecture 17. The reader must be able to tell what
+you did.
 
 ## Exercise {background="#43464B"}
 
-Using your own export plus a spend table, real or simulated:
+In pairs, one of you plays the client.
 
-1. Aggregate sessions and key events by channel and week, and write the grain in
-   a comment
-2. Join to spend on campaign, with `validate=` set
-3. Report the four-number check
-4. Report how many rows failed to match, and **why**, with the actual key values
-5. Compute cost per key event by channel, and say which channels it is undefined
-   for
+1. The analyst presents a finding produced with an agent
+2. The client asks: "how do you know that is right?"
+3. The analyst answers without saying "the AI did it"
+4. Swap
 
-**25 minutes**
-
-# 4. Agentic Joins
-
-## AI This Block: Agentic coding
-
-Where we are on the module's AI spine, introduced in Lecture 10:
-
-> **Agentic coding**
-
-## A Failed Join Is the Ideal Agentic Task
-
-Because the diagnosis is a **loop**: count, inspect, hypothesise, test, count
-again.
-
-. . .
-
-Chat can list the usual causes of a key mismatch. An agent can find out which
-one is actually happening in your file, in one pass, without you pasting
-anything.
-
-> "This merge left 340 of 500 rows unmatched. Find out why, show me the
-> mismatched key values side by side, and propose a normalisation. Do not apply
-> it yet."
-
-. . .
-
-**"Do not apply it yet"** is the useful half of that prompt.
-
-## Why an Agent Beats Chat Here
-
-- It can run `value_counts()` on both sides rather than asking you to
-- It can test a normalisation and report the new match rate immediately
-- It can check whether the fix changed the row count, which is the check you
-  would forget
-
-. . .
-
-The loop is fast, mechanical, and has an unambiguous success criterion. That
-combination is exactly where delegation pays.
-
-## What You Still Verify
-
-- Row counts before and after: the four-number check is yours, not its
-- That the fix **normalised** keys rather than dropping the rows that did not
-  match
-- That no duplicate rows were created by a many-to-many join
-- That the campaigns which still do not match are genuinely absent from the
-  spend table, and not renamed
-
-::: {.callout-note appearance="minimal"}
-An agent that silently changes `how="left"` to `how="inner"` will report a 100%
-match rate. Which of the checks above catches that, and would you have run it?
-:::
-
-<!-- Speaker notes: this is the concrete instance of lecture 10's "verification
-     is checking output, not reading code". Reading the diff would catch the
-     changed keyword; but so would the row count, and the row count also catches
-     the five other ways it could go wrong. -->
-
-## Exercise {background="#43464B"}
-
-1. Deliberately break a join by changing case in one key
-2. Ask an agent to diagnose it
-3. Check whether its fix preserved the row count you expected
-4. Ask it to add a `validate=` argument and explain which value it chose and why
-5. Break it a second way, with a duplicate row rather than a bad key, and see
-   whether the same prompt finds it
+Then write, for your own portfolio work, the three sentences of your AI use
+disclosure.
 
 **15 minutes**
 
-## Going Further
-
-- Wickham (2011), *The Split-Apply-Combine Strategy for Data Analysis* — the
-  paper that named the pattern
-- pandas user guide, *Merge, join, concatenate and compare* — read the
-  `validate` and `indicator` sections properly
-- McKinney, *Python for Data Analysis*, ch. 8 — the reference for this lecture
-
 ## Next Lecture
 
-The analyses Tableau makes awkward: cohorts, retention and RFM.
-
-**Prepare**: have a joined table ready. Lecture 13 builds on it rather than
-starting again.
+Python I. You now know what you are doing when you let something else write it.

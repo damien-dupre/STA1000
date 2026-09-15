@@ -41,3 +41,47 @@
 	font-weight: bold;
 	padding: 2px 5px;
 }
+
+// Quarto's two-column layout does not reach these decks through the metropolis
+// theme, so `::: {.columns}` blocks were stacking vertically instead of sitting
+// side by side. Restore the intended flex row, and switch .column to border-box
+// so the theme's own padding and margin do not push the pair past 100%.
+.reveal .slides .columns {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: flex-start;
+}
+
+.reveal .slides .column {
+	box-sizing: border-box;
+}
+
+// The produnis timer extension renders a 300px dial, which eats a third of a
+// slide. Shrink it and pin it to the bottom-right corner so an exercise slide
+// keeps its full height for the instructions.
+.reveal .slides .base-timer {
+	width: 140px;
+	height: 140px;
+	position: absolute;
+	right: 10px;
+	bottom: 10px;
+}
+
+// Inherit the slide's own text colour, so the remaining time stays legible on
+// the dark exercise slides as well as on a light one.
+.reveal .slides .base-timer text {
+	fill: currentColor;
+	font-weight: 600;
+}
+
+// A Quarto layout panel drops the height= attribute from an image and lets it
+// fill the cell width instead, which on a two-column slide can push the image
+// past the bottom of the slide. Cap the height and let the width follow the
+// aspect ratio, so `:::: {layout="[1,1]"}` behaves on image pairs.
+.reveal .slides .quarto-layout-cell img {
+	max-height: 360px;
+	width: auto;
+	max-width: 100%;
+	object-fit: contain;
+}

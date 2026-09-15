@@ -1,509 +1,437 @@
 ---
-title: "Lecture 16: Core Marketing Metrics"
+title: "Lecture 16: Python IV - Text and Social Data"
 subtitle: STA1000 - Data Analytics and Metrics
 ---
 
 ## Previously ...
 
-You can produce almost any number. Block 4 is about which numbers a decision
-turns on.
+Everything so far has been structured. Most of what customers say is not.
 
 ## Learning Outcomes
 
 By the end of this lecture you will be able to:
 
-- Decompose revenue into the factors marketing can move
-- Calculate acquisition cost, lifetime value, ROAS and contribution
-- Explain the relationship between them, and which one a CFO recognises
-- Identify when a metric is being gamed, including by you
+- Prepare text for analysis, and say what each preparation step destroys
+- Represent text as numbers, from counts to embeddings
+- Score sentiment with a lexicon and with a model, and state the trade
+- Validate any text method against human labels before reporting a number
 
-# 1. Which Number Is the Business
+# 1. Text as Data
 
-## Two Laws
+## Where Marketing Text Comes From
 
-**First law**: no customers, no business.
-
-No customers → no revenue → no profit → no business.
-
-. . .
-
-**Second law**: more customers, more profit.
+Reviews, comments, replies, support tickets, survey free text, social captions,
+search queries, and the sales team's notes.
 
 . . .
 
-The second is an empirical tendency rather than a logical necessity. Individual
-customers can be unprofitable, and we will spend part of this lecture on the
-ones who are.
+It is the only data that tells you **why**. Every structured metric in this
+module tells you what happened.
+
+. . .
+
+It is also the data most likely to be analysed badly, because the tooling makes
+producing a number very easy and validating it entirely optional.
+
+## The Lifecycle, Upside Down
+
+**How it used to go**: define the task, collect thousands of examples, label
+them by hand, train a model, evaluate, deploy. Months.
+
+. . .
+
+**How it goes now**: write a prompt, get labels, ship. Minutes.
+
+. . .
+
+The expensive step was labelling, and it has apparently disappeared. It has not.
+It has moved from the start of the project, where it was a budget line, to the
+end, where it is optional and therefore skipped.
 
 ::: {.callout-note appearance="minimal"}
-Which functions in a business can afford to ignore customers? Whose budget is
-justified by a number that is not a customer count?
+If labelling was where the domain knowledge entered the process, and labelling
+is now automated, where does the domain knowledge enter?
 :::
 
-## Revenue, Decomposed
+<!-- Speaker notes: this framing is the spine of the lecture. The old pipeline
+     forced you to look at your data. The new one does not, and that is the
+     entire risk. Everything after this slide is about putting the looking
+     back in on purpose. -->
 
-Any brand's revenue can be written as a chain of ratios:
+## Semantic and Pragmatic Meaning {.smaller}
 
-$$\text{Revenue} = \underbrace{\text{stores}}_{\text{distribution}} \times
-\underbrace{\frac{\text{customers}}{\text{store}}}_{\text{reach}} \times
-\underbrace{\frac{\text{transactions}}{\text{customer}}}_{\text{frequency}} \times
-\underbrace{\frac{\text{spend}}{\text{transaction}}}_{\text{basket}}$$
+:::: {layout="[1,1]"}
+::: {#first-column}
 
-. . .
+**Semantic**
 
-Four levers. Marketing teams argue endlessly about which one to pull.
+What the words literally mean.
 
-::: {.callout-note appearance="minimal"}
-Before the next slide: which of the four do you expect to explain most of the
-variation in revenue across firms?
+> "Wow, you really are an expert."
+
+A compliment.
+
 :::
 
-## The Answer Is Customer Count
+::: {#second-column}
 
-Work on the full US Visa transaction panel, over a trillion dollars of spending
-across 32 billion transactions, regressed each factor against merchant revenue.
+**Pragmatic**
 
-. . .
+What was meant, given context, speaker and history.
 
-**Unique customers per store explains 68 to 84% of the variation in merchant
-revenue.** Far more than transaction frequency or basket size, and the result
-holds across sectors.
+> "Wow, you really are an expert."
 
-. . .
+Possibly the opposite of a compliment.
 
-This is why serious firms measure at the **customer level** rather than the
-store, visit or transaction level. It is also why the metrics in the rest of
-this lecture are all customer metrics.
-
-<!-- Speaker notes: the students' instinct is usually basket size, because that
-     is the lever a marketer feels in control of. The result reframes the whole
-     block: acquisition and retention dominate, and everything else is trim. -->
-
-## Vocabulary, Fixed Now
-
-| Level | Unit | Typical metric |
-|---|---|---|
-| Market | The category | Size, growth, share |
-| Customer | A person | CAC, LTV, retention, RFM |
-| Product | A SKU or service | Margin, attach rate |
-| Transaction | An order | AOV, units per order |
-
-. . .
-
-**Most bad marketing arguments are two people using metrics from different
-levels.** "Our AOV is up" and "our customer count is down" can both be true, and
-only one of them decides whether the business survives.
-
-# 2. Cost
-
-## Customer Acquisition Cost
-
-$$\text{CAC} = \frac{\text{acquisition spend}}{\text{new customers acquired}}$$
-
-. . .
-
-**The numerator is an argument.** Media only? Media plus agency fees? Plus the
-salaries of the people who made the ads? Plus the discount you gave to close the
-first sale?
-
-. . .
-
-Every one of those is defensible and they produce numbers that differ by a
-factor of three. **State the definition beside the number, every time.**
-
-## Blended and Paid CAC {.smaller}
-
-:::: {.columns}
-::: {.column width="45%"}
-**Blended CAC**
-
-All spend ÷ all new customers, organic ones included.
-
-Flatters you. Useful for asking "what does growth cost us overall".
-:::
-::: {.column width="45%"}
-**Paid CAC**
-
-Paid spend ÷ customers attributed to paid.
-
-Honest about the marginal channel. Depends entirely on attribution, which is
-Lecture 18's problem.
 :::
 ::::
 
 . . .
 
-Reporting blended CAC while making a decision about paid spend is one of the
-most common and most expensive confusions in the discipline.
-
-## Cost per What
-
-CPM, CPC, CPA, CPL: the same spend divided by a different denominator.
+Lexicons see only the semantic layer. Models see more of the pragmatic layer,
+but not the context that decides it: who wrote it, to whom, after what.
 
 . . .
 
-Each choice of denominator is a **strategic claim** about what you are buying:
+**You have that context**, and it does not scale, which is why it is spent on a
+sample rather than the corpus.
 
-- **CPM** claims you are buying attention
-- **CPC** claims you are buying visits
-- **CPA** claims you are buying customers
-- **CPL** claims you are buying the chance of a conversation
+## Preparation, and Its Costs {.smaller}
 
-. . .
-
-A channel can be cheap on one and ruinous on the next. The ranking of your
-channels changes with the denominator, which is why everyone quotes the
-denominator that flatters their channel.
-
-# 3. Value
-
-## Lifetime Value
-
-Start simple:
-
-$$\text{LTV} = \text{AOV} \times \text{frequency} \times \text{lifespan} \times \text{margin}$$
+| Step | Fixes | Destroys |
+|---|---|---|
+| Lowercase | `Great` = `great` | `US` vs `us`, brand names, SHOUTING |
+| Strip punctuation | Token noise | `!!!` intensity, emoji, `:(` |
+| Remove stopwords | "the" topping every list | Negation: "not good" becomes "good" |
+| Lemmatise | `running`/`ran` unify | Tense, which sometimes is the finding |
 
 . . .
 
-Then say it properly, with retention and the cost of capital:
-
-$$\text{CLV} = \sum_{t=0}^{T} \frac{m_t \, r^t}{(1+i)^t}$$
-
-$m_t$ = contribution margin in period $t$, $r$ = retention probability, $i$ =
-cost of capital, $T$ = horizon.
+**Removing stopwords before sentiment analysis destroys negation.** It is a
+standard step in a standard pipeline and on this task it inverts your answer.
 
 . . .
 
-$m$ and $r$ are **observable in past data**. The values you put in the formula
-are **predictions**. That distinction is the whole subject.
+Every preparation step is a decision about what does not matter. Write down
+which ones you made, in Lecture 17's log.
 
-## A Worked Example {.smaller}
+## Counting
 
-A tennis club:
+```{.python}
+from sklearn.feature_extraction.text import TfidfVectorizer
 
-- Annual membership fee: €300
-- Average additional spend per member per year: €100
-- Contribution margin on that additional spend: 60%
-- Annual retention: 80%. Cost of capital: 15%
-
-. . .
-
-$m = 300 + 0.6 \times 100 = 360$
+tfidf = TfidfVectorizer(ngram_range=(1, 2), min_df=3, stop_words=None)
+X = tfidf.fit_transform(comments["text"])
+```
 
 . . .
 
-| Horizon | CLV |
-|---|---|
-| $T=1$ | €360 |
-| $T=2$ | $360 + \frac{360 \times 0.8}{1.15} =$ €610 |
-| $T=3$ | $360\left(1 + \frac{0.8}{1.15} + \frac{0.64}{1.3225}\right) =$ €785 |
+**Raw counts return "the".** TF-IDF weights a term by how often it appears in a
+document against how rare it is across the corpus, which surfaces the terms that
+distinguish documents rather than the terms that fill them.
 
 . . .
 
-Notice how quickly it asymptotes. **Extending the horizon adds less than people
-expect**, and adds prediction error faster than it adds value.
+`ngram_range=(1,2)` keeps two-word phrases, which is how "not recommended"
+survives as a unit. `min_df=3` drops terms appearing in fewer than three
+documents, most of which are typos.
 
-## The Horizon Is a Judgement Call
+## Embeddings {.smaller}
 
-$T$ is conventionally set to three years, for no better reason than convention.
-
-. . .
-
-Amazon has long argued that a seven-year horizon lets it justify investments
-competitors cannot match. That is a real strategic advantage and it comes
-entirely from a choice of $T$.
+TF-IDF says two documents are similar when they share words. `car` and
+`automobile` share none.
 
 . . .
 
-**The horizon, the retention rate and the discount rate are all assumptions.**
-Change any one and the answer moves. Report the three, and report the answer at
-two horizons.
+An **embedding** is a vector representation where similar meanings sit near each
+other in space, learned from how words are used rather than how they are spelt.
+
+. . .
+
+What that buys you:
+
+- Semantic search: retrieve comments about pricing without the word "price"
+- Clustering by meaning, which is Lecture 15's k-means on a different feature
+  space
+- Duplicate and near-duplicate detection, which is more useful than it sounds on
+  review data
 
 ::: {.callout-note appearance="minimal"}
-A longer horizon makes more marketing spend look justified. Who in an
-organisation benefits from choosing a longer $T$, and who checks?
+Embeddings encode the usage patterns of the corpus they were trained on,
+including its biases. What does that imply about running them on a corpus that
+does not look like general web English?
 :::
 
-## Using CLV to Decide
+## What an Embedding Buys You {.smaller}
 
-A campaign is worth running if $\text{CAC} < \text{CLV}$, with two caveats
-attached.
+:::: {layout="[1,1]"}
+::: {#first-column}
 
-. . .
+**Arithmetic on meaning**
 
-**The tennis club and the billboard.** €20,000 for a billboard seen by 100,000
-people, expected conversion 0.1%.
+![](./figures/external/mgt100_embedding_analogy.png){fig-align="center" height="235px"}
 
-. . .
-
-Customers acquired: $100{,}000 \times 0.001 = 100$.
-
-CAC = $20{,}000 / 100 =$ **€200**.
-
-. . .
-
-Below the one-year CLV of €360. On paper, a clear yes.
-
-## The Two Caveats
-
-**One.** The rule holds only if the newly acquired customers have CLV at least
-equal to the existing average. Cheaply acquired customers usually do not: the
-people a discount brings in are the people a discount brings in.
-
-. . .
-
-**Two.** Nobody believes the 0.1%. So firms impose a **fudge factor**, requiring
-$\text{CLV} > f \times \text{CAC}$ with $f$ typically 3 or 7.
-
-. . .
-
-The 3:1 rule of thumb you will read on marketing blogs **is that fudge factor**,
-detached from its reasoning and presented as a law. It is a speed bump against
-optimistic conversion forecasts, not a target to hit.
-
-::: {.callout-note appearance="minimal"}
-How confident are you in a 0.1% conversion prediction for a billboard? Can you
-get your money back if it underperforms? Are there better uses of €20,000? Those
-three questions are what the fudge factor is standing in for.
 :::
 
-## Payback Period
+::: {#second-column}
 
-Often more useful than the ratio, because it is about **cash** rather than
-theory.
+**Directions that mean something**
 
-. . .
+![](./figures/external/mgt100_embedding_space.png){fig-align="center" height="235px"}
 
-"We recover CAC in four months" is a statement a finance director can act on.
-"Our LTV:CAC is 3.2" requires them to accept your retention assumption, your
-horizon and your discount rate first.
+:::
+::::
 
-. . .
-
-At a payback of 18 months, a growing company runs out of money while being
-profitable on paper. This is the most common way a well-measured business dies.
-
-## CLV Cautions
-
-- **Identity is mismeasured.** Can you link the same person across two cards,
-  two devices, two email addresses? Every failure to link splits one loyal
-  customer into two churned ones and destroys your retention estimate
-- **CLV is predictive, not prescriptive.** It contains no model of *why* anyone
-  buys. It cannot tell you what to change
-- **It can be self-fulfilling.** Treat a customer as low value, give them a worse
-  experience, and watch them behave like a low-value customer
-
-. . .
-
-The guiding principle: **using CLV to create more value for the customer
-benefits everyone. Using it purely to extract margin sets your interests against
-theirs**, and customers eventually notice.
-
-## Firing Customers
-
-In the 2000s consultancies published claims that 20 to 30% of customers were
-unprofitable, and firing them sounded free.
-
-. . .
-
-Firms tried it: paying cardholders to close accounts, quietly withdrawing
-promotions, minimum balances and fees designed to drive accounts away,
-suspending frequent returners.
-
-. . .
-
-Concentration can be extreme. In published work on online gambling, roughly 3%
-of customers generated half of net revenue, and the top 5% of winners cost
-operators around a fifth of it.
-
-. . .
-
-**Customers talk to each other.** The better move is usually to redesign the
-offer and the pricing so unprofitable customers either become profitable or
-select themselves out, rather than being shown the door.
-
-# 4. Return
-
-## ROAS
-
-$$\text{ROAS} = \frac{\text{revenue attributed to ads}}{\text{ad spend}}$$
-
-Simple, universal, comparable across campaigns, and misleading in three separate
-ways at once.
-
-## Why ROAS Is Not Profit
-
-<!-- Speaker notes: a 4x ROAS on a product with a 20% margin is a loss. This
-     single point is the most commercially useful thing in the lecture. Make
-     them compute it rather than showing them. -->
-
-A campaign returns **4x ROAS**. €10,000 spend, €40,000 revenue. Everyone is
-delighted.
-
-. . .
-
-The product carries a **20% contribution margin**.
-
-. . .
-
-Gross contribution: $40{,}000 \times 0.20 = €8{,}000$.
-
-Media cost: €10,000.
-
-. . .
-
-**Result: a loss of €2,000.** The break-even ROAS on a 20% margin is 5x, and
-nobody in the room knew it.
-
-::: {.callout-note appearance="minimal"}
-Break-even ROAS is $1/\text{margin}$. What is yours? If you do not know your
-contribution margin, what exactly does your ROAS target mean?
+::: {style="font-size:0.55em;text-align:center;"}
+Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)
 :::
 
-## Contribution Margin
+*Meaning becomes geometry. Similar things sit close together, and the
+directions between them are themselves interpretable.*
 
-$$\text{Contribution} = \text{revenue} - \text{variable costs} - \text{media}$$
 
-. . .
+# 2. Sentiment
 
-Revenue minus the costs that scale with the sale: goods, payment fees, delivery,
-returns, support. Then media.
+## Lexicon Approaches
 
-. . .
-
-**This is the number a CFO recognises**, and translating your ROAS into it is the
-single most useful thing you can do to be taken seriously outside the marketing
-function.
-
-## Incrementality
-
-A brand-search campaign reports 12x ROAS. It bids on your own company name.
+```{.python}
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+analyser = SentimentIntensityAnalyzer()
+comments["compound"] = comments["text"].apply(
+    lambda t: analyser.polarity_scores(t)["compound"])
+```
 
 . . .
 
-Most of those people were going to arrive anyway. The campaign is charging you
-for traffic you already had.
+VADER: a hand-built dictionary of words with valence scores, plus rules for
+negation, intensifiers, capitals and punctuation. Tuned on social media text.
 
 . . .
 
-**Incrementality asks the only question that matters**: what would have happened
-if we had not run this? ROAS cannot answer it, attribution models cannot answer
-it, and Lectures 18 and 19 are about the two ways to try.
+**Fast, free, deterministic, and fully auditable.** You can show a client the
+exact word that produced the score, which matters more often than accuracy does.
 
-# 5. Gaming
+## Model Approaches
 
-## Every Metric Becomes a Target {.smaller}
-
-Goodhart's law: when a measure becomes a target, it stops being a good measure.
-
-In marketing, specifically:
-
-- **Bidding on your own brand terms**, which buys traffic you had, at excellent
-  reported ROAS
-- **Retargeting cart abandoners** and claiming the sale they were going to
-  complete
-- **Counting assisted conversions** in every channel that touched them, so the
-  channel totals exceed the actual conversions
-- **Moving the attribution window** until the number improves
-- **Redefining "new customer"** near the end of the quarter
+```{.python}
+from transformers import pipeline
+clf = pipeline("sentiment-analysis")
+clf("The delivery was late but the product is excellent")
+```
 
 . . .
 
-None of these requires dishonesty. Each is a defensible choice made repeatedly
-in the same direction.
+A transformer classifier fine-tuned on labelled sentiment data. Substantially
+better than a lexicon on negation, context and mixed sentences.
+
+. . .
+
+Still deterministic, still local, still inspectable in the sense that the same
+input gives the same output. **The middle option, and the one most often
+skipped** in the jump from VADER to an LLM.
+
+## Where All of Them Fail
+
+- **Sarcasm.** "Great, another outage." Lexicons fail completely, models mostly
+- **Negation at distance.** "I wouldn't say I was impressed"
+- **Domain terms.** "Sick trainers", "this is fire", "wicked". Positive
+- **Mixed sentiment in one sentence.** "Service was great but the food was
+  terrible" is not neutral, it is two opposite judgements about two different
+  things
+- **Non-English text**, and code-switching within a sentence
+- **No units.** A compound score of 0.7 is not 70% positive. It is not a
+  percentage of anything
+
+## Aspect-Based Sentiment
+
+> "The service was great but the food was terrible."
+
+Document-level sentiment: roughly neutral, and useless.
+
+. . .
+
+Aspect-based: `service: positive`, `food: negative`. Two findings, both
+actionable.
+
+. . .
+
+**This is almost always what a marketer actually wanted.** It is also where the
+benchmark gap between lexicons, fine-tuned models and LLMs is widest, and where
+an LLM's ability to follow an instruction in plain language is worth the most.
 
 ::: {.callout-note appearance="minimal"}
-Which of these could you do to your own portfolio, honestly, and improve every
-number in your final report? Is there a check that would catch it?
+Which aspects would you extract from comments about your own portfolio site?
+Name them **before** you run anything.
+:::
+
+## Validate Against Humans
+
+**Hand-label 50 items. Compare. Report the agreement.**
+
+. . .
+
+Not as a nicety. As the only evidence you have that the number means anything.
+
+```{.python}
+from sklearn.metrics import cohen_kappa_score, classification_report
+cohen_kappa_score(human_labels, method_labels)
+```
+
+. . .
+
+Raw agreement flatters you: if 80% of comments are positive, a classifier that
+answers "positive" every time is 80% accurate. **Cohen's kappa** corrects for
+agreement by chance, and is the number to report.
+
+. . .
+
+**Never ship an unvalidated sentiment number.** It takes forty minutes to label
+fifty comments, and it is the difference between a finding and a decoration.
+
+# 3. Themes
+
+## Simple Before Clever
+
+Before any topic model:
+
+1. TF-IDF ranking, read by a human, which takes ten minutes
+2. Keyword grouping, using terms you chose because you know the business
+3. Co-occurrence: which terms appear together, which is often the whole finding
+
+. . .
+
+On a few hundred comments this is usually all you need, and it produces themes
+you can defend line by line.
+
+## A Brand Map Built From Text Alone {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_brand_maps_from_text.png){fig-align="center" height="340px"}
+
+*Netzer et al. built these car brand maps from forum posts, with no survey.
+The left map is co-mention, the right is switching.*
+
+
+## Topic Extraction
+
+**LDA** assumes documents are mixtures of topics and topics are distributions
+over words. Long-established, and needs a lot of documents.
+
+. . .
+
+**BERTopic** clusters embeddings and then labels the clusters. Better on short
+text, which is what marketing text is.
+
+. . .
+
+Two honest warnings, equally true of both:
+
+- **Topics need human naming.** The model gives you word lists. The name is your
+  interpretation, and it is where the errors go in
+- **They are unstable across runs and across $K$.** Same data, different seed,
+  different topics. Report the seed, or do not report the topics
+
+## Exercise {background="#43464B"}
+
+On a set of comments, reviews or captions relevant to your portfolio:
+
+1. Clean the text and produce a TF-IDF ranking, and say what your cleaning
+   destroyed
+2. Score sentiment with VADER
+3. Hand-label 30 items and report kappa, not just raw agreement
+4. Name three themes and quote one example of each
+5. Find one item where the method and your label disagree, and explain why
+
+**30 minutes**
+
+# 4. LLMs for Text: Better and Riskier
+
+## AI This Block: Agentic coding
+
+Where we are on the module's AI spine, introduced in Lecture 12:
+
+> **Agentic coding**
+
+## An LLM Is a Better Sentiment Classifier
+
+This is not in dispute. On sarcasm, negation, domain language and aspect-based
+tasks, a general model beats a lexicon comfortably.
+
+. . .
+
+The published picture is more interesting than "better": general models are
+**jack of all trades, master of none**. A model fine-tuned on your domain
+usually beats a general LLM **within** that domain, and the LLM generalises
+better **outside** it.
+
+. . .
+
+Which means the right choice depends on whether your text looks like the
+training data of any available specialised model. Usually it does not.
+
+## What You Give Up
+
+- **Reproducibility.** The same comment can score differently across runs, and
+  across silent model updates you are not told about
+- **Auditability.** You cannot show a client the lexicon, because there is not
+  one
+- **Cost.** Scales with corpus size, so the pilot is free and the production run
+  is not
+- **Calibration.** It is confidently wrong on the ambiguous cases, which are
+  exactly the cases you were trying to resolve
+
+. . .
+
+**Be able to state the trade, not just pick a side.** That is what is being
+assessed.
+
+## The Discipline Is Unchanged
+
+Hand-label 50. Compare. Report kappa.
+
+. . .
+
+Identical to what this lecture demands of VADER. An LLM does not exempt you from
+validation. It makes validation **more** important, because you cannot inspect
+the rule that produced the label.
+
+. . .
+
+And two additions specific to LLMs:
+
+- **Fix the prompt and record it.** The prompt is the method section
+- **Run a sample twice** and report how often the two runs disagree with each
+  other. That is your reproducibility number, and it is rarely zero
+
+::: {.callout-note appearance="minimal"}
+If two runs of the same prompt disagree on 6% of comments, what is the honest
+sentence to put under the chart?
 :::
 
 ## Exercise {background="#43464B"}
 
-For a business of your choice, or your portfolio:
-
-1. Calculate CAC and CLV with every assumption written down
-2. Compute CLV at $T=1$ and $T=3$ and say how much the horizon is worth
-3. Compute ROAS, then break-even ROAS, then contribution for the same campaign
-4. Identify the assumption your conclusion is most sensitive to
-5. Describe how someone could make this campaign look excellent while losing
-   money
+1. Score 50 comments with VADER and with an LLM, using a prompt you write down
+2. Hand-label the same 50
+3. Report kappa for each method against your labels
+4. Run the LLM a second time on the same 50 and report run-to-run agreement
+5. Say which you would ship, and exactly what you would tell the client about
+   its limits
 
 **25 minutes**
 
-# 6. AI as Devil's Advocate
-
-## AI This Block: An analyst you interrogate
-
-Where we are on the module's AI spine, introduced in Lecture 10:
-
-> **An analyst you interrogate**
-
-## The Block 4 Step on the Spine
-
-From here on, the useful prompt is not "do this" but **"tell me why I am
-wrong"**.
-
-> "I am reporting a 4.2x ROAS on this campaign and recommending we increase
-> spend. Argue against that recommendation. Assume I have not thought about
-> margin, incrementality or the quality of the customers this channel acquires."
-
-. . .
-
-Naming the objections you have already considered forces it past the obvious
-three and into the ones you have not.
-
-## Why This Works
-
-The standard objections to a marketing metric are **well documented**, which
-means a broadly-read assistant reproduces them reliably and quickly.
-
-. . .
-
-What it cannot know is which objection applies to **your** numbers: your margin,
-your channel mix, your customers, your data.
-
-. . .
-
-**You supply the context, it supplies the checklist.** That division of labour is
-the whole of block 4.
-
-## Where It Will Be Confidently Wrong
-
-- It will accept your CAC definition without asking what is in the numerator
-- It will quote the 3:1 LTV:CAC rule as though it were a finding rather than a
-  fudge factor
-- It will not notice that your retention rate came from 12 users
-- It will produce a beautifully argued case against a number you typed in wrong
-
-::: {.callout-note appearance="minimal"}
-It will argue whichever side you ask it to, with equal fluency. What does that
-tell you about how much weight its agreement should carry?
-:::
-
-## Exercise {background="#43464B"}
-
-1. Compute CAC, CLV and ROAS for a campaign
-2. Ask an assistant to argue that your conclusion is wrong
-3. Identify which of its objections actually applies to your numbers, and which
-   are generic
-4. Recompute with the applicable objection addressed
-5. Then ask it to argue the **opposite** case and notice how good that one also
-   sounds
-
-**15 minutes**
-
 ## Going Further
 
-- Einav, Klenow, Klopack, Levin, Levin and Best (2021), *Customers and Retail
-  Growth* (NBER 29561) — the decomposition and the customer-count result
-- Farris, Bendle, Pfeifer and Reibstein, *Marketing Metrics* — the reference
-  work; read the chapters on CLV and on margin
-- Gupta and Lehmann, *Managing Customers as Investments* — CLV as an asset
-- MIT Sloan Management Review (2024), *Firing the Right Customers Is Good
-  Business*
+- Hutto and Gilbert (2014), *VADER* — the paper, and read the rules section
+- Kocoń et al. (2023), *ChatGPT: Jack of all trades, master of none* — the
+  benchmark picture across NLP tasks
+- Zhang et al. (2023), *Is ChatGPT a Good Sentiment Analyzer?* — aspect-based
+  results specifically
+- Grimmer and Stewart (2013), *Text as Data* — the methodological warnings, all
+  of which predate LLMs and none of which have expired
 
 ## Next Lecture
 
-Where the traffic you paid for actually goes: funnel and conversion analysis.
+The unglamorous lecture that decides whether any of this is true: cleaning, and
+the audit trail.
 
-**Prepare**: bring your contribution margin, or the reason you cannot get it.
+**Prepare**: bring the list of preparation decisions you made today. They are
+the first entries in your cleaning log.

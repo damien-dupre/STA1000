@@ -3,16 +3,22 @@ title: "Lecture 24: Presentation and Synthesis"
 subtitle: STA1000 - Data Analytics and Metrics
 ---
 
-## The Whole Module in One Slide
+## The Whole Module in One Slide {.smaller}
 
-TODO: the arc. Build a thing, measure it, describe it, analyse it, value it,
-frame it, present it.
+The arc, in the order it happened:
 
-- **Lectures 1-4**: you caused the data to exist
-- **Lectures 5-9**: you learned to see it
-- **Lectures 11-15**: you learned to compute with it, and to distrust it
-- **Lectures 16-20**: you learned what it is worth and what it proves
-- **Lectures 21-23**: you learned to put it in front of someone who pays
+| Lectures | What you learned to do |
+|---|---|
+| **1-7** | See data, and build something a stakeholder can read |
+| **8-11** | Cause the data to exist, lawfully, and get it back out |
+| **12-17** | Compute with it, and distrust it |
+| **18-22** | Say what it is worth and what it proves |
+| **23-24** | Put it in front of someone who pays |
+
+. . .
+
+**Blocks 2 and 3 are deliberately in that order.** You had to be handed somebody
+else's clean dataset before building your own was worth anything.
 
 ## Learning Outcomes
 
@@ -24,59 +30,178 @@ By the end of this lecture you will be able to:
 
 # 1. Presenting
 
-## The Structure
+## Present in the Opposite Order
 
-TODO: finding first, then evidence, then method, then caveats. The opposite of
-the order you did the work in.
+You did the work as: data → cleaning → analysis → finding.
+
+. . .
+
+**You present it as: finding → evidence → method → caveats.**
+
+. . .
+
+Nobody in the room wants the chronology. They want to know what you concluded,
+and then, only if they are interested, how you got there.
+
+. . .
+
+::: {.callout-note appearance="minimal"}
+The narrative order from Lecture 7 said the same thing about a dashboard:
+introduction, analysis, conclusion, with the conclusion doing real work. A
+presentation compresses it further, because you can be interrupted.
+:::
 
 ## Ten Minutes, Three Points
 
-TODO: what a client remembers.
+A client remembers **three things**, and that number does not go up if you talk
+for longer.
+
+. . .
+
+So decide, in advance, what the three are. Everything else on your slides is
+evidence for one of them or it comes out.
+
+. . .
+
+**A rough shape for ten minutes:**
+
+| Minutes | Content |
+|---|---|
+| 0-1 | The finding, stated plainly |
+| 1-6 | Three points, with one visual each |
+| 6-8 | How you know, including what you excluded |
+| 8-10 | What you would do next, and what would change your mind |
 
 ## Presenting Uncertainty
 
-TODO: how to say "we do not know" without losing the room. Ranges, not points.
+The hardest skill in this module, and the one that separates an analyst from a
+dashboard operator.
+
+. . .
+
+- **Ranges, not points.** "Between 4% and 9%, most likely around 6%" is more
+  useful and more honest than "6.3%"
+- **Name the sample size** in the sentence, not the footnote. "Across 38
+  sessions" changes how a number is heard, which is the point
+- **Say what would change your answer.** It converts a hedge into a plan
+
+. . .
+
+**"We do not know yet, and here is what it would take to find out" is a strong
+answer.** "6.3%" from 38 sessions is a weak one that sounds strong.
 
 ## Anticipating the Hard Question
 
-TODO: rehearse the three questions you least want to be asked.
+Write down the three questions you least want to be asked. Rehearse the answers
+out loud.
+
+. . .
+
+The usual three, on this module's work:
+
+1. *"How many people is that actually?"*
+2. *"What did you exclude, and why?"*
+3. *"Would you spend your own money on this?"*
+
+. . .
+
+**You have the answers.** They are in your cleaning log, your consent-bias note,
+and your contribution calculation. What you need is to have said them once before
+somebody asks.
 
 # 2. Assessment Briefing
 
-## The Portfolio Deliverable
+## Assignment 2 {.smaller}
 
-TODO: components, weighting, deadline, submission format.
+**Your website plus an analytics report**, due mid-April, 25% of the module.
 
-## The Marking Criteria
+The report covers your own site, your own traffic, and your own measurement
+decisions:
 
-TODO: rubric walk-through. Emphasise that documented judgement scores above
-undocumented certainty.
+- What the site was for, and the success statement you wrote in Lecture 8
+- What you measured, and why those events
+- What the data says, with the honest sample sizes
+- What you cleaned, and what that cost you
+- What you would do next
+
+. . .
+
+**The in-class test at the end of April covers the module's concepts**, not the
+tools' menus.
+
+## How This Is Marked {.smaller}
+
+The principle, stated in Lecture 1 and applied throughout:
+
+> **Documented judgement beats undocumented certainty.**
+
+. . .
+
+Concretely, in this report:
+
+- A caveat you raise yourself costs you nothing. The same caveat found by your
+  marker costs you a lot
+- A small number reported honestly scores above a large number you cannot defend
+- "I excluded these 87 rows because..." is worth more than a clean-looking table
+  with no history
+
+. . .
+
+**There is no version of this where the best mark goes to the most impressive
+figure.**
 
 # 3. Presentations
 
 ## Student Presentations {background="#43464B"}
 
-TODO: schedule, 10 minutes plus 5 for questions.
+Ten minutes each, plus five for questions.
 
-Peer feedback prompt for each presentation:
+For every presentation you watch, answer three questions in writing:
 
 1. What was the single finding?
 2. What evidence supported it?
-3. What was the biggest unstated assumption?
+3. What was the biggest **unstated** assumption?
 
-# Synthesis
+. . .
+
+Hand your three answers to the presenter afterwards. The third one is the gift.
+
+# 4. Synthesis
 
 ## What This Module Was Actually About
 
-TODO: not GA4, not Tableau, not Python. All three will change. The transferable
-skill is deciding what is worth measuring and being honest about what the
-measurement can support.
+Not GA4. Not Tableau. Not Python.
 
-# AI and What You Submit
+. . .
+
+All three will change, and two of them will probably be replaced inside your
+career. GA4 replaced Universal Analytics, which replaced Urchin.
+
+. . .
+
+**The transferable skill is deciding what is worth measuring, and being honest
+about what the measurement can support.** Everything else was a delivery vehicle
+for that.
+
+## The Three Ideas Worth Keeping {.smaller}
+
+1. **"What decision would change if this number were different?"** From Lecture 1,
+   and the fastest way to strip a dashboard down to what matters
+2. **Say the grain out loud.** From Lecture 2, and the source of most wrong
+   numbers in marketing
+3. **Documented judgement beats undocumented certainty.** From everywhere, and
+   the only one of the three that is about character rather than technique
+
+. . .
+
+::: {.callout-note appearance="minimal"}
+If you remember nothing else from twenty-four sessions, these three will still
+make you better than most people in the room.
+:::
+
+# 5. AI and What You Submit
 
 ## Disclosure, One More Time
-
-TODO: restate and enforce.
 
 Every submission carries three sentences:
 
@@ -86,36 +211,72 @@ Every submission carries three sentences:
 
 . . .
 
-Nobody loses marks for using AI. People lose marks for numbers they cannot
-defend.
+**Nobody loses marks for using AI.** People lose marks for numbers they cannot
+defend, and that was true before any of this existed.
 
 ## The Question You Will Be Asked
 
-TODO: rehearse it.
+In the viva, in a job interview, and in every meeting after that:
 
-> "How do you know that is right?"
-
-. . .
-
-Acceptable answers name a check: a figure reconciled against GA4, a hand-computed
-case, a row count that did not change.
+> **"How do you know that is right?"**
 
 . . .
 
-Unacceptable answers name a tool.
+**Acceptable answers name a check**: a figure reconciled against GA4, a case
+computed by hand, a row count that did not change across a join, a total that
+matches the source.
+
+. . .
+
+**Unacceptable answers name a tool.** "Python calculated it", "the agent ran it",
+"it is what the dashboard says". None of those is a check, and everyone senior
+enough to matter knows it.
 
 ## What Actually Transfers
 
-TODO: close the loop opened in Lecture 10.
-
-The tools in this module will all change. GA4 will be replaced, Tableau will be
-replaced, and the assistants will get better every few months.
+Lecture 12 opened this thread: you will hand more execution to the machine as you
+become more able to check it.
 
 . . .
 
-**What does not change is the ability to say why a number is trustworthy.** That
-was the module.
+That is now the job description. The typing is commoditised; **the checking is
+not**, because the checking requires knowing what the number is supposed to mean
+and what would make it wrong.
 
-## Where to Go Next
+. . .
 
-TODO: certifications, further modules, reading, and the datasets to practise on.
+**Which is what the last twenty-four sessions were for.**
+
+## Where to Go Next {.smaller}
+
+**Certifications worth the time**
+
+- Google Analytics Certification, and the Analytics Academy courses
+- Tableau Desktop Specialist
+- Google Cloud, if BigQuery interested you
+
+**Reading**
+
+- Wilke, *Fundamentals of Data Visualization*, free online
+- McKinney, *Python for Data Analysis*
+- Kohavi, Tang and Xu, *Trustworthy Online Controlled Experiments*
+
+**Practice**
+
+- Keep the site running and the property collecting. In a year it is a portfolio
+  with real data behind it, which almost no other candidate has
+- Tableau Public, as a public body of work
+
+## {background="#43464B"}
+
+```{=html}
+<style>img.circle {border-radius: 50%;}</style>
+```
+
+::: {layout-ncol="2"}
+<img class="circle" src="https://github.com/damien-dupre.png" />
+
+**Thanks for a full year, and good luck with the reports.**
+[https://damien-dupre.github.io](https://damien-dupre.github.io)
+[damien.dupre@dcu.ie](mailto:damien.dupre@dcu.ie)
+:::

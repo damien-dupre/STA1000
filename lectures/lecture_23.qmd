@@ -1,155 +1,493 @@
 ---
-title: "Lecture 23: Dashboard Build"
+title: "Lecture 23: Frameworks and Sustainable Performance"
 subtitle: STA1000 - Data Analytics and Metrics
 ---
 
 ## Previously ...
 
-You have the data, the metrics, the framework and the design principles. Today
-you assemble the client deliverable.
+Twenty-two lectures of individual metrics: reach, conversion rate, CAC, LTV,
+ROAS, contribution, attribution, lift.
+
+. . .
+
+A board does not want a list of metrics. It wants a **structure**, and it
+increasingly wants one that does not stop at money.
+
+<!-- Speaker notes: this lecture carries LO6 and LO8 and is the merge of two
+     earlier sessions. If time is short, cut section 3 (successors) rather than
+     section 4, which is LO6's only home. -->
 
 ## Learning Outcomes
 
 By the end of this lecture you will be able to:
 
-- Design a dashboard around a decision rather than around available data
-- Build it in Tableau to a client standard
-- Anticipate the questions a client will ask of it
+- Describe the Balanced Scorecard and its marketing application
+- Compare it to later frameworks and select one for a given organisation
+- Explain why marketing performance measurement now includes non-financial metrics
+- Evaluate a sustainability claim against its evidence
 
-# 1. Design First
+# 1. Why a Framework
 
-## Start With the Decision
+## The Metric Sprawl Problem
 
-TODO: write the decision the dashboard supports at the top of a blank page
-before opening Tableau.
+A GA4 property exposes several hundred metrics. Your dashboard could show any of
+them.
 
-## The Sketch
+. . .
 
-TODO: pen and paper. Five minutes. Layout, hierarchy, and what goes above the
-fold.
+Without a structure, three things happen, reliably:
 
-## Layout Conventions
+- The report becomes a **data dump**, and nobody reads past the first screen
+- The client picks the **flattering number**, because you offered it
+- Nobody can say whether the quarter was good, because there is no agreed answer
+  to what good means
 
-TODO: headline metrics top-left, trend beneath, breakdowns below, detail on
-demand. Reading order follows the decision.
+. . .
 
-## A Dashboard That Answers One Question {.smaller}
+**A framework is a commitment made in advance about which numbers count.** It is
+the pre-registration habit from Lecture 8, at organisational scale.
 
-![Source: [Quarto Dashboards, posit::conf(2024)](https://github.com/posit-conf-2024/quarto-dashboards)](./figures/external/qd_dashboard_customer_churn.png){fig-align="center" height="340px"}
+## What a Framework Actually Does
 
-*Three numbers at the top, the reasons underneath, the detail last. You can
-say what decision it supports in one sentence.*
+1. **Selects.** A small set of metrics, chosen before the results are in
+2. **Structures.** A hierarchy, so a number has a parent it explains
+3. **Connects.** Every metric attaches to a stated objective
+4. **Forces trade-offs into the open.** Two metrics that pull against each other
+   are visible on the same page rather than argued about separately
 
+. . .
 
-## What to Leave Out
+The fourth is the one that makes frameworks uncomfortable, and the reason they
+are worth having.
 
-<!-- Speaker notes: students will want to show everything they built over
-     22 sessions. The discipline of removal is the assessed skill. -->
+# 2. The Balanced Scorecard
 
-TODO: every chart must earn its place by changing a decision.
+## Kaplan and Norton, 1992
 
-# 2. Building It
+Robert Kaplan and David Norton's argument was simple and, at the time, radical:
 
-## Structure in Tableau
+> Financial measures are **lagging** indicators. They tell you the result of
+> decisions taken quarters ago, and they tell you nothing about whether the next
+> quarter will be any good.
 
-TODO: worksheets, dashboard containers, device layouts, actions and filters.
+. . .
 
-## Performance
+Managing on financial measures alone therefore encourages exactly the behaviour
+that produces good numbers now and a weaker business later: cutting training,
+deferring maintenance, under-investing in the customer relationship.
 
-TODO: extracts versus live, filter order, avoiding a dashboard that takes
-30 seconds to load in front of a client.
+. . .
 
-## Annotation
+**Their fix was to make three other kinds of measure equally visible.**
 
-TODO: a dashboard without context is a quiz. Titles that state findings, not
-field names. Notes on definitions and data caveats.
+## The Four Perspectives {.smaller}
 
-## Consistency
+| Perspective | The question | A marketing metric |
+|---|---|---|
+| **Financial** | How do we look to shareholders? | Contribution, ROAS, CAC payback |
+| **Customer** | How do customers see us? | NPS, retention, share of wallet |
+| **Internal process** | What must we excel at? | Campaign cycle time, lead response time |
+| **Learning and growth** | Can we keep improving? | Test velocity, skills, data quality |
 
-TODO: one palette, one date format, one number format. Reuse the Lecture 9
-encoding rules.
+. . .
 
-## Two More, For Comparison {.smaller}
+Note where this module's own subject sits. **Data quality is a learning and
+growth metric**, which is why the cleaning log in Lecture 17 is a management
+artefact and not just good manners.
 
-:::: {.columns}
-::: {.column width="48%"}
-**Focused**
+## Strategy Maps
 
-![](./figures/external/qd_dashboard_stock_explorer.png){fig-align="center" height="255px"}
+The perspectives are not a list. They are a **causal chain**, read from the
+bottom up:
+
+```{mermaid}
+%%| echo: false
+%%| fig-align: center
+%%| fig-height: 2.2
+flowchart LR
+  L["<b>Learning &amp; growth</b><br>analyst skills,<br>data quality"] --> P["<b>Internal process</b><br>faster tests,<br>quicker response"]
+  P --> C["<b>Customer</b><br>better experience,<br>higher retention"]
+  C --> F["<b>Financial</b><br>contribution,<br>growth"]
+```
+
+. . .
+
+**Drawing the map is the exercise that exposes the assumptions.** Every arrow is
+a claim that one thing causes another, and most organisations have never tested
+any of them.
+
+## Criticisms Worth Taking Seriously
+
+- **Static.** Built annually, in a world that moves quarterly
+- **Top-down.** Cascaded from the board, so the people measured did not choose
+  the measures
+- **Slow.** Some measures cannot be updated more often than they can be collected
+- **Causality is assumed, not demonstrated.** The arrows on the strategy map are
+  hypotheses, and they are rarely tested even when the data exists
+
+. . .
+
+::: {.callout-note appearance="minimal"}
+The last one is the interesting criticism for this module. You spent Lecture 21
+learning how to test a causal claim. Almost nobody applies it to their own
+strategy map.
 :::
-::: {.column width="48%"}
-**Dense**
 
-![](./figures/external/qd_dashboard_housing_market.png){fig-align="center" height="255px"}
+# 3. Successors
+
+## OKRs {.smaller}
+
+**Objectives and Key Results**: one qualitative objective, three to five
+quantitative key results, reviewed quarterly.
+
+> **Objective**: Become the obvious choice for Dublin deadstock buyers
+>
+> **KR1**: Repeat purchase rate from 18% to 26%
+> **KR2**: Non-follower reach share from 41% to 55%
+> **KR3**: Email list from 2,100 to 5,000
+
+. . .
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+**Stronger than the scorecard at**
+
+Cadence, focus, and getting the team to care
+
+:::
+
+::: {#second-column}
+
+**Weaker at**
+
+Trade-offs. Nothing in the format says what you are willing to lose
+
 :::
 ::::
 
-::: {style="font-size:0.55em;text-align:center;"}
-Source: [Quarto Dashboards, posit::conf(2024)](https://github.com/posit-conf-2024/quarto-dashboards)
+## The North Star Metric
+
+One number the whole organisation is steered by, with a handful of input metrics
+beneath it.
+
+. . .
+
+Attractive because it is simple, and **dangerous for exactly the same reason**.
+Everything not in the number becomes invisible, and any single metric can be
+moved in ways nobody intended.
+
+. . .
+
+::: {.callout-note appearance="minimal"}
+If Loomrow's north star were "reach", the reel in Lecture 3 that reached 535,086
+accounts and engaged almost none of them would be the best thing the company ever
+did.
 :::
 
-*Both are competent. Only one of them can be read from the back of a room.*
+## Marketing-Specific Scorecards
 
+- **Funnel-stage scorecards**: a small set of metrics per stage, so awareness and
+  conversion are not judged by the same number
+- **Brand plus performance**: the long-term and short-term split, because the
+  measurable half is the short-term half and budgets follow measurement
+- **The Marketing Accountability Standards Board** line of work, on connecting
+  marketing activity to financial outcomes in terms a CFO accepts
 
-# 3. Client Standard
+## Choosing One {.smaller}
 
-## The Handover Test
+| If the organisation is... | Consider |
+|---|---|
+| Small, fast, one marketing hire | OKRs. Quarterly, few metrics, low overhead |
+| Large, board-governed, regulated | Balanced Scorecard, with a reporting calendar |
+| Product-led with one clear behaviour | A north star, plus explicit guardrail metrics |
+| Data-immature | Fewer metrics than you want, measured properly |
 
-TODO: could someone open this without you in the room and reach the right
-conclusion?
+. . .
 
-## Caveats in Public
-
-TODO: your cleaning log from Lecture 15 and your consent bias from Lecture 4
-belong on the dashboard, not in your head.
-
-## Studio Time {background="#43464B"}
-
-Build your portfolio performance dashboard.
-
-Checkpoints:
-
-1. Decision statement written and visible
-2. Sketch approved by one peer
-3. Draft built with real data
-4. Peer review against the Lecture 9 critique checklist
-
-**Remainder of lecture**
-
-# 4. Agent as Dashboard Draftsman
-
-## AI This Block: A producer
-
-Where we are on the module's AI spine, introduced in Lecture 10:
-
-> **A producer**
-
-## Specification, Not Construction
-
-TODO: the agent is good at turning your decision statement into a layout spec,
-and at listing the views you have forgotten.
-
-> "My dashboard supports this decision: [statement]. Propose a layout: which
-> views, in what order, above and below the fold. Say what to leave out."
-
-## What It Cannot Do
-
-TODO: expand. It cannot build the Tableau workbook, it does not know your data
-quality caveats, and it has no view on what your client will actually ask.
-
-## The Removal Test
-
-TODO: ask it which of your existing views does not change a decision. It is
-better at removing than you are, because it is not attached to the work.
+**The last row is the common case and the hardest advice to give**, because it
+sounds like doing less. A framework the organisation cannot feed is worse than no
+framework: it produces numbers nobody trusts and everybody quotes.
 
 ## Exercise {background="#43464B"}
 
-1. Give an agent your decision statement and your list of built views
-2. Ask which to cut
-3. Cut at least one you disagree about, and see whether the dashboard is worse
+For Loomrow, or a company you know:
 
-**15 minutes**
+1. Build a four-perspective scorecard with two metrics per perspective
+2. Draw the strategy map linking them
+3. Mark every arrow that is **assumed** rather than measured
+4. Say which framework you would actually recommend, and why
+
+::: {#timer1 .timer seconds="1500"}
+:::
+
+# 4. The Perspective Every Framework Now Needs
+
+## Why This Is a Marketing Metrics Question {.smaller}
+
+<!-- Speaker notes: regulation here moves fast and has been repeatedly amended,
+     delayed and simplified. Check the current position of CSRD, the omnibus
+     package and the Green Claims proposal before delivering this slide, and say
+     plainly when something is in flux. -->
+
+**Regulation.** EU corporate sustainability reporting obligations have been
+extending non-financial disclosure well beyond the largest listed companies, and
+separate work on substantiating environmental claims has been moving in parallel.
+Both have been amended and delayed repeatedly, so **check the current position
+before you rely on any of it**.
+
+. . .
+
+**Ireland specifically.** The Advertising Standards Authority for Ireland's code
+covers environmental claims in advertising now, whatever happens at EU level.
+
+. . .
+
+**Stakeholders beyond shareholders.** Employees, customers, and above all
+**procurement teams**: B2B buyers ask for this data in tenders, and an answer of
+"we do not measure that" loses the tender.
+
+## Reputational Risk Has a Price
+
+Greenwashing is no longer a reputational abstraction. It is an advertising risk
+with a measurable cost: campaigns withdrawn, rulings published, and the original
+claim reprinted in every article about the ruling.
+
+. . .
+
+**The asymmetry is what matters for a marketer.** An unsupported green claim buys
+a small lift in sentiment and risks a headline naming the brand. Most marketing
+decisions do not have that shape.
+
+## What Gets Measured: Environmental {.smaller}
+
+The emissions of the marketing function itself, which are almost entirely
+**Scope 3**:
+
+- **Media delivery.** Every ad impression is computation plus transmission plus a
+  device. Per-impression it is tiny; at campaign scale it is not
+- **The ad tech supply chain.** A programmatic impression may pass through a
+  dozen intermediaries, each with its own footprint
+- **Production.** Shoots, travel, sets, samples
+- **Events.** Usually the largest single line, and the easiest to count
+
+. . .
+
+Per-thousand-impression carbon estimates now exist and are increasingly requested
+in media plans. **Treat the published figures as estimates with wide error bars**,
+because that is what they are.
+
+## Social and Governance {.smaller}
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+**Social**
+
+- Representation in creative
+- **Accessibility** of digital assets: alt text, captions, contrast, keyboard
+  navigation
+- Ad placement standards, and what your programmatic buying funds
+- Supplier diversity
+
+:::
+
+::: {#second-column}
+
+**Governance**
+
+- Data protection compliance, as a reportable metric
+- Consent rates and how consent is obtained
+- Retention periods actually applied
+
+:::
+::::
+
+. . .
+
+**That governance column is Lecture 10, returning as a board metric.** The cookie
+banner you wrote is now a number somebody reports.
+
+## Measured, Estimated, or Asserted {.smaller}
+
+The single most useful distinction in this whole area:
+
+| | Example | What it supports |
+|---|---|---|
+| **Measured** | Event travel, from receipts | A claim, with a boundary |
+| **Estimated** | Media delivery emissions, from a published model | A direction, with error bars |
+| **Asserted** | "We are committed to sustainability" | Nothing |
+
+. . .
+
+Most published sustainability communication mixes all three **in the same
+sentence**, and presents the whole thing at the confidence of the first.
+
+## The Evidence Ladder {.smaller}
+
+From the bottom:
+
+1. **Sentiment.** "We care about the planet"
+2. **Activity.** "We switched to recycled packaging"
+3. **A number.** "We cut packaging emissions by 30%"
+4. **A number with a boundary and a baseline.** "...across our own packaging,
+   against 2023, excluding inbound freight"
+5. **Audited**, by someone whose opinion is published
+6. **Audited, and comparable**, against a standard others report to
+
+. . .
+
+**Marketing claims usually live on rungs 1 to 3. Procurement questions start at
+rung 4.**
+
+## Greenwashing Patterns {.smaller}
+
+The recurring five. Once you can name them you will see them daily:
+
+1. **Unbounded claims.** "Sustainable" with no scope. Sustainable compared to
+   what, measured how?
+2. **Shifted baselines.** Choosing the worst year as the starting point
+3. **Offsets presented as reductions.** "Carbon neutral" where nothing was reduced
+4. **Selective scope.** Reporting the 8% you control and omitting the 92% you buy
+5. **Irrelevant precision.** "We saved 1,247,391 litres of water." Out of how
+   much? Compared to what?
+
+. . .
+
+::: {.callout-note appearance="minimal"}
+The fifth is the one this module has already taught you to spot. Lecture 2's
+spurious-precision slide was the same fault on a chart.
+:::
+
+## Putting Them on the Dashboard
+
+Non-financial metrics get ignored when they are put somewhere ignorable: a second
+tab, a footer, an appendix.
+
+. . .
+
+**Same page, same visual weight, or they will not be read.** That is a design
+decision, and you learned how to make it in Lectures 6 and 7.
+
+. . .
+
+And apply the honesty rule from Lecture 17 here too: mark which figures are
+measured, which are estimated, and which are somebody's assertion. A dashboard
+that shows all three at the same weight is making the claim on rung 1 look like
+rung 5.
+
+## Exercise {background="#43464B"}
+
+Take a real brand's sustainability communication, on their own site:
+
+1. List every quantitative claim it makes
+2. For each, identify the **boundary**, the **baseline**, and whether it is
+   audited
+3. Rank the claims on the evidence ladder
+4. Design two non-financial metrics you would add to that brand's marketing
+   dashboard, and say where on the page they go
+
+::: {#timer2 .timer seconds="1500"}
+:::
+
+# 5. AI, Frameworks and Claims
+
+## AI This Block: A Producer
+
+Where we are on the module's AI spine, set out in Lecture 1 and named properly in
+Lecture 12:
+
+> **A producer.** It drafts the spec, the report and the deck. You are still the
+> one who signs it.
+
+## Comparing Frameworks Is a Reading Task
+
+This is well-documented territory, widely written about, and assistants handle it
+well.
+
+> "Compare the Balanced Scorecard and OKRs for a 12-person Irish e-commerce
+> business with one marketing hire. Which fits, and why?"
+
+. . .
+
+Then the prompt that stops you accepting the first fluent answer:
+
+> "Now argue for the one you rejected."
+
+. . .
+
+**It will argue that side just as fluently**, which tells you how much weight the
+first answer deserved.
+
+## The Greenwashing Machine
+
+<!-- Speaker notes: strong exercise. Let them generate the fluent unfalsifiable
+     claim themselves, then have to fix it. It lands far harder than an example
+     from a slide. -->
+
+Ask an assistant to write sustainability copy for a brand, and it will produce
+exactly what section 4 warns about: unbounded, baseline-free, rung-one claims, in
+confident marketing prose.
+
+. . .
+
+It is not being careless. **It is reproducing the genre**, and the genre is mostly
+greenwashing.
+
+## Using It the Other Way
+
+Pointed at claims rather than producing them, it is a genuinely good auditor:
+
+> "For each quantitative claim in this text, identify the boundary, the baseline,
+> and whether it is verifiable. Flag anything unfalsifiable."
+
+. . .
+
+The same tool, the same afternoon, on both sides of the problem. **Which is the
+clearest demonstration in this module that the tool is not the thing that has
+judgement.**
+
+## An AI-Drafted Claim Is Still Your Claim
+
+There is no exemption for generated copy. Not in the ASAI code, not in
+consumer-protection law, not in a tender response.
+
+. . .
+
+If a claim in your campaign turns out to be unsupported, "the assistant wrote it"
+is the same defence as "the AI produced it" in Lecture 1, and it fails for the
+same reason.
+
+. . .
+
+**Disclosure protects you. Delegation does not.**
+
+## Exercise {background="#43464B"}
+
+1. Ask an assistant to write sustainability copy for a brand
+2. Audit its own output with the prompt from two slides ago
+3. Rewrite one claim so it would survive procurement scrutiny
+4. Note what the rewrite cost you in punchiness, because that cost is the reason
+   the original genre exists
+
+::: {#timer3 .timer seconds="900"}
+:::
+
+## Going Further
+
+- Kaplan and Norton, *The Balanced Scorecard*, Harvard Business Review, 1992
+- Doerr, *Measure What Matters*, for OKRs in practice
+- Advertising Standards Authority for Ireland, on environmental claims:
+  <https://www.asai.ie>
+- Ad Net Zero, and the current industry work on advertised emissions
+- The GHG Protocol on Scope 3, for where the boundaries actually come from
 
 ## Next Lecture
 
-Presenting it.
+The last one. You present your own analysis, defend your method, and we close the
+loop on what any of this was for.
+
+. . .
+
+**Prepare**: ten minutes of slides, and rehearsed answers to the three questions
+you least want to be asked.

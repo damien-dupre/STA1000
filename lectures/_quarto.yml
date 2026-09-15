@@ -9,6 +9,9 @@ author: "Damien Dupré"
 # Code shown for reading uses ```{.python}, which needs no kernel.
 # jupyter: python3
 
+filters:
+  - timer
+
 format:
   revealjs:
     theme: [theme/metropolis.scss, styles.scss]

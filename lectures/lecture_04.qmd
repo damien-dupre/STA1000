@@ -1,128 +1,456 @@
 ---
-title: "Lecture 4: What Tracking Data Actually Is"
+title: "Lecture 4: Tableau II - Calculated Fields and Breakdowns"
 subtitle: STA1000 - Data Analytics and Metrics
 ---
+## Connect to Multiple Data
+
+It is possible to add more than one file but it can be done with or without joining the data.
+
+- If you join the two or more data source, you will be able to use variables from
+  different files in the same visualisation. However, a relationship between the
+  data has to be established.
+- If you don't join the data, the variables from each data will have to be used
+  separately in different visualisations.
+
+## Joining Multiple Data {.smaller}
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+Connect your first data file/database. In the Data Source window, beside
+Connections, click on the plus sign to "Connect to Data"
+
+<br>
+
+Drag and drop the second file next to the box representing the first file
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/tableau_connect_join_1.png){style="max-height:215px;"}
+
+![](./figures/dd/tableau_connect_join_2.png){style="max-height:215px;"}
+
+:::
+::::
+
+## Joining Multiple Data
+
+Set the variables to join and if the link between the data files is correct then the link will be green
+
+![](./figures/dd/tableau_connect_join_3.png){fig-align="center" style="max-height:400px;"}
+
+## Add Different Data {.smaller}
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+Instead of clicking on the plus sign beside Connections, you can add data by
+clicking on the database symbol.
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/tableau_add_data_1.png){style="max-height:230px;"}
+
+:::
+::::
+
+However you won't be able to use variable from both source for the same visualisation:
+
+![](./figures/dd/tableau_add_data_2.png){fig-align="center" style="max-height:170px;"}
+
 
 ## Previously ...
 
-Your site now sends events to GA4. That makes the next set of questions
-concrete rather than abstract:
-
-- What exactly is being recorded?
-- Who owns it?
-- What are you legally obliged to do about it?
+You can describe a single variable honestly. Now we combine variables, which is
+where the interesting mistakes live.
 
 ## Learning Outcomes
 
 By the end of this lecture you will be able to:
 
-- Describe tracking data as events and parameters
-- Distinguish structured from unstructured sources
-- Distinguish first-party from third-party data
-- Apply consent and GDPR requirements to your own site
+- Write calculated fields, including level-of-detail expressions
+- Build channel and device breakdowns you can defend to a client
+- Recognise Simpson's paradox in a marketing breakdown
+- Construct a first cohort triangle from your own traffic
 
-# 1. The Shape of Tracking Data
+# 1. Calculated Fields
 
-## Events and Parameters
+## Row Level versus Aggregate {.smaller}
 
-TODO: an event is a verb, a parameter is an adjective. Show one raw GA4 event
-payload and decompose it.
+:::: {layout="[1,1]"}
+::: {#first-column}
 
-## Structured versus Unstructured
+**Row-level calculation**
 
-TODO: the GA4 export is structured; reviews, comments, captions and support
-tickets are not. Lecture 14 returns to the unstructured half.
+Evaluated once per row, before aggregation.
 
-## Hit-Level, Session-Level, User-Level
+`[Key Events] / [Sessions]`
 
-TODO: the three grains, and why a metric changes meaning at each grain.
+computed row by row, then summed, gives you the **average of the rates**.
 
-# 2. Who Owns the Data
+:::
 
-## First, Second and Third Party
+::: {#second-column}
 
-TODO: define each with a marketing example. Note the deprecation pressure on
-third-party cookies and what that changed.
+**Aggregate calculation**
 
-## The Identity Problem
+Evaluated after aggregation.
 
-TODO: cross-device, logged-out users, why "users" is an estimate.
+`SUM([Key Events]) / SUM([Sessions])`
 
-# 3. Consent and GDPR
+gives you the **rate of the totals**, which is almost always what you meant.
 
-## The Cookie Banner Is Now Your Problem
+:::
+::::
 
-<!-- Speaker notes: this is the pedagogical pivot of the block. Students who
-     have to publish a banner on their own live site stop treating GDPR as an
-     exam topic. -->
+. . .
 
-TODO: lawful basis, consent before non-essential cookies, the practical
-implications of consent mode for your numbers.
+Lecture 3's "you cannot average an average", in Tableau syntax.
 
-## What GDPR Requires of You Specifically
+::: {.callout-note appearance="minimal"}
+Under what circumstances would the average of the rates be the number you
+actually want? What would you have to believe about the rows?
+:::
 
-TODO: privacy notice, banner, data retention setting in GA4, IP anonymisation,
-the right to erasure and what it means for an analytics property.
+## Conditional Logic
 
-## What They Do With It {.smaller}
+Your source / medium values are a mess. They are supposed to be. Grouping them
+into named channels is the first calculated field everyone writes.
 
-![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_ftc_surveillance_pricing.png){fig-align="center" height="350px"}
+```
+IF CONTAINS([Source], "google") AND [Medium] = "cpc" THEN "Paid Search"
+ELSEIF [Medium] = "organic" THEN "Organic Search"
+ELSEIF CONTAINS([Source], "linkedin")
+    OR CONTAINS([Source], "instagram")
+    OR [Source] = "t.co" THEN "Social"
+ELSEIF [Medium] = "email" THEN "Email"
+ELSEIF [Medium] = "referral" THEN "Referral"
+ELSEIF [Source] = "(direct)" THEN "Direct"
+ELSE "Other"
+END
+```
 
-*The FTC's 2025 study on surveillance pricing. This is the far end of the same
-pipeline your cookie banner sits at the front of.*
+. . .
+
+**Then check the size of "Other".** If it holds more than a few percent of your
+sessions, your grouping is hiding something rather than simplifying it.
+
+## The Grouping Is an Argument
+
+<!-- Speaker notes: the point to labour. A channel grouping is not a technical
+     artefact, it is a claim about which traffic sources are the same kind of
+     thing. Two analysts group differently and produce different strategies from
+     identical data. Nobody ever asks to see the CASE statement. -->
+
+A channel grouping asserts that these sources are the same kind of traffic and
+those are different.
+
+. . .
+
+Put `t.co` in Social and paid X campaigns become invisible. Put `(direct)` in
+its own channel and you have quietly labelled "we could not tell" as a marketing
+channel with a budget line.
+
+. . .
+
+**Every channel report anyone has ever shown you rests on a CASE statement you
+did not see.** Keep yours in your measurement plan.
+
+## Level of Detail Expressions
+
+An LOD expression computes at a grain other than the one in the view. It is how
+Tableau lets you say "per user, regardless of what is on the rows".
+
+```
+{ FIXED [User ID] : MIN([Date]) }
+```
+
+Each user's first-touch date, available on every row for that user.
+
+. . .
+
+This one expression is the building block of every cohort view you will ever
+build, and of the triangle chart at the end of this lecture.
+
+::: {.callout-note appearance="minimal"}
+`{FIXED}` ignores the filters on the view; `{INCLUDE}` and `{EXCLUDE}` do not.
+On a cohort chart, why does that difference decide whether your cohort sizes
+change when someone clicks a filter?
+:::
+
+# 2. Breakdowns That Mean Something
+
+## Channel
+
+From source / medium to a grouping you can defend, then the two questions:
+
+1. Does each channel behave differently on the metric you care about?
+2. Could you spend differently against each one tomorrow?
+
+. . .
+
+If both answers are no, you have built a nicer-looking version of the same
+number.
+
+## Device
+
+Device is a segment, not a curiosity. The mobile conversion gap is one of the
+most consistent findings in digital marketing, and it is usually a **design**
+finding rather than an audience one.
+
+. . .
+
+At portfolio volume, expect the gap to be visible and the sample to be too small
+to size it. Both facts belong in the report.
+
+## Simpson's Paradox
+
+<!-- Speaker notes: worth ten minutes of its own. A channel can look worse
+     overall and better within every device category. Once they have seen it
+     with numbers they never quite trust an aggregate again, which is the
+     desired state. -->
+
+A channel can convert **worse overall** and **better within every single device
+category**.
+
+. . .
+
+Not a paradox, and not rare. It happens whenever the segments differ in both
+their base rate and their share of the traffic.
+
+## Simpson's Paradox, With Numbers {.smaller}
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+**Mobile**
+
+| Channel | Sessions | Conv. | Rate |
+|---|---|---|---|
+| Email | 900 | 45 | **5.0%** |
+| Social | 100 | 4 | 4.0% |
+
+:::
+
+::: {#second-column}
+
+**Desktop**
+
+| Channel | Sessions | Conv. | Rate |
+|---|---|---|---|
+| Email | 100 | 12 | **12.0%** |
+| Social | 900 | 99 | 11.0% |
+
+:::
+::::
+
+. . .
+
+**Combined**: Email 57 / 1000 = 5.7%. Social 103 / 1000 = **10.3%**.
+
+. . .
+
+Email wins on mobile, wins on desktop, and loses overall, because email traffic
+is mostly mobile and mobile converts badly.
+
+::: {.callout-note appearance="minimal"}
+Which number goes in the client deck? Neither is wrong.
+:::
+
+## What to Do About It
+
+You cannot fix Simpson's paradox with a better chart. You can only decide which
+question you are answering.
+
+. . .
+
+- **"Which channel should I buy more of?"** needs the breakdown, because the mix
+  is part of what you are buying
+- **"Which channel converts better for the same kind of visitor?"** needs the
+  within-device rates
+- **"What happened last month?"** needs both, and the mix shift is often the
+  entire story
+
+. . .
+
+**Always show the sizes.** The paradox is invisible without the counts, which is
+Lecture 3's rule 2 arriving with consequences.
+
+# 3. Cohorts
+
+## What a Cohort Is
+
+A **cohort** is the set of users first seen in the same period, followed
+forward.
+
+. . .
+
+A **segment** is a group defined by an attribute, measured now.
+
+. . .
+
+Cohorts are the only honest way to ask whether things are getting better,
+because they hold acquisition date constant. An overall retention rate mixes
+this month's new users with users acquired two years ago.
+
+## The C Matrix {.smaller}
+
+Let $C(t, t')$ be the number of users acquired in period $t$ who are still
+active in period $t' \ge t$.
+
+- $C(t,t)$ is simply the users acquired in $t$: the cohort's size
+- $C(t,t')$ is weakly decreasing in $t'$: cohorts only shrink
+- $C(\cdot,t)$ is everyone active in $t$, which is roughly what drives revenue
+- The difference between consecutive columns is attrition
+
+. . .
+
+Startups call the picture of this matrix a **triangle retention chart**. It is
+the single most informative chart about a subscription or repeat-purchase
+business, and it is the thing investors ask for.
+
+::: {.callout-note appearance="minimal"}
+Whether you label the columns with calendar months or with months-since-signup
+changes the shape of the chart completely. Which labelling answers "is our
+product getting better?" and which answers "how was March?"
+:::
+
+## The Cohort Matrix, Drawn {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_cohort_c_matrix.png){fig-align="center" height="350px"}
+
+*Rows are acquisition cohorts, columns are periods since acquisition. Reading
+across a row is a survival curve; reading down a column is a calendar snapshot.*
 
 
-## Consent Bias
+## Building One in Tableau
 
-TODO: if 30% of visitors decline, your data is a non-random sample. This is the
-first appearance of a theme that returns in Lecture 19.
+1. `{ FIXED [User ID] : MIN([Date]) }` → first-touch date
+2. `DATETRUNC('week', [First Touch])` → cohort label, on rows
+3. `DATEDIFF('week', [First Touch], [Date])` → periods since acquisition, on
+   columns
+4. `COUNTD([User ID])` → the cell value
+5. Divide by the cohort's own week-0 count for a percentage, and keep the raw
+   count as a label
+
+. . .
+
+Column 0 is 100% by construction. If it is not, your first-touch field is wrong.
+
+## What One Looks Like With Real Data {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_cohort_retention_heatmap.png){fig-align="center" height="350px"}
+
+*The triangle is not missing data. Recent cohorts simply have not lived long enough.*
+
+
+## The Portfolio Caveat
+
+Your site may produce cohorts of four people.
+
+. . .
+
+Build it anyway. The mechanics are the same at four users and four million, and
+the discipline of writing "cohort n = 4" beside a percentage is the thing being
+assessed.
+
+. . .
+
+**Documented judgement beats undocumented certainty**, including when the
+judgement is "this chart cannot support a conclusion".
 
 ## Exercise {background="#43464B"}
 
-For your own site:
+In Tableau, on your own data:
 
-1. Publish a consent banner and a privacy notice
-2. List every cookie or identifier your site sets, and its purpose
-3. Set your GA4 data retention explicitly and justify the choice
-4. Estimate what proportion of your traffic you expect to lose to declined consent
+1. Write a channel grouping calculated field, and report the share in "Other"
+2. Build a channel-by-device matrix of sessions and key events, counts visible
+3. Check whether any channel shows Simpson's paradox across device
+4. Create a first-touch date LOD field
+5. Produce a weekly cohort triangle of returning users, with cohort sizes shown
 
-**20 minutes**
+**25 minutes**
 
-# 4. AI and the Law
+# 4. Vibe Coding Tableau Calculations
 
-## AI This Block: Chat
+## AI This Block: Chat with context
 
-Where we are on the module's AI spine, set out in Lecture 1 and named properly in Lecture 10:
+Where we are on the module's AI spine, set out in Lecture 1 and named properly
+in Lecture 12:
 
-> **Chat**
+> **Chat with context**
 
-## Do Not Take Legal Advice From a Chatbot
+## Calculated Fields Are Ideal for This
 
-<!-- Speaker notes: the one place in the module where the honest answer is
-     "verify against the primary source, every time". -->
+Tableau's calculation language is verbose, thoroughly documented and heavily
+represented in training data. Assistants write it well, and the cost of a wrong
+answer is visible immediately.
 
-TODO: assistants are confidently wrong about GDPR. They mix up jurisdictions,
-cite repealed provisions, and invent article numbers.
+> "Write a Tableau calculated field that groups source and medium into Paid
+> Search, Organic Search, Social, Email, Referral and Direct. My Source values
+> include google, bing, linkedin.com, t.co, l.instagram.com and (direct)."
 
-## What It Is Genuinely Good For
+. . .
 
-TODO: expand.
+Give it your **actual** source values. Pasted from the data, not remembered.
 
-- **Drafting** a privacy notice you then check against the DPC's guidance
-- **Explaining** a concept so you can go and confirm it
-- **Listing** what your cookie banner should cover, as a starting checklist
+## LOD Expressions Especially
 
-Never: telling you whether your specific setup is lawful.
+> "Write a FIXED LOD expression giving each user's first session date, and a
+> second field giving the number of weeks between a row's date and that user's
+> first session date."
+
+. . .
+
+**Then check it.** Not by reading it:
+
+- Does the row count change after adding the field? It should not
+- Does one user you can trace by hand get the date you expect?
+- Is column 0 of the cohort chart exactly 100%?
+
+## The Delegation Boundary
+
+The assistant should write the **syntax**. You must own the **grouping**,
+because the grouping is the argument.
+
+. . .
+
+Ask it for a channel grouping and it will produce a sensible industry-standard
+one. Sensible and industry-standard is not the same as right for a one-page
+portfolio site with three traffic sources, one of which is your own phone.
+
+::: {.callout-note appearance="minimal"}
+Delegate the typing, keep the deciding. On this lecture's material, exactly
+which decisions are yours?
+:::
 
 ## Exercise {background="#43464B"}
 
-1. Ask an assistant to draft a privacy notice for your site
-2. Check three of its claims against the Data Protection Commission's own guidance
-   at <https://www.dataprotection.ie>
-3. Record what it got wrong
+1. Generate your channel grouping with an assistant, giving it your real source
+   values
+2. Generate the first-touch LOD field
+3. Verify both against five rows you check by hand
+4. Find one source value the grouping puts in the wrong bucket, and say what it
+   would have cost you
+5. Change one grouping decision on purpose and note which conclusion moves
 
 **15 minutes**
 
+## Going Further
+
+- Sequoia, *Retention* — the triangle chart as investors read it
+- Tableau, *Level of Detail Expressions* whitepaper — FIXED, INCLUDE, EXCLUDE
+  and the order of operations
+- Wagner (1982), *Simpson's Paradox in Real Life* — short, and mostly about
+  medicine, which makes the marketing case land harder
+
 ## Next Lecture
 
-Block 2 begins: we connect Tableau to the data you have started to collect.
+Segmentation: of all the splits you can now build, which ones actually pay.
+
+**Prepare**: bring your channel-by-device matrix. We will test its segments
+against three criteria.

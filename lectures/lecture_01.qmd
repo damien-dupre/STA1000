@@ -215,7 +215,7 @@ Data collection is never free:
 
 - **Storage and tooling**
 - **Analyst time**, which is the expensive part
-- **Legal exposure**, which we make concrete in Lecture 4
+- **Legal exposure**, which we make concrete in Lecture 10
 - **Attention**: every metric on a dashboard competes with every other
 
 . . .

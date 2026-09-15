@@ -1,352 +1,379 @@
 ---
-title: "Lecture 5: Tableau I - Connecting to the Data"
+title: "Lecture 5: Comparison and Segmentation"
 subtitle: STA1000 - Data Analytics and Metrics
 ---
 
 ## Previously ...
 
-- You have a live site
-- It emits events with parameters
-- You have a consent banner and a statement of success
-
-Now we look at what has actually arrived.
+You can slice the data many ways. Most slices are noise. Today: which ones pay.
 
 ## Learning Outcomes
 
 By the end of this lecture you will be able to:
 
-- Export GA4 data in a form Tableau can consume
-- State the **grain** of a table before you build anything on it
-- Distinguish dimensions from measures, and say why the distinction is not cosmetic
-- Interrogate the **provenance** of a dataset you did not collect yourself
+- Explain what customer heterogeneity is and which kinds of it predict behaviour
+- Judge a segment against measurability, substantiality and actionability
+- Compare new versus returning, source / medium, device and geography honestly
+- Recognise when a segment difference is too small to act on
 
-# 1. Before the Tool: Provenance
+# 1. Heterogeneity
 
-## Where Did This Table Come From?
+## Customers Differ. On What? {.smaller}
 
-**Provenance** describes the people, systems and decisions involved in
-producing, transforming and sharing a dataset.
+"Heterogeneity" is a long word for the fact that customers differ. The question
+that matters is **on which dimension**.
 
-. . .
+:::: {layout="[1,1]"}
+::: {#first-column}
 
-It determines quality, reliability and trustworthiness. It is also the part of
-an analysis nobody puts on a slide.
+**Predicts behaviour well**
 
-. . .
+- Product needs: usage intensity, frequency, context
+- Prior experience with the category
+- Information: what they already know
+- Occasion and context
 
-**Treat every provenance claim as a hypothesis to be verified in the data**, not
-as documentation to be trusted. Sometimes the documentation is a marketing
-document.
-
-::: {.callout-note appearance="minimal"}
-You wrote the measurement plan for your own site three weeks ago. Can you still
-say, without checking, what your `key_event` counts include?
 :::
 
-## GIGO
+::: {#second-column}
 
-Garbage In, Garbage Out. The oldest principle in analytics and still the one
-that costs the most.
+**Predicts behaviour weakly**
 
-. . .
+- Demographics: age, gender, income
+- Location, in most categories
+- Stated attitudes
+- Psychographics
 
-Your advantage in this module is unusual: **you are your own data source.** You
-can answer provenance questions about your site that no analyst can answer about
-a client's.
-
-. . .
-
-Use it. By Lecture 15 you will be documenting cleaning decisions, and the
-students who know their own tagging history will finish that lecture in twenty
-minutes.
-
-## When Is Zero Not Zero?
-
-<!-- Speaker notes: this is the single most useful habit to install early. Take
-     the crime-map example if they need something outside marketing: a map of
-     police reports shows almost nothing on the university campus, because
-     campus crime is reported to a different force. The blank area is not
-     safety, it is a reporting boundary. -->
-
-Three different things arrive in your export looking identical:
-
-:::: {.columns}
-::: {.column width="30%"}
-**A true zero**
-
-Nobody converted on Tuesday.
-:::
-::: {.column width="30%"}
-**A missing value**
-
-The tag did not fire on Tuesday.
-:::
-::: {.column width="30%"}
-**A boundary**
-
-Tuesday's visitors declined consent.
 :::
 ::::
 
 . . .
 
-Tableau will happily plot all three as a point at zero.
+**Needs beat demographics, by a distance**, and by more than marketers expect.
+
+## You Are Not Your Customer {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_computer_skills_distribution.png){fig-align="center" height="340px"}
+
+*Computer skills across OECD countries. Somewhere under 10% of people are at
+Level 3. Everyone in this room is one of them.*
+
+
+## So Why Does Everyone Segment by Demographics? {.smaller}
+
+<!-- Speaker notes: this is the good bit, because they have all been taught
+     demographic personas on another module and nobody has told them the
+     evidence is weak. Handle it as "here is why the default persists", not
+     "your other module is wrong". -->
+
+Three honest reasons:
+
+1. Demographics are **easily measurable**, and often the only thing you can buy
+2. They are **visually perceivable**, so people believe they understand them
+3. Many people **identify themselves** in those terms
+
+. . .
+
+None of those is "they predict purchasing".
+
+. . .
+
+**The exceptions are real**: makeup, nappies, sports kit and footwear are
+categories where demographics correlate strongly with needs. Notice what those
+categories have in common.
 
 ::: {.callout-note appearance="minimal"}
-Which of the three would you be most likely to miss on your own site? What check
-would catch it?
+Is segmenting by gender sexist? Literally, yes: it treats people differently by
+a protected characteristic. When is that acceptable, and who decides? Does your
+answer change between a nappy brand and a car insurer?
 :::
 
-# 2. Getting Data Out of GA4
+## A Segmentation Someone Published {.smaller}
 
-## Three Routes Out {.smaller}
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_firefox_personas.png){fig-align="center" height="320px"}
 
-| Route | Live? | Effort | Ceiling |
-|---|---|---|---|
-| Report export to CSV | No, a snapshot | Minutes | Thresholding, sampling, aggregated fields only |
-| Looker Studio connector | Yes | Low | Not Tableau, and not our tool |
-| BigQuery export | Yes, event-level | An afternoon of setup | Effectively none, free tier is ample |
+*Mozilla's Firefox user types. Note that each one is written so a product
+team could act on it. That is the test.*
+
+
+## The Circularity Trap
+
+Suppose you segment your visitors by which product they bought.
 
 . . .
 
-**Our default is the CSV export**, because it is the one you can repeat weekly
-without help. We name BigQuery so you know the ceiling you are working under,
-and so you can say the word in an interview.
+**This gets you nowhere.** You have used the outcome as the input. The segments
+are defined by the thing you were trying to predict, so they predict it
+perfectly and tell you nothing about who to target next.
+
+. . .
+
+The same error in your own portfolio: segmenting by "converted" and "did not
+convert", then reporting that the converters converted more.
 
 ::: {.callout-note appearance="minimal"}
-The CSV route gives you rows GA4 has already aggregated. BigQuery gives you one
-row per event. Which questions can only be asked at the second grain?
+Where is the boundary? "Visitors who viewed the pricing page" is close to the
+outcome but not the outcome. Is it a usable segment?
 :::
 
-## Data Thresholding
+## How to Pick Attributes
 
-GA4 withholds rows when the numbers are small enough to identify someone,
-particularly when Google Signals is on.
+You want to segment on attributes that drive sales, retention or profit. Six
+routes to candidates, roughly in order of cost:
 
-. . .
-
-The rows do not appear with a warning. They simply are not there, and your
-totals will not reconcile.
-
-. . .
-
-**On a portfolio site with 40 sessions a week, this is not an edge case.** It is
-the normal case. Check the data-quality icon on every report you export.
-
-## The Export You Will Use {.smaller}
-
-Reports → Acquisition → Traffic acquisition, then Share → Download CSV.
-
-Set before exporting:
-
-1. **Date range**: from your site's first tagged day to yesterday. Not "last 28
-   days", which will silently change meaning every week you re-export.
-2. **Dimensions**: session source / medium, session campaign, device category,
-   country, landing page.
-3. **Metrics**: sessions, engaged sessions, average engagement time, key events,
-   session key event rate.
-4. **Rows**: raise the row limit. The default truncates and does not tell you.
+1. Theory and experience
+2. Consulting the people who talk to customers
+3. Your own database, explored
+4. Market research
+5. Finding out what competitors are doing
+6. Letting the data pick, with a clustering or a heterogeneous-choice model
 
 . . .
 
-Save every export with the date you pulled it in the filename. You will re-pull,
-and you will need to know which is which.
+Route 6 is where k-means and its relatives live. We reach it properly in
+Lecture 15, on your own users. It is last on this list for a reason.
 
-# 3. Grain, Dimensions and Measures
+## Segmentation as a Process, Not a Chart {.smaller}
 
-## Say the Grain Out Loud
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_segmentation_process.png){fig-align="center" height="265px"}
 
-**The grain is what one row is.** Before any chart, finish this sentence: "one
-row in this table is one ______".
 
-. . .
+# 2. What Makes a Segment Worth Having
 
-GA4 gives you at least three grains, and mixes them freely in the interface:
+## The Three Tests
 
-- **User level**: one row per person (as far as a cookie can tell)
-- **Session level**: one row per visit
-- **Event level**: one row per thing that happened
+**Measurable.** You can identify who is in the segment, from data you actually
+have, at the moment you need to act.
 
 . . .
 
-Nearly every wrong number in a marketing dashboard is a metric from one grain
-divided by a metric from another.
+**Substantial.** The segment is large enough to be worth serving. Small can be
+fine, and a niche can sustain a business, but there is a floor below which the
+operation cannot pay for itself.
+
+. . .
+
+**Actionable.** You could do something different for this segment tomorrow. If
+the answer is "nothing we could change", it is a description, not a segment.
 
 ::: {.callout-note appearance="minimal"}
-"Conversion rate" is a ratio. Name three different numbers that phrase could
-mean on your own site, depending on the grain of the numerator and denominator.
+Add a fourth test: **different**. The segments must actually behave differently
+on the metric you care about. Which of the four does a typical marketing persona
+deck usually fail?
 :::
 
-## Dimensions versus Measures {.smaller}
+## Measurable, and the Trap Inside It
 
-:::: {.columns}
-::: {.column width="45%"}
-**Dimension**
-
-Slices. Blue in Tableau.
-
-Answers "for which group?"
-
-`sessionSource`, `deviceCategory`, `country`, `landingPage`
-:::
-::: {.column width="45%"}
-**Measure**
-
-Aggregates. Green in Tableau.
-
-Answers "how much?"
-
-`sessions`, `keyEvents`, `engagedSessions`
-:::
-::::
+A segment that is measurable **after the fact** but not **at the point of
+action** is useless for targeting.
 
 . . .
 
-Tableau guesses when it connects. It guesses from the data type, so a postcode
-becomes a measure and Tableau offers you the average postcode.
-
-## The Fields That Are Already Aggregated {.smaller}
-
-| GA4 field | Tableau's guess | What it actually is |
-|---|---|---|
-| `sessions` | Measure | A count. Safe to sum |
-| `keyEvents` | Measure | A count. Safe to sum |
-| `averageSessionDuration` | Measure | **Already a mean.** Never sum, never average |
-| `sessionKeyEventRate` | Measure | **Already a ratio.** Never average |
-| `deviceCategory` | Dimension | Correct |
+"High-lifetime-value customers" is measurable in your database in two years'
+time. Whether you can identify one on their first visit is a different, harder
+and more valuable question.
 
 . . .
 
-**You cannot average an average.** Averaging the mean session duration of mobile
-and desktop gives every device equal weight regardless of how many sessions each
-had.
+This is the whole business of a customer data platform, and its four jobs:
+collect, unify, comprehend, activate. **Activation is where most of them fail.**
 
-## The Trap, With Numbers {.smaller}
+## Measurable, and Worth Measuring {.smaller}
 
-:::: {.columns}
-::: {.column width="45%"}
-| Device | Sessions | Mean duration |
-|---|---|---|
-| Mobile | 900 | 30s |
-| Desktop | 100 | 300s |
-:::
-::: {.column width="45%"}
-**Averaging the averages**
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_yield_by_fico_score.png){fig-align="center" height="340px"}
 
-(30 + 300) / 2 = **165s**
+*Portfolio yield by credit score. The middle 36% of accounts are
+indistinguishable. The segments that matter are at the edges.*
 
-**The true mean**
 
-(900×30 + 100×300) / 1000 = **57s**
-:::
-::::
+## Substantial, and Small Numbers
+
+<!-- Speaker notes: with a student portfolio getting 40 sessions a week, most
+     segment differences are noise. Name it now rather than letting them
+     over-interpret in the portfolio. Lecture 21 gives them the tools; here they
+     only need the instinct. -->
+
+A 100% conversion rate on 2 sessions.
 
 . . .
 
-A factor of three, from one plausible-looking drag and drop.
+A segment that converts at 8% versus one at 4%, on 25 sessions each: that is two
+conversions versus one.
+
+. . .
+
+**Rate differences on small denominators are almost always noise.** You will not
+have the tools to say how much until Lecture 21. Until then, the rule is: put
+the denominator on the slide and let the room see it.
+
+## Actionable
+
+Segments that regularly fail this test on a portfolio site:
+
+- **Browser version.** You are not building a version-specific experience
+- **Screen resolution.** Unless it is a responsive-design bug, in which case it
+  is a bug, not a segment
+- **Hour of day**, at low volume. Interesting, unactionable, and unstable
+- **Country**, when you serve one city
+
+. . .
+
+Naming a segment you deliberately did not pursue, and why, is worth more marks
+than a fourth chart of one you did.
+
+# 3. The Standard Comparisons
+
+## New versus Returning
+
+Different funnels, different intent, different appropriate metrics.
+
+. . .
+
+A blended conversion rate over both describes nobody: it is a weighted average
+of a first-visit rate and a considered-return rate, and it moves whenever the
+mix moves, without either underlying rate changing.
+
+. . .
+
+**This is Lecture 4's Simpson's paradox in its most common marketing costume.**
+
+## Source and Medium
+
+Intent varies more by source than by almost anything else you can measure.
+
+. . .
+
+Someone arriving from a search for your service and someone arriving from a
+social feed are at different points of the same journey, and comparing their
+conversion rates as though they were competing channels is a category error that
+still shapes budgets.
 
 ::: {.callout-note appearance="minimal"}
-The fix is to export a numerator and a denominator and divide them in Tableau,
-never to export the ratio. What does that mean for the export you set up in
-part 2?
+Your own site: which of your sources reflect intent, and which reflect
+interruption? Should they ever appear in the same bar chart?
 :::
 
-<!-- Speaker notes: this slide is the whole point of the lecture. If they take
-     one thing away, it is "export counts, not rates". Lecture 6 then attacks
-     the mean itself. -->
+## Geography and Device
 
-# 4. First Views
+**Geography** is genuinely useful for a business with regional operations, and
+mostly noise for a student portfolio. Say so in the report rather than producing
+a map because Tableau makes maps easy.
+
+. . .
+
+**Device** we covered in Lecture 4. The addition here: a device gap is
+actionable in a way most segments are not, because you can change the design
+this week.
+
+## The Consent Segment You Cannot See
+
+Your declined-consent visitors are a segment. They are invisible, they are
+probably not random, and every comparison you make excludes them.
+
+. . .
+
+Lecture 10 established this. It matters here because **segmentation on consented
+data is segmentation of the consenting**.
+
+. . .
+
+If privacy-conscious visitors differ in ways related to your outcome, and there
+is evidence they do, then every segment comparison in your portfolio carries the
+same unmeasured bias.
+
+::: {.callout-note appearance="minimal"}
+Does that make the analysis worthless, or does it make one sentence mandatory?
+What is the sentence?
+:::
+
+# 4. In Practice
 
 ## Live Demo {background="#43464B"}
 
-1. Connect to the CSV. Watch Tableau assign blue and green, and fix two of them
-2. Sessions over time, week not day, so the shape is visible at portfolio volume
-3. Break by channel. Note the long tail
-4. Break by device. Add the session count as a label next to every rate
-5. Break by landing page, and find a page nobody has ever landed on
+1. Segment comparison view in Tableau, rates with counts alongside
+2. New versus returning on the key event, then the mix shift over time that
+   explains the blended rate
+3. A segment that looks striking, with n shown, and the room deciding whether to
+   believe it
+4. Writing the caveat sentence together
 
 ## Exercise {background="#43464B"}
 
-Connect Tableau to your own export and build:
+On your own data:
 
-1. Sessions over time
-2. Sessions by device category, **with counts shown beside every rate**
-3. Sessions by source / medium
-4. State the grain of your table in one sentence, written down
-5. One view that surprised you, with a sentence saying why
+1. Build a new versus returning comparison on your key event
+2. Add the raw counts next to every rate
+3. Identify one segment that passes all four tests, and one that fails, naming
+   the test it fails
+4. Write what you would do differently for the segment that passes
+5. Write the sentence about who is missing from all of it
 
-**25 minutes**
+**20 minutes**
 
-# 5. AI for Getting Data Out
+# 5. AI for Segment Hypotheses
 
 ## AI This Block: Chat with context
 
 Where we are on the module's AI spine, set out in Lecture 1 and named properly
-in Lecture 10:
+in Lecture 12:
 
 > **Chat with context**
 
-## Attach the Export, Not a Description of It
+## Generating Candidates, Not Conclusions
 
-This block's step on the AI spine: **stop describing your data and start
-attaching it.**
+Use it to widen the list of segments worth considering, then apply the tests
+yourself.
 
-. . .
-
-A description of your data is your model of your data. Attaching the file
-removes your model from the loop, which is the point, because your model is what
-you are trying to check.
-
-## A Prompt Worth Reusing
-
-> "Here are the first 20 rows of a GA4 export [attached]. Tell me the grain of
-> this table, which columns are dimensions and which are measures, and which
-> measures are already averages or rates that I must not aggregate again."
+> "I run a portfolio site for a freelance designer in Dublin. What visitor
+> segments might behave differently on an enquiry form? Rank them by how likely
+> they are to matter at 200 sessions a month, and say which I could actually
+> identify in a GA4 export."
 
 . . .
 
-Then the follow-up that does the real work:
+The second clause is the one that turns a generic list into a usable one.
 
-> "Which of the columns you just called measures would give a wrong answer if I
-> summed it, and what should I export instead?"
+## The Trap
 
-## Where It Will Be Wrong
+<!-- Speaker notes: it will happily propose twelve segments, and testing twelve
+     segments on small traffic guarantees a spurious finding. This is the
+     multiple-comparisons problem arriving three lectures before they have the
+     vocabulary for it. Plant it here, pay it off in 19. -->
 
-- It will not know your thresholding. It sees rows, not the rows that were
-  withheld
-- It will read `sessionKeyEventRate` correctly and `conversion_rate_v2`, which
-  you named yourself, however it likes
-- It will infer the grain from the columns. If your export mixes grains, it will
-  confidently pick one
+More hypotheses means more chances to find noise.
 
-::: {.callout-note appearance="minimal"}
-Verification here is not reading its answer and nodding. It is checking one
-column against the GA4 reference, and one row against your own site. Which row
-would you check?
-:::
+. . .
+
+Test twelve segments on 200 sessions and something will look significant. Not
+because it is, but because you looked twelve times.
+
+. . .
+
+**Pick two before you look.** Write them down. This is the same pre-registration
+discipline as the success statement in Lecture 8, and it will return in
+Lecture 21.
 
 ## Exercise {background="#43464B"}
 
-1. Attach your export and run the prompt above
-2. Check its answer against the GA4 dimension and metric reference
-3. Note any column it misclassified, and whether the misclassification would
-   have changed a number
-4. Ask it what is missing from the export that you would need to compute
-   conversion rate correctly
+1. Generate ten candidate segments
+2. Reject eight using measurable / substantial / actionable / different
+3. Say what made the surviving two different
+4. Commit to which two you will test, in writing, **before** you build the view
 
 **10 minutes**
 
 ## Going Further
 
-- Google, *GA4 Dimensions and metrics reference* — the authority on which fields
-  are already aggregated
-- Google, *Data thresholding in GA4* — read this before you reconcile totals
-- *Analytics Academy: Digital Analytics Fundamentals* — the in-class test is
-  based on this, and lectures 3 to 5 cover its ground
+- Kotler and Keller, *Marketing Management*, ch. on STP — the canonical criteria,
+  worth reading critically against today's evidence
+- Yankelovich and Meer (2006), *Rediscovering Market Segmentation*, HBR — why so
+  much segmentation produces nothing
+- Sharp, *How Brands Grow*, ch. 9 — the sceptical case against segmentation
+  altogether, which you should be able to answer
 
 ## Next Lecture
 
-Your first views contain averages. Next lecture we ask whether any of them mean
-anything.
+Turning views into something a client can read, and being critiqued on it.
 
-**Prepare**: bring your export and the mean and median of one metric on it.
+**Prepare**: bring one chart from your workbook that you are pleased with. It
+will be pulled apart.
