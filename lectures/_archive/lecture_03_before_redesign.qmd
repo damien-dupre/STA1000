@@ -1,0 +1,617 @@
+---
+title: "Lecture 3: Describing Marketing Data"
+subtitle: STA1000 - Data Analytics and Metrics
+filters:
+  - timer
+---
+
+## Previously ...
+
+In Lecture 2 you connected `insta-data.csv` to Tableau Public, explored dimensions and measures, and built your first worksheets.
+
+Two of them reported an average, and you found:
+
+- **Mean reach**: 9,788
+- **Median reach**: 5,184
+
+. . .
+
+Why is there a near 2-to-1 gap between them?
+
+**Today: When is an average a lie, how do we describe marketing data honestly, and how do we design high-scoring Tableau dashboards?**
+
+## Learning Outcomes
+
+By the end of this lecture you will be able to:
+
+- Explain why you must **plot a distribution before summarising it**.
+- Select the honest summary for **skewed, zero-inflated marketing metrics** (Mean vs Median vs Mode, IQR vs SD, p50/p90).
+- Master the **Four Families of Figures** (Composition, Distribution, Comparison, Relationship) conceptually and in Tableau.
+- Implement the **Five Principles of Data Visualization** (Claus Wilke) for ethical, clear design.
+- Identify and critique **misleading graphs** in media and corporate reporting.
+- Assemble interactive, high-scoring **Tableau Dashboards** meeting the four assignment criteria.
+
+# 1. When an Average Is a Lie
+
+## The 2-to-1 Gap
+
+In your `insta-data.csv` worksheet:
+
+- Mean reach = **9,788**
+- Median reach = **5,184**
+
+. . .
+
+If a client asks: *"What is the typical reach of our posts?"* which number do you report?
+
+. . .
+
+If you answer **9,788**, you describe a post that almost never happens. 
+
+If you answer **5,184**, you ignore the breakout viral reels that drove the brand's growth this quarter.
+
+> Choosing a summary statistic is not a calculation; it is a **business claim**.
+
+## Same Summary, Different Data {.smaller}
+
+Four datasets. Identical means ($\bar{x} = 9.0, \bar{y} = 7.5$), identical variances, identical correlation ($r = 0.816$), and identical regression line ($y = 3.00 + 0.500x$).
+
+. . .
+
+Plotted, they are a line, a curve, an outlier, and a vertical cluster!
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_same_stats_different_graphs.png){fig-align="center" height="255px"}
+
+. . .
+
+This is Anscombe's quartet (1973), and its modern descendant, the **Datasaurus Dozen** (Matejka & Fitzmaurice, 2017), which produces a dinosaur with the same summary stats as a cloud of noise.
+
+::: {.callout-note appearance="minimal"}
+If summary statistics cannot distinguish a dinosaur from a circle, what are you claiming when you report an average and stop?
+:::
+
+## The Golden Rule
+
+**Plot the distribution before you compute a summary of it.**
+
+. . .
+
+Not as a courtesy to the client. As a reality-check on yourself.
+
+. . .
+
+When the histogram appears, answer four questions:
+
+1. **Where is the mass?** One lump, two, or a long tail?
+2. **Where is the floor?** How much data sits at or near zero?
+3. **What is the ceiling?** Is something capping the values artificially?
+4. **What is on the far right?** A VIP customer, or a corrupted row?
+
+## Marketing Data: Skewed & Zero-Inflated {.smaller}
+
+| Metric | Typical Shape | Why the Spike at Zero? |
+|---|---|---|
+| **Session duration** | Heavily right-skewed | Bounced visits recorded as 0 seconds |
+| **Order value** | Heavily right-skewed | >97% of sessions purchase nothing (€0) |
+| **Pages per session** | Right-skewed | Single page bounce and gone |
+| **Time to conversion** | Long tail | Most visitors never convert |
+| **Revenue per user** | Extreme power-law | Handful of "whales" drive the business |
+
+. . .
+
+:::: {layout="[1.2,1]"}
+::: {#first-column}
+
+**The bell curve is the rare exception in marketing, never the default.**
+
+Research on digital platforms reveals **3% to 5% of users generate 50%+ of net revenue**. A mean computed across this distribution describes nobody.
+
+:::
+
+::: {#second-column}
+
+![](./figures/external/mgt100_revenue_by_customer_rank.png){style="max-height:220px;"}
+
+:::
+::::
+
+## Which Summary, When? {.smaller}
+
+:::: {layout="[1,1,1]"}
+::: {#first-column}
+
+**Mean**
+
+Sum divided by count.
+
+Pulled by extreme values and corrupted rows.
+
+**Right for**: Totals, budgets, financial projections ($n \times \text{mean} = \text{total}$).
+
+:::
+
+::: {#second-column}
+
+**Median**
+
+The 50th percentile (middle value).
+
+Completely unaffected by the size of extreme tails.
+
+**Right for**: "What does a typical user or session experience?"
+
+:::
+
+::: {#third-column}
+
+**Mode**
+
+The most common single value.
+
+On marketing data, the mode is almost always **zero**—which is itself the primary business finding!
+
+:::
+::::
+
+. . .
+
+**Decision Rule**: If you will multiply the summary by $n$ to forecast revenue or budget, you need the **mean**. For understanding user behavior on skewed data, start with the **median**.
+
+## Spread & Percentiles: The Marketer's Habit {.smaller}
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+- **Standard deviation** assumes a symmetric bell curve and is dragged by outliers.
+- On right-skewed marketing data, $\text{Mean} - 2\text{SD}$ routinely predicts negative values (e.g., $-15\text{s}$ duration or negative reach!).
+- **Interquartile range (IQR)** ($Q3 - Q1$, or p25 to p75) is robust: it describes the middle 50% of your data.
+
+. . .
+
+**Build the p50 / p90 habit**:
+
+> *"Average duration was 2m14s"* vs *"Half of visits ended in 20s; 1 in 10 lasted >4 minutes."*
+
+:::
+
+::: {#second-column}
+
+![](./figures/external/sd_bell_curve.png){fig-align="center" style="max-height:280px;"}
+
+:::
+::::
+
+## The Bounce Problem & Five Honest Rules {.smaller}
+
+Bounces are logged as 0 seconds duration and often constitute 50%–70% of website traffic. Mean duration is mostly a disguised bounce rate!
+
+- **All Sessions** ($n = 500$, 320 bounces): Mean duration = **41s**
+- **Engaged Sessions Only** ($n = 180$, bounces filtered): Mean duration = **114s**
+
+. . .
+
+**Five Rules of Honest Summary**:
+
+1. **Plot the distribution before you summarise it.**
+2. **Report a count ($n$) alongside every average and rate.**
+3. **On skewed data, lead with the median and quote percentiles (p50 / p90 / IQR).**
+4. **State explicitly which cohort or filter the summary covers.**
+5. **If a summary changes a commercial decision, show the underlying distribution.**
+
+# 2. The Four Families of Figures
+
+## A Chart for Every Question {.smaller}
+
+![](./figures/dd/viz_key_figures_1.jpeg){fig-align="center" height="340px"}
+
+. . .
+
+The variable types you have dictate the chart family:
+
+- **1 Categorical** $\rightarrow$ **Composition** (*What is it made of?*)
+- **1 Continuous** $\rightarrow$ **Distribution** (*What do the values look like?*)
+- **Categorical + Continuous** $\rightarrow$ **Comparison** (*Does this group differ from that?*)
+- **2 Continuous** $\rightarrow$ **Relationship** (*Does one move with the other?*)
+
+## What a Figure Throws Away (Aggregation Zoo) {.smaller}
+
+Every figure is an **aggregation** that chooses what summary to show and what to discard.
+
+:::: {layout="[1,1,1]"}
+::: {#first-column}
+
+![](./figures/dd/viz_med_quartiles_1.png){height="170px"}
+
+**Median & Quartiles**
+
+Middle value + Q1/Q3 cutoffs. Interquartile range (IQR) forms the box.
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/viz_med_quartiles_2.png){height="170px"}
+
+**Box Plot Anatomy**
+
+Whiskers reach $1.5 \times \text{IQR}$. Data points beyond are flagged as outliers.
+
+:::
+
+::: {#third-column}
+
+![](./figures/dd/viz_correlation_1.png){height="170px"}
+
+**Correlation & Regression**
+
+Best fit line $Y = b_0 + b_1 X + e$. Pearson $r \in [-1, +1]$ measures linear strength.
+
+:::
+::::
+
+# 3. The Four Families in Action & Tableau
+
+## Family 1: Composition (Bar vs. Pie) {.smaller}
+
+*What is this made of?* Counts or proportions across categories.
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/loomrow/viz_pie_vs_bar.png){style="max-height:210px;"}
+
+- **Pie charts**: Only acceptable for **two categories**, flat, directly labelled.
+- Past 2 slices, human eyes cannot accurately judge angles. Bar charts communicate in one glance what pies conceal.
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/tableau_simple_bar.gif){style="max-height:210px;"}
+
+- **Tableau Recipe**: Drag Dimension to Rows/Columns, Measure (or `CNT`) to the other shelf.
+- **Rule**: Always sort bars descending by value!
+
+:::
+::::
+
+## Family 2: Distribution (Histograms & Box Plots) {.smaller}
+
+*What do the values look like?* Uncovering skewness, zero spikes, and spread.
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/tableau_histogram.gif){style="max-height:210px;"}
+
+**Histogram in Tableau**:
+
+- Right-click Measure $\rightarrow$ **Create Bins...**
+- Drag Bins to Columns, `CNT` to Rows.
+- Reveals where the mass sits and where zero spikes occur.
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/tableau_box_plot.gif){style="max-height:210px;"}
+
+**Box Plot in Tableau**:
+
+- Drag Measure to Rows, disaggregate marks.
+- Open **Analytics** tab $\rightarrow$ drag **Box Plot** to view.
+- Avoid single "Average Bar" charts that hide the spread!
+
+:::
+::::
+
+## Family 3: Comparison (Segmented Views) {.smaller}
+
+*Does this group differ from that one?* Comparing performance across formats, channels, or campaigns.
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/tableau_multiple_bar.gif){style="max-height:210px;"}
+
+**Multiple Bars**:
+
+- Add a second Dimension to **Color** for stacked bars, or Columns for grouped bars.
+- Use percent of total when group sizes differ.
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/tableau_comparison_3.png){style="max-height:210px;"}
+
+**Segmented Box Plots**:
+
+- Place continuous metric on Rows, category on Columns.
+- Instantly compares medians, spreads, and outliers across segments.
+
+:::
+::::
+
+## Family 4: Relationship (Scatterplots & Trendlines) {.smaller}
+
+*Does one move with the other?* Evaluating correlations and regressions between two continuous metrics.
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/tableau_scatterplot.gif){style="max-height:210px;"}
+
+**Scatterplot in Tableau**:
+
+- Measure 1 on Columns ($X$), Measure 2 on Rows ($Y$).
+- **Crucial**: Uncheck **Analysis $\rightarrow$ Aggregate Measures** (or add `post_id` to Detail) so Tableau doesn't sum to 1 dot!
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/tableau_relationship_2.png){style="max-height:210px;"}
+
+**Trend Lines & Customization**:
+
+- From **Analytics** tab, drag **Trend Line** into view. Hover to see $R^2$ and $p$-value.
+- Use Marks card to encode third dimensions (Color, Size).
+
+:::
+::::
+
+# 4. Visual Integrity: Principles & How Charts Lie
+
+## Principle 1: Do Not Cheat With Axes {.smaller}
+
+**Rule**: Include zero when zero is meaningful (bars, counts, rates). Truncating exaggerates trivial changes.
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/dataviz_principle_2.png){style="max-height:150px;"}
+![](./figures/dd/dataviz_principle_3.png){style="max-height:150px;"}
+
+*Wilke: Bar charts encode value by length/area. Truncating the axis magnifies differences dishonestly.*
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/dataviz_exercise_12.jpg){style="max-height:280px;"}
+
+*KCRA News: A 5-cent gas price rise ($4.17 to $4.22) depicted as a 400% surge!*
+
+:::
+::::
+
+## Principle 1 (cont.): Line Charts & Dual Axes {.smaller}
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/dataviz_principle_4.png){style="max-height:150px;"}
+![](./figures/dd/dataviz_principle_5.png){style="max-height:150px;"}
+
+*Truncated baseline is legitimate for line charts of subtle variations (stock indices, temperature). Always disclose it!*
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/dataviz_principle_6.png){style="max-height:150px;"}
+![](./figures/dd/dataviz_principle_7.png){style="max-height:150px;"}
+
+***Never use two y-axes!** The scaling between them is arbitrary and invites false correlations. Two measures $\rightarrow$ two charts.*
+
+:::
+::::
+
+## Principle 2: Make It Easy to Read {.smaller}
+
+**Rule**: Sort bars by value, not alphabetically. Use horizontal bars for long labels.
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/dataviz_principle_8.png){style="max-height:150px;"}
+![](./figures/dd/dataviz_principle_9.png){style="max-height:150px;"}
+
+*Wilke: Horizontal bars prevent painful neck-straining rotated text. Sort bars by magnitude.*
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/dataviz_exercise_6.jpeg){style="max-height:280px;"}
+
+*Georgia Dept of Health: Dates ordered **Apr 28, Apr 27, Apr 29, May 1** to manufacture an artificial downward decline!*
+
+:::
+::::
+
+## Principle 3: Be Fancy Only When It Helps {.smaller}
+
+**Rule**: Use transparency (alpha) for overplotting, jitter for discrete points. Avoid 3D effects and chartjunk!
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/dataviz_principle_10.png){style="max-height:150px;"}
+![](./figures/dd/dataviz_principle_11.png){style="max-height:150px;"}
+
+*Wilke: Alpha transparency reveals density when points pile up.*
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/dataviz_exercise_3.jpeg){style="max-height:280px;"}
+
+*Fox News: 3D pie chart slices that sum to 193%! (70% + 60% + 63%).*
+
+:::
+::::
+
+## Principle 4: Colour Carries Meaning {.smaller}
+
+**Rule**: Use a restrained palette. Color only what matters. Keep colors consistent across all dashboard sheets.
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/dataviz_principle_16.png){style="max-height:150px;"}
+![](./figures/dd/dataviz_principle_17.png){style="max-height:150px;"}
+
+*Wilke: If "Reels" is blue on sheet 1, it must be blue across the entire dashboard.*
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/dataviz_exercise_1.png){style="max-height:280px;"}
+
+*White House tweet: Highlighting one bar white and calling pandemic rebound "growth since 1984" (starting at 2001!).*
+
+:::
+::::
+
+## Principle 5: The Details Are the Work {.smaller}
+
+**Rule**: Direct labels beat remote legends. Title states takeaway. Geographic area $\ne$ human beings.
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/dataviz_principle_20.png){style="max-height:280px;"}
+
+*Wilke: Professional anatomy — informative title stating takeaway, units on axes, sample size ($n$), and data source.*
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/dataviz_exercise_11.gif){style="max-height:280px;"}
+
+***Land does not vote; people do.** Animated cartogram scales counties by population rather than empty acreage.*
+
+:::
+::::
+
+# 5. Designing the Dashboard: Assignment 1
+
+## The Benchmark: Federica Pinza vs Anti-Pattern {.smaller}
+
+Federica Pinza — DCU winner of the 2024 European Data Visualisation Challenge (EDHEC):
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/tableau_good.png){style="max-height:240px;"}
+
+**Excellence**: Purposeful layout, consistent palette, clear narrative annotations.
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/tableau_bad.png){style="max-height:240px;"}
+
+**Anti-Pattern**: Cluttered visual field, conflicting colors, no clear takeaway.
+
+:::
+::::
+
+. . .
+
+**The 4 Assignment Assessment Criteria (25% each)**:
+- **Creativity (25%)**: Intuitive controls, dynamic filters, interactive actions
+- **Analytical Depth (25%)**: Meaningful figure families, appropriate aggregations
+- **Beauty & Design (25%)**: Clean layouts, intentional whitespace, harmonious palette
+- **Overall Story (25%)**: Clear narrative guiding stakeholders to data-driven action
+
+## Assembling the Dashboard in Tableau {.smaller}
+
+Combine worksheets into an interactive command center:
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/tableau_dashboard.png){style="max-height:280px;"}
+
+- Use **Horizontal** and **Vertical** layout containers to create a clean, responsive grid.
+- Keep standard sizes (Fixed or Automatic).
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/tableau_dashboard.gif){style="max-height:280px;"}
+
+- Drag sheets into containers.
+- Connect filters to multiple worksheets.
+- Remove redundant legends to free up whitespace.
+
+:::
+::::
+
+## Hands-On Exercise: The Honest Marketing Dashboard {background="#43464B" .smaller}
+
+Using `insta-data.csv` in Tableau Public:
+
+1. **Composition**: Build a bar chart of `theme` or `product_line` (counts and % of total).
+2. **Distribution**: Build a histogram of `reach` (notice the severe right-skew!).
+3. **Comparison**: Build side-by-side box plots comparing `reach` across `format` (reel, carousel, post).
+4. **Relationship**: Build a scatterplot of `likes` vs `impressions` with a linear trend line.
+5. **Assemble**: Combine the four sheets into a polished Dashboard with a clear title and business takeaway.
+
+::: {#timer3_1 .timer seconds="1200" starton="interaction"}
+:::
+
+# 6. AI as a Statistical Critic
+
+## Prompting the Statistical Critique {.smaller}
+
+Assistants excel at *critiquing* statistical decisions when provided with distribution context:
+
+> *"I reported mean session duration as 2m14s to the marketing director. Using the attached distribution (where 60% of sessions are 0s), write a rigorous critique explaining why this mean is misleading. Then list three clarifying business questions you would need answered before recommending an alternative summary metric."*
+
+. . .
+
+**Where AI Will Mislead You**:
+
+- **Assumes Normality**: Defaults to t-tests and means without verifying distribution shape.
+- **Blind to Domain Context**: Does not know 0s represent bounces unless explicitly told.
+- **Silent on Sample Size**: Confidently interprets noise from tiny samples ($n = 12$).
+- **Supplying business context is the analyst's un-delegatable job.**
+
+## Exercise: The AI Statistical Audit {background="#43464B" .smaller}
+
+1. Export summary statistics for `insta-data.csv` `reach`.
+2. Ask AI: *"Critique reporting the mean reach of 9,788 vs the median of 5,184."*
+3. Ask it what business risks arise if the ad budget is allocated based on the mean.
+4. Evaluate its response: Which valid points did it raise? Where did it miss digital marketing nuances?
+
+::: {#timer3_2 .timer seconds="600" starton="interaction"}
+:::
+
+## Going Further
+
+- **Anscombe (1973)**, *Graphs in Statistical Analysis* — The foundational paper on why graphics are essential.
+- **Matejka & Fitzmaurice (2017)**, *Same Stats, Different Graphs* — The Datasaurus Dozen.
+- **Claus O. Wilke**, *Fundamentals of Data Visualization* — Free online at [clauswilke.com/dataviz](https://clauswilke.com/dataviz/)
+- **Edward Tufte**, *The Visual Display of Quantitative Information* — "Above all else show the data."
+
+## Next Lecture
+
+**Lecture 4: Tableau II - Calculated Fields and Breakdowns**
+
+- Creating row-level vs aggregate calculations
+- Conditional logic (`IF ... THEN ... ELSE`)
+- Level of Detail expressions (`{FIXED}`)
+- Uncovering **Simpson's Paradox** across marketing channels and devices
+
+::: {style="font-size:0.8em;margin-top:40px;"}
+*Prepare: Bring your finished Lecture 3 Tableau dashboard and your `insta-data.csv` file.*
+:::

@@ -1,5 +1,5 @@
 ---
-title: "Lecture 2: Data Files, Visualisation and Tableau"
+title: "Lecture 2: Data Files, Structures, and Tableau"
 subtitle: STA1000 - Data Analytics and Metrics
 filters:
   - timer
@@ -551,7 +551,7 @@ Equivalent to Excel Pivot Table but for visualisations
 
 ## Aggregation Method
 
-When selected as Rows or Columns, double click/click left on a Measure variable (green variable)
+When a Measure (green pill) is in Rows or Columns, open its menu from the dropdown arrow, or with {{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click
 
 :::: {layout="[1,1]"}
 ::: {#first-column}

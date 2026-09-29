@@ -1,611 +1,524 @@
 ---
-title: "Lecture 3: Describing Marketing Data"
+title: "Lecture 3: Master the Key Figures"
 subtitle: STA1000 - Data Analytics and Metrics
+filters:
+  - timer
 ---
 
 ## Previously ...
 
-You built four Tableau worksheets from `insta-data.csv`. Two of them reported an
-average, and you were told the mean reach is 9,788 while the median is 5,184.
+- In Lecture 2 we opened `insta-data.csv`, cleaned and transformed data, and identified the **type of each variable**: categorical or continuous.
 
-Today: when is an average a lie?
+- We also met **Tableau**: Data Source, Worksheet and Dashboard, with **Dimensions** for categorical variables and **Measures** for continuous ones.
 
-## Learning Outcomes
+**Today it is time to look at the data: which figure for which variables, and how to build it in Tableau.**
 
-By the end of this lecture you will be able to:
+## Why Use Figures?
 
-- Plot a distribution before summarising it, and say why that order matters
-- Choose an appropriate summary for a skewed, zero-inflated distribution
-- Explain why mean session duration and mean order value mislead
-- Report a distribution rather than a point estimate, in a sentence a client
-  understands
+Data visualisations are important:
 
-# 1. Visualise Before You Summarise
+- For the **analyst**, to **understand** what is going on in the data (errors, unexpected values, analyses to run)
+- For the **reader**, to access the message and **be convinced**: a report tells a story, and each figure supports it
 
-## A Chart for Every Question {.smaller}
+[{{< fa triangle-exclamation >}}]{style="color:#e34948;"} Figures can also lie or mislead: use them with ethics and professionalism.
 
-![](./figures/dd/viz_key_figures_1.jpeg){fig-align="center" height="370px"}
+# 1. The Key Figures
 
-. . .
+## What Would You Like to Show?
 
-Four of those six columns are the whole of section 3, and the variables you have
-choose the column for you: **1 categorical → composition. 1 continuous →
-distribution. Categorical plus anything → comparison. 2 continuous →
-relationship.**
+![](./figures/dd/viz_key_figures_2.jpeg){fig-align="center" style="max-height:470px;"}
 
-# 3. The Four Families of Figure
+::: {style="font-size:0.5em;text-align:center;"}
+Based on Andrew Abela's Chart Chooser: start from the question, not from the chart
+:::
 
-## Composition: One Categorical Variable
-
-![](./figures/loomrow/viz_composition.png){fig-align="center" height="380px"}
-
-. . .
-
-Counts, or the same bars as percentages. *What is this made of?*
-
-## Distribution: One Continuous Variable
-
-![](./figures/loomrow/viz_distribution.png){fig-align="center" height="360px"}
-
-. . .
-
-*What do the values look like?* Here: **most posts reach nobody, and the mean
-describes no post that ever existed.** Lecture 3 is about that gap.
-
-## Comparison: Categorical and Continuous
-
-![](./figures/loomrow/viz_comparison.png){fig-align="center" height="380px"}
-
-. . .
-
-*Does this group differ from that one?* Hold on to this chart. It is wrong in a
-way we cannot see yet, and Lecture 4 takes it apart.
-
-## Relationship: Two Continuous Variables
-
-![](./figures/loomrow/viz_relationship.png){fig-align="center" height="380px"}
-
-. . .
-
-*Does one move with the other?* The scatterplot, and a line through it.
-
-## What a Figure Throws Away {.smaller}
-
-Every figure is an **aggregation**. Choosing one is choosing which summary the
-reader sees, and everything else is discarded.
+## Keep Your Figures Clear and Self-Explanatory
 
 :::: {layout="[1,1]"}
 ::: {#first-column}
 
-![](./figures/dd/viz_med_quartiles_1.png){height="215px"}
+#### 1. Clear
 
-**Median** is the middle value; **Q1** and **Q3** cut the outer quarters. The gap
-between them, the **interquartile range**, is what a box plot draws as its box.
+Complex figures should be crystal clear: use design features (colours, sizes, ...) to make them clear
+
+#### 2. Self-Explanatory
+
+Always use a title, a legend and well-defined axes
 
 :::
 
 ::: {#second-column}
 
-![](./figures/dd/viz_correlation_2.png){height="160px"}
+![](./figures/external/venngage_clear_figure.png){fig-align="center"}
 
-**Correlation** is the slope of the best line, rescaled to run from -1 to +1.
-Near zero rules out only a *straight* relationship, and never implies causation.
+::: {style="font-size:0.5em;text-align:center;"}
+Source: www.venngage.com [{{< fa link >}}](https://venngage-wordpress.s3.amazonaws.com/uploads/2020/06/image17.png)
+:::
 
 :::
 ::::
 
-. . .
+## Figures Aggregate Data
 
-The others: **count**, **proportion**, and **mean with standard deviation**. A
-large SD means the mean describes nobody.
+A figure **aggregates** data into information with basic statistical calculations
 
-## When Is a Pie Chart Acceptable? {.smaller}
+:::: {layout="[1,1.6]"}
+::: {#first-column}
+
+| Student | Group | Mark |
+|---|---|---|
+| S1 | A | 60 |
+| S2 | B | 70 |
+| S3 | A | 60 |
+| S4 | B | 55 |
+| S5 | A | 65 |
+| S6 | B | 65 |
+| S7 | A | 65 |
+
+:::
+
+::: {#second-column}
+
+**Count**
+: A = 4, B = 3
+
+**Proportion**
+: A = 57%, B = 43%
+
+**Density**
+: 55 = 14%, 60 = 29%, 65 = 43%, 70 = 14%
+
+**Median and quartiles**
+: Q1 = 60, Median = 65, Q3 = 65
+
+**Mean and Standard Deviation**
+: Mean = 62.9, SD = 4.9
+
+:::
+::::
+
+## Zoom on Median and Quartiles
+
+![](./figures/dd/viz_med_quartiles_1.png){fig-align="center" style="max-height:255px;"}
+
+![](./figures/dd/viz_med_quartiles_3.png){fig-align="center" style="max-height:105px;"}
+
+Sort the values, then cut them into four groups of equal size. The **interquartile range** (IQR = Q3 - Q1) holds the middle 50% of the data.
+
+## Zoom on the Box Plot
+
+![](./figures/dd/viz_med_quartiles_2.png){fig-align="center" style="max-height:250px;"}
+
+- The **box** runs from Q1 to Q3, and the line inside is the **median**
+- The **whiskers** stop at the most extreme values within 1.5 × IQR of the box
+- Anything further away is drawn as a **dot**: a possible outlier
+
+## Zoom on Mean and Standard Deviation
+
+- **Mean** (or average) is the sum of all the values divided by their number
+- **Standard deviation** (SD) is the typical distance to the mean: the square root of the average squared distance
+
+![](./figures/external/sd_bell_curve.png){fig-align="center" style="max-height:300px;"}
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Cuemath [{{< fa link >}}](https://d138zd1ktt9iqe.cloudfront.net/media/seo_landing_files/standard-deviation-1626765925.png)
+:::
+
+## Zoom on Regression
+
+The line that best fits the points of two continuous variables is a **regression line**: **Y = b₀ + b₁X + e**
 
 :::: {layout="[1,1]"}
 ::: {#first-column}
 
-![](./figures/dd/viz_piechart_1.jpeg){height="195px"}
-
-**Two categories**, flat, directly labelled.
+![](./figures/dd/viz_correlation_1.png){fig-align="center" style="width:100%; max-height:400px;"}
 
 :::
 
 ::: {#second-column}
 
-![](./figures/loomrow/viz_pie_vs_bar.png){height="225px"}
+- **b₀** is the **intercept**: the value of Y when X is 0
+- **b₁** is the **slope**: how much Y changes when X increases by 1
+- **e** is the **error** (or residual): the distance between each point and the line
 
 :::
 ::::
 
+## Zoom on Correlation
+
+The **correlation** (r) is the slope of the regression line once both variables are on the same scale. It measures how closely the points follow a straight line, **from -1 to +1**:
+
+![](./figures/dd/viz_correlation_2.png){fig-align="center" style="width:100%; max-height:400px;"}
+
+## Which Figure for Which Variables?
+
+```{dot}
+//| echo: false
+//| fig-width: 11
+//| fig-height: 6
+digraph figures {
+  graph [rankdir = LR, bgcolor = "transparent", nodesep = 0.35, ranksep = 0.7]
+  node [shape = box, style = "rounded,filled", fillcolor = "#ffffff", color = "#23373b",
+        fontname = "Helvetica", fontsize = 16, penwidth = 1.5, margin = "0.25,0.12"]
+  edge [color = "#23373b", penwidth = 1.3, arrowsize = 0.8]
+  vars [label = "Variable(s)\nto analyse"]
+  cat [label = "Categorical"]
+  con [label = "Continuous"]
+  mix [label = "Categorical + Categorical\nCategorical + Continuous"]
+  two [label = "Continuous + Continuous"]
+  node [fillcolor = "#23373b", fontcolor = "#fafafa"]
+  composition [label = "COMPOSITION"]
+  distribution [label = "DISTRIBUTION"]
+  comparison [label = "COMPARISON"]
+  relationship [label = "RELATIONSHIP"]
+  vars -> cat -> composition
+  vars -> con -> distribution
+  vars -> mix -> comparison
+  vars -> two -> relationship
+}
+```
+
 . . .
 
-Past two or three slices, human beings cannot compare angles, and the bar chart
-answers in one second what the pie never answers at all.
+In Tableau, **categorical = Dimension** and **continuous = Measure**.
 
-# 4. Five Principles, and How Charts Lie
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
-## Principle 1: Do Not Cheat With Axes {.smaller}
+### Which family of figures?
 
-:::: {layout="[1,1,1]"}
-::: {#first-column}
+| Variable(s) in `insta-data.csv` | Family |
+|---|---|
+| `format` | |
+| `reach` | |
+| `format` and `reach` | |
+| `format` and `is_paid` | |
+| `impressions` and `likes` | |
+| `theme` | |
 
-![](./figures/dd/dataviz_principle_2.png){height="215px"}
-
+::: {#timer3_1 .timer seconds="120" starton="interaction"}
 :::
 
-::: {#second-column}
+## Which Family of Figures?
 
-![](./figures/dd/dataviz_principle_3.png){height="215px"}
+| Variable(s) in `insta-data.csv` | Family | Figure |
+|---|---|---|
+| `format` | Composition | Bar chart |
+| `reach` | Distribution | Histogram, box plot |
+| `format` and `reach` | Comparison | Box plots |
+| `format` and `is_paid` | Comparison | Stacked bars |
+| `impressions` and `likes` | Relationship | Scatterplot |
+| `theme` | Composition | Bar chart, not a pie |
 
-:::
+# 2. The Four Families on Loomrow
 
-::: {#third-column}
+## Composition Figures
 
-![](./figures/loomrow/viz_principle_axes.png){height="215px"}
+Count of the different categories
 
-:::
-::::
+![](./figures/loomrow/viz_composition_counts.png){fig-align="center" style="max-height:440px;"}
 
-. . .
+## Composition Figures
 
-**Include zero whenever zero is meaningful**, which for a count, a rate or a
-proportion it always is. A truncated axis is legitimate for a temperature or a
-stock index. Say so on the chart when you do it.
+Proportion of the different categories
 
-## Principle 2: Make It Easy to Read {.smaller}
+![](./figures/loomrow/viz_composition_proportions.png){fig-align="center" style="max-height:440px;"}
+
+## When to Use a Pie Chart?
 
 :::: {layout="[1,1]"}
 ::: {#first-column}
 
-![](./figures/dd/dataviz_principle_8.png){height="300px"}
+Only when the variable has **two categories**
+
+![](./figures/dd/viz_piechart_1.jpeg)
 
 :::
 
 ::: {#second-column}
-
-![](./figures/dd/dataviz_principle_9.png){height="300px"}
-
-:::
-::::
-
-. . .
-
-Sort bars by value, not alphabetically. Horizontal bars when labels are long;
-rotated text is a failure. Label directly rather than sending the eye to a legend
-and back. **One idea per figure.**
-
-## Principle 3: Be Fancy Only When It Helps {.smaller}
-
-:::: {layout="[1,1]"}
-::: {#first-column}
-
-![](./figures/dd/dataviz_principle_10.png){height="300px"}
-
-:::
-
-::: {#second-column}
-
-![](./figures/dd/dataviz_principle_11.png){height="300px"}
-
-:::
-::::
-
-. . .
-
-Transparency when points pile up, jitter when values are rounded, small multiples
-instead of eight colours. And the reverse: 3D bars, drop shadows and gradients
-solve nothing. **Never use two y-axes.** Two measures, two charts.
-
-## Principle 4: Colour Carries Meaning {.smaller}
-
-:::: {layout="[1,1]"}
-::: {#first-column}
-
-![](./figures/dd/dataviz_principle_14.png){height="290px"}
-
-:::
-
-::: {#second-column}
-
-![](./figures/dd/dataviz_principle_15.png){height="290px"}
-
-:::
-::::
-
-. . .
-
-Fifty-one colours and a legend is not a colour scheme. **Cut to a handful of
-groups and label them on the chart.** Keep the same colour for the same thing
-across a dashboard, use one hue light to dark for ordered data, never a rainbow,
-and check the palette: around 1 man in 12 cannot separate red from green.
-
-## Principle 5: The Details Are the Work {.smaller}
-
-:::: {layout="[1,1]"}
-::: {#first-column}
-
-![](./figures/dd/dataviz_principle_18.png){height="280px"}
-
-:::
-
-::: {#second-column}
-
-![](./figures/dd/dataviz_principle_19.png){height="280px"}
-
-:::
-::::
-
-. . .
-
-A legend makes the reader do work the chart should have done. **Label the line
-at its end.** Then the rest: units on every axis, thousands separators, sensible
-precision (`10.4%`, never `10.4056%`), a title that **states the finding**, and
-the **sample size** somewhere, because a 40% rate on five posts is not a rate.
-
-## Exercise 3: What Is Wrong Here? {background="#43464B" .smaller}
-
-:::: {layout="[1,1]"}
-::: {#first-column}
-
-![](./figures/dd/dataviz_exercise_1.png){height="400px"}
-
-:::
-
-::: {#second-column}
-
-**Find four faults. Then write the sentence this chart should have reported.**
 
 ::: {.fragment}
-- The claim says *since 1984*; the chart starts at **2001**
-- One bar is white and the rest yellow, encoding **nothing but the conclusion**
-- 2020 was a pandemic collapse, so 2021 is a **rebound**, not growth
-- No definition of "economic growth", and no comparison to trend
+With more categories, use a **bar chart**
+
+![](./figures/dd/viz_piechart_2.jpeg)
 :::
 
 :::
 ::::
 
-::: {style="font-size:0.5em;"}
-Source: @WhiteHouse on Twitter
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Depict Data Studio [{{< fa link >}}](https://depictdatastudio.com/when-pie-charts-are-okay-seriously-guidelines-for-using-pie-and-donut-charts/)
 :::
 
-::: {#timer3 .timer seconds="420"}
-:::
+## When to Use a Pie Chart?
 
-## Same Summary, Different Data
+Here is a pie chart that works:
 
-Four datasets. Identical means, identical standard deviations, identical
-correlation, identical regression line.
+![](./figures/dd/example_piechart.jpg){fig-align="center" style="max-height:470px;"}
 
-. . .
+## Distribution Figures
 
-Plotted, they are a line, a curve, a line with one outlier, and a star.
+Four figures of one continuous variable, `reach`
 
-. . .
-
-This is Anscombe's quartet (1973), and its modern descendant, the *Datasaurus
-Dozen* (Matejka and Fitzmaurice, 2017), which produces a dinosaur with the same
-summary statistics as a cloud of noise.
-
-::: {.callout-note appearance="minimal"}
-If summary statistics cannot distinguish a dinosaur from a cloud, what exactly
-are you claiming when you report a mean and stop?
-:::
-
-<!-- Speaker notes: show the Autodesk animation if the room has network. It
-     morphs one dataset through twelve shapes while the summary statistics stay
-     fixed on screen. Nothing else makes the point as fast. -->
-
-## Four Datasets, One Regression Line {.smaller}
-
-![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_same_stats_different_graphs.png){fig-align="center" height="255px"}
-
-*Identical means, identical variances, identical fitted line. Only one of these
-is a linear relationship.*
-
-
-## The Rule
-
-**Plot the distribution before you compute a summary of it.**
+![](./figures/loomrow/viz_distribution_forms.png){fig-align="center" style="max-height:360px;"}
 
 . . .
 
-Not as a courtesy to the audience. As a check on yourself. The most common use
-of a chart is private: an analyst looking at a variable for the first time.
+Each figure keeps something and throws the rest away: the dynamite keeps **only the mean**.
 
-. . .
+## Mean or Median? {.smaller}
 
-A junior analyst who reports a mean without having seen the histogram is telling
-you something about their process, and it is not good news.
-
-## What You Are Looking For
-
-When the histogram appears, four questions:
-
-1. **Where is the mass?** One lump, two, or a long tail?
-2. **Where is the floor?** How much of the data sits at or near zero?
-3. **What is the ceiling?** Is something capping the values artificially?
-4. **What is on the far right?** One customer, or a broken row?
-
-::: {.callout-note appearance="minimal"}
-On a portfolio site, the far right of the session-duration distribution is
-usually you, with the tab left open. Is that a data error or a real session?
-Who decides, and where do you write the decision down?
-:::
-
-# 2. The Shape of Marketing Data
-
-## Right-Skewed and Zero-Inflated Is the Normal Case
-
-<!-- Speaker notes: nearly every marketing quantity is right-skewed and
-     zero-inflated. This is not an edge case, it is the normal case, and the
-     statistics they were taught assumed the opposite. -->
-
-| Quantity | Shape | Spike at zero because |
-|---|---|---|
-| Session duration | Right-skewed | Bounces are recorded as 0s |
-| Order value | Right-skewed | Most sessions buy nothing |
-| Pages per session | Right-skewed | One page and gone |
-| Time to conversion | Right-skewed | Most never convert |
-| Revenue per user | Extreme | A handful of customers are most of it |
-
-. . .
-
-**The normal distribution is the exception in marketing, not the default.**
-
-## The 5 Percent Who Are the Business
-
-In consumer categories where spending is heavily skewed, a small share of
-customers generates most of the revenue, and a small share can generate negative
-revenue.
-
-. . .
-
-Published work on online gambling operators found roughly **3% of customers
-generating half of net revenue**, and the top 5% of winners costing operators
-around a fifth of it.
-
-. . .
-
-A mean computed over that distribution describes nobody, and hides both ends.
-
-::: {.callout-note appearance="minimal"}
-If your revenue is that concentrated, what does "the average customer" mean as a
-planning object? What would you report instead to someone setting next
-quarter's budget?
-:::
-
-## The Shape of Almost Every Marketing Dataset {.smaller}
-
-![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_revenue_by_customer_rank.png){fig-align="center" height="340px"}
-
-*Cumulative revenue by customer percentile. The mean of this distribution
-describes nobody.*
-
-
-# 3. Which Summary, When
-
-## Mean, Median, Mode {.smaller}
-
-:::: {layout="[1,1,1]"}
+:::: {layout="[1.7,1]"}
 ::: {#first-column}
 
-**Mean**
-
-Sum divided by count.
-
-Uses every value, including the one broken row.
-
-Right for: totals, budgets, anything you will multiply by a count.
+![](./figures/loomrow/viz_distribution.png){fig-align="center"}
 
 :::
 
 ::: {#second-column}
 
-**Median**
+Reach is **right-skewed**: most posts reach a few thousand accounts, a few reach tens of thousands, and **one reel reached 535,086**.
 
-The middle value.
+The **mean (9,788)** is pulled towards that tail. The **median (5,184)** is the typical post.
 
-Ignores how extreme the extremes are.
-
-Right for: "what does a typical session look like".
-
+::: {.fragment}
+Mean ± SD = 9,788 ± 27,748: a range that goes **below zero**, for a count that cannot be negative.
 :::
-
-::: {#third-column}
-
-**Mode**
-
-The most common value.
-
-On marketing data it is usually zero, which is often the finding.
 
 :::
 ::::
 
-. . .
+## Comparison Figures
 
-**The decision rule**: if you will multiply the summary by a count to get a
-total, you need the mean. For everything else on skewed data, start with the
-median.
+Two categorical variables: `format` and `is_paid`
 
-## Spread
+![](./figures/loomrow/viz_comparison_counts.png){fig-align="center" style="max-height:430px;"}
 
-**Standard deviation** assumes a symmetric distribution and is dragged by
-outliers, in the same direction and for the same reason as the mean.
+## Comparison Figures
 
-. . .
+A categorical and a continuous variable: `format` and `reach`
 
-**Interquartile range** (p25 to p75) survives them. It is the middle half of
-your data, and it is what you should quote alongside a median.
+![](./figures/loomrow/viz_comparison_shapes.png){fig-align="center" style="max-height:430px;"}
 
-. . .
+## Relationship Figures
 
-On a right-skewed variable, reporting mean ± SD produces a lower bound below
-zero for a quantity that cannot be negative. That is the distribution telling
-you the summary is wrong.
+Two continuous variables: `impressions` and `likes`
 
-## Percentiles as the Marketer's Default {.smaller}
+![](./figures/loomrow/viz_relationship_forms.png){fig-align="center" style="max-height:430px;"}
 
-> "Average session duration is 2m14s."
+## Relationship Figures
 
-versus
+Adding a categorical variable: one panel per `format`, same axes
 
-> "Half of our sessions end within 20 seconds. One in ten lasts more than four
-> minutes."
+![](./figures/loomrow/viz_relationship_facets.png){fig-align="center" style="max-height:390px;"}
 
 . . .
 
-The second is the same data, is harder to argue with, and suggests a different
-action.
+For the same impressions, carousels earn about 6 likes per 100 impressions and reels fewer than 3.
 
-. . .
+# 3. The Key Figures in Tableau
 
-**Build the p50 / p90 habit.** Two numbers, no distributional assumptions, and
-a client can picture both.
+## Variable Types and Tableau Figures
 
-::: {.callout-note appearance="minimal"}
-Which of those two sentences would a client be more likely to repeat correctly
-to someone else? Does that matter?
+:::: {layout="[1,2.4]"}
+::: {#first-column}
+
+![](./figures/external/showme3.png){fig-align="center" style="max-height:500px;"}
+
 :::
 
-## The Bounce Problem {.smaller}
+::: {#second-column}
 
-A bounced session is recorded with duration 0. Bounces are typically the largest
-single group in the data.
+A family of figures for each type of variable:
 
-. . .
+- **Composition**: 1 Dimension
+- **Distribution**: 1 Measure
+- **Comparison**: 2 Dimensions, or 1 Dimension and 1 Measure
+- **Relationship**: 2 Measures
 
-So mean session duration is mostly a measure of **how many people left
-immediately**, wearing the costume of a measure of engagement.
+**Show Me** highlights the figures they allow, it also explicitely indicate what combinaison of **Dimension** and **Measure** is needed.
 
-. . .
+:::
+::::
+
+## Composition in Tableau {.smaller}
+
+![](./figures/dd/tableau_simple_bar.gif){fig-align="center" style="max-height:395px;"}
+
+A Dimension on **Columns** and the count field on **Rows**. For percentages, open the menu of the count pill (click its arrow, or {{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click) → **Quick Table Calculation** → **Percent of Total**.
+
+::: {style="font-size:0.7em;text-align:center;"}
+The recordings in this section use another dataset: the clicks are the same with `insta-data.csv`.
+:::
+
+## Composition in Tableau: Pie Chart {.smaller}
+
+![](./figures/dd/tableau_pie_chart.gif){fig-align="center" style="max-height:450px;"}
+
+Only for variables with **two categories**: the Dimension on **Columns**, the count on **Rows**, then **Show Me** → pie chart.
+
+## Distribution in Tableau
+
+:::: {layout="[1.5,1]"}
+::: {#first-column}
+
+Tableau does not draw every distribution figure:
+
+- **Histogram**: yes, with Show Me
+- **Density**: no density curve out of the box
+- **Box plot**: yes, with Show Me or the Analytics pane
+- **Dynamite**: an average bar, but no error bars
+
+:::
+
+::: {#second-column}
+
+![](./figures/external/tableau_meme_monsters.png){fig-align="center"}
+
+:::
+::::
+
+## Distribution in Tableau: Histogram {.smaller}
+
+![](./figures/dd/tableau_histogram.gif){fig-align="center" style="max-height:430px;"}
+
+- A Measure on **Rows**, then **Show Me** → histogram. 
+
+- Tableau creates a new field, `variable (bin)`: to change the width of the bars, open its menu → **Edit**.
+
+## Distribution in Tableau: Box Plot {.smaller}
+
+![](./figures/dd/tableau_box_plot.gif){fig-align="center" style="max-height:430px;"}
+
+- A Measure on **Rows**, then **Show Me** → box-plot
+- Use dimension to display all the values and the 2 whiskers.
+
+## Distribution in Tableau: Average Bar {.smaller}
+
+![](./figures/dd/tableau_average_bar.gif){fig-align="center" style="max-height:430px;"}
+
+- A Measure on **Rows** is a **SUM** by default: open its menu → **Measure** → **Average**. 
+- Alternatively, the same menu offers **Median** if needed.
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### Composition and distribution in Tableau
+
+With `insta-data.csv`, one worksheet each:
+
+1. Posts per `format`: count, then percent of total
+2. A pie chart of `is_paid`
+3. A histogram of `reach`: where are most posts?
+4. A box plot of `reach`, `post_id` on Detail: which post is the highest dot?
+5. `reach` as an **Average**, then as a **Median**: which would you report?
+
+::: {#timer3_2 .timer seconds="600" starton="interaction"}
+:::
+
+## Comparison in Tableau {.smaller}
+
+Add a Dimension on **Colour**, **Columns** or **Rows** to any of the previous figures: bar or pie charts with the count, histograms, box plots, bar charts with the average.
 
 :::: {layout="[1,1]"}
 ::: {#first-column}
 
-**All sessions**
-
-n = 500, 320 of them bounces
-
-Mean duration: 41s
+![](./figures/dd/tableau_comparison_1.png)
 
 :::
 
 ::: {#second-column}
 
-**Engaged sessions only**
-
-n = 180
-
-Mean duration: 114s
+![](./figures/dd/tableau_comparison_4.png)
 
 :::
 ::::
 
-. . .
+## Comparison in Tableau: Multiple Bars {.smaller}
 
-Neither number is wrong. Reporting one without saying which is.
+![](./figures/dd/tableau_multiple_bar.gif){fig-align="center" style="max-height:450px;"}
 
-## Honest Summary: Five Rules
+A second Dimension on **Columns** puts the bars side by side; on **Colour**, it tells the groups apart.
 
-1. Plot it before you summarise it
-2. Report a count next to every rate and every average
-3. On skewed data, lead with the median and give the spread
-4. Say which rows the summary is computed over
-5. If the summary would change a decision, show the distribution it came from
+## Comparing Distributions in Tableau {.smaller}
 
-::: {.callout-note appearance="minimal"}
-Rule 2 is the one that gets dropped under time pressure. Why is a rate without
-its denominator worse than no number at all?
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/tableau_comparison_2.png)
+
+A Dimension on **Rows**: one histogram per group
+
 :::
 
-# 4. Doing It in Tableau
+::: {#second-column}
 
-## Live Demo {background="#43464B"}
+![](./figures/dd/tableau_comparison_3.png)
 
-1. Histogram of session duration, bin width chosen badly, then chosen well
-2. The same data as a box plot; find the whisker rule Tableau used
-3. Median line on a weekly time series, with the mean line on top of it, and the
-   gap between them narrated
-4. Filter out bounces, watch every number move, and write the caveat that now
-   has to travel with the chart
+A Dimension on **Columns**: one box per group
 
-## Exercise {background="#43464B"}
+:::
+::::
 
-Using your own data:
+## Relationship in Tableau {.smaller}
 
-1. Plot the distribution of session duration
-2. Report the mean and the median side by side, with n
-3. Report p50 and p90
-4. Write one sentence explaining the gap between mean and median to a
-   non-analyst
-5. Decide which number you would put in a client report, and defend it in
-   writing
+The scatterplot is the best way to show the relationship between **2 Measures**, but:
 
-**20 minutes**
+- switch both from the default **SUM** to **Dimension** (pill menu), or Tableau draws a single dot for the sum of everything
+- add a **Trend Line** from the **Analytics** pane
 
-# 5. AI as a Statistical Critic
+:::: {layout="[1,1]"}
+::: {#first-column}
 
-## AI This Block: Chat with context
+![](./figures/dd/tableau_relationship_1.png)
 
-Where we are on the module's AI spine, set out in Lecture 1 and named properly
-in Lecture 12:
+:::
 
-> **Chat with context**
+::: {#second-column}
 
-## Ask It to Argue Against Your Summary
+![](./figures/dd/tableau_relationship_2.png)
 
-Assistants are markedly better at criticising a choice than at making one. A
-critique is a well-defined task with a large literature behind it. Choosing a
-summary requires knowing what the number is for, which is the part it cannot
-see.
+:::
+::::
 
-. . .
+## Relationship in Tableau: Scatterplot {.smaller}
 
-> "I reported mean session duration as 2m14s to a client. Argue that this number
-> is misleading, using the distribution I have attached. Then tell me what you
-> would need to know about the business before recommending a replacement."
+![](./figures/dd/tableau_scatterplot.gif){fig-align="center" style="max-height:430px;"}
 
-## Where It Will Mislead You
+Two Measures on **Columns** and **Rows**, each switched to **Dimension**. **Analytics** pane → **Trend Line** → Linear. A Dimension on **Colour** gives one line per group: hover a line to read its R² and p-value.
 
-- It will suggest a test without checking the test's assumptions
-- It will not know that your zero-duration sessions are bounces, unless you say
-  so, and it will not ask
-- It will not tell you your sample is too small unless you ask directly
-- It will produce a confident sentence about a distribution it has seen twenty
-  rows of
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
-. . .
+### Comparison and relationship in Tableau
 
-**All four are failures of context, not of capability.** Supplying the context
-is the analyst's job, and it is the job it cannot take from you.
+1. Number of posts per `format`, with `is_paid` on **Colour**
+2. Box plots of `reach` by `format`: which format has the highest median?
+3. Average `reach` by `format`: which format wins now, and why?
+4. A scatterplot of `impressions` against `likes` with a trend line, then `format` on **Colour**: which format earns the most likes per impression?
 
-## Exercise {background="#43464B"}
+Save the workbook to your Tableau Public profile: Lecture 4 turns these sheets into a dashboard.
 
-1. Attach your session duration distribution
-2. Ask it to argue against reporting the mean
-3. Ask what it would need to know before recommending a summary
-4. Note which of its points you had already made yourself, and which one you had
-   not
-5. Note one point it made that is wrong about *your* site, and why it could not
-   have known
+::: {#timer3_3 .timer seconds="600" starton="interaction"}
+:::
 
-**10 minutes**
+## {background="#43464B"}
 
-## Going Further
+```{=html}
+<style>img.circle {border-radius:50%;}</style>
+```
 
-- Anscombe (1973), *Graphs in Statistical Analysis* — four pages, still the best
-  four pages on this
-- Matejka and Fitzmaurice (2017), *Same Stats, Different Graphs* — the
-  Datasaurus, with the method for generating it
-- Tufte, *The Visual Display of Quantitative Information*, ch. 1 — "show the
-  data", which is this lecture in three words
+:::: {layout="[1,1]"}
+::: {#first-column}
+<img class="circle" src="https://github.com/damien-dupre.png" />
 
-## Next Lecture
+:::
+::: {#second-column}
+**Thanks for your attention and don't hesitate to ask if you have any questions!**
 
-Back to Tableau, with calculated fields, and the first breakdowns that combine
-two variables at once.
+[{{< fa brands mastodon >}} @damien_dupre](https://datasci.social/@damien_dupre)
 
-**Prepare**: bring your four worksheets from Lecture 2, and the `campaign`
-column of `insta-data.csv`. All of its values, including the blank ones.
+[{{< fa brands github >}} @damien-dupre](https://github.com/damien-dupre)
+
+[{{< fa link >}} https://damien-dupre.github.io](https://damien-dupre.github.io)
+
+[{{< fa paper-plane >}} damien.dupre@dcu.ie](mailto:damien.dupre@dcu.ie)
+:::
+::::

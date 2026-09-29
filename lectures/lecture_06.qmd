@@ -5,7 +5,7 @@ subtitle: STA1000 - Data Analytics and Metrics
 
 ## Previously ...
 
-Lecture 2 gave you five principles: honest axes, easy reading, restraint, colour
+Lecture 4 gave you five principles: honest axes, easy reading, restraint, colour
 that means something, details that are right. Those keep a chart from being
 wrong.
 
@@ -446,7 +446,7 @@ is "more conventional" the wrong direction?
 
 ## Exercise {background="#43464B"}
 
-1. Screenshot one of your charts and ask for a critique
+1. Screenshot one of your charts ({{< fa brands windows >}} <kbd>⊞ Win</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd>, {{< fa brands apple >}} <kbd>⌘ Cmd</kbd> + <kbd>⇧ Shift</kbd> + <kbd>4</kbd>) and ask for a critique
 2. Apply the two changes you agree with
 3. Note one piece of its advice you rejected, and why
 4. Ask it to rewrite the title at three confidence levels, and pick the one your

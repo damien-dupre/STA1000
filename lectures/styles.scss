@@ -85,3 +85,20 @@
 	max-width: 100%;
 	object-fit: contain;
 }
+
+// The theme's code font is JetBrains Mono, falling back to Fira Code, and both
+// fuse `==`, `!=`, `->` and `>=` into single glyphs. Beginners cannot type what
+// they cannot see as separate characters, so switch the ligatures off and keep
+// the letterforms. Ligatures live in the contextual-alternates feature, so both
+// fonts fall back to plain characters here.
+// For a font with no ligatures at all, replace $font-family-monospace in
+// theme/metropolis.scss with "Roboto Mono", which the theme already loads.
+code,
+pre,
+kbd,
+.reveal code,
+.reveal pre,
+.reveal div.sourceCode {
+	font-variant-ligatures: none;
+	font-feature-settings: "liga" 0, "clig" 0, "calt" 0;
+}

@@ -265,7 +265,7 @@ without you explaining it?**
 
 ## Local Filters and Highlighters
 
-On a single worksheet, right-click a field and **Show Filter** to put a control
+On a single worksheet, {{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click a field and choose **Show Filter** to put a control
 beside the view.
 
 . . .
@@ -311,7 +311,7 @@ a default.
 
 ## Alias, Format, and the Small Things
 
-- **Aliases**: right-click a dimension member to rename it for display.
+- **Aliases**: {{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click a dimension member to rename it for display.
   `behind the scenes` becomes `Behind the scenes` without editing the data
 - **Number format**: set it once on the field, not per view
 - **Dates**: Tableau's date hierarchy (`Year > Quarter > Month > Day`) gives you
@@ -483,7 +483,7 @@ asking.
 1. Give an assistant your decision sentence and your list of built views
 2. Ask which to cut, and why
 3. Cut at least one you disagree about, and look at the result
-4. Screenshot the dashboard and ask what it thinks you are recommending
+4. Screenshot the dashboard ({{< fa brands windows >}} <kbd>⊞ Win</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd>, {{< fa brands apple >}} <kbd>⌘ Cmd</kbd> + <kbd>⇧ Shift</kbd> + <kbd>4</kbd>) and ask what it thinks you are recommending
 
 If its answer is not your recommendation, the dashboard is wrong, not the
 assistant.

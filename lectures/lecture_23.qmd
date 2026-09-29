@@ -355,8 +355,8 @@ The recurring five. Once you can name them you will see them daily:
 . . .
 
 ::: {.callout-note appearance="minimal"}
-The fifth is the one this module has already taught you to spot. Lecture 2's
-spurious-precision slide was the same fault on a chart.
+The fifth is the one this module has already taught you to spot. Lecture 4's
+rule on sensible precision named the same fault on a chart.
 :::
 
 ## Putting Them on the Dashboard

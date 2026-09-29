@@ -28,13 +28,27 @@ Re-fetch any of them with:
 | `dataviz_principle_18,19` | Principle 5: details | Wilke |
 | `dataviz_exercise_1.png` | Exercise 3 | @WhiteHouse on Twitter |
 
-## Not used yet
+## Used by lecture 2 and 3
 
-The rest are spares for other lectures: `dataviz_exercise_2/4/7/10/11` (more
-misleading charts, for lecture 6), `dataviz_principle_4/5/6/7/12/13/16/17/20`
-(the other half of each Wilke pair), `clean_tweet.png`, `tidy_full.png`,
-`long_and_wide.png` (lecture 17), `viz_correlation_1.png`, `viz_custom.png`,
-`viz_med_quartiles_2.png`, `viz_piechart_2.jpeg`.
+| File | Where | Original source |
+|---|---|---|
+| `clean_zoom.jpg` | "What Is Going Wrong With This Table?" | @kareem_carr on Twitter |
+| `clean_answer.png` | "Michael's Answer" | @CoffeeCodeCrash on Twitter |
+| `name_convention.jpg` | "Michael's Answer" | unattributed meme |
+| `viz_exercise_1.png` | Exercise 2 | Northwind sample database |
+| `viz_key_figures_1.jpeg` | "A Chart for Every Question" | unattributed chart-chooser matrix |
+| `viz_med_quartiles_1,2,3` | "What a Figure Throws Away" & Quartiles zoom | unattributed |
+| `viz_correlation_1,2` | "What a Figure Throws Away" & Correlation zoom | unattributed |
+| `viz_piechart_1,2` | "When Is a Pie Chart Acceptable?" | depictdatastudio.com |
+| `example_piechart.jpg` | "When Is a Pie Chart Acceptable?" | depictdatastudio.com |
+| `dataviz_principle_1..20` | Wilke's 5 Principles (before/after comparisons) | Wilke, *Fundamentals of Data Visualization* |
+| `dataviz_exercise_1,3,4,6,7,9,10,11,12` | "How Charts Lie: The Hall of Shame" | Various news & social media |
+| `tableau_frederica.png`, `tableau_good*`, `tableau_bad.png` | Tableau Dashboard Showcase | Federica Pinza (EDHEC 2024 Challenge) |
+| `tableau_composition_*`, `tableau_simple_bar.gif`, `tableau_pie_chart.gif` | Composition in Tableau | Tableau Public demo |
+| `tableau_distribution_*`, `tableau_histogram.gif`, `tableau_box_plot.gif`, `tableau_average_bar.gif` | Distribution in Tableau | Tableau Public demo |
+| `tableau_comparison_*`, `tableau_multiple_bar.gif` | Comparison in Tableau | Tableau Public demo |
+| `tableau_relationship_*`, `tableau_scatterplot.gif` | Relationship in Tableau | Tableau Public demo |
+| `tableau_dashboard.png`, `tableau_dashboard.gif` | Building Dashboards in Tableau | Tableau Public demo |
 
 Several are reproductions of third-party material. Fine for closed university
 teaching; review before publishing the decks openly.

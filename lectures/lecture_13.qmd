@@ -81,7 +81,7 @@ A notebook is a sequence of **cells**.
 
 . . .
 
-`Shift + Enter` runs the current cell and moves to the next.
+{{< fa brands windows >}} <kbd>Shift</kbd> + <kbd>Enter</kbd> or {{< fa brands apple >}} <kbd>⇧ Shift</kbd> + <kbd>↩ Return</kbd> runs the current cell and moves to the next.
 
 ## The One Thing That Will Bite You
 

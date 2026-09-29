@@ -1,7 +1,485 @@
 ---
-title: "Lecture 4: Tableau II - Calculated Fields and Breakdowns"
+title: "Lecture 4: Visualisation Principles and Tableau II"
 subtitle: STA1000 - Data Analytics and Metrics
+filters:
+  - timer
 ---
+
+## Previously ...
+
+- In Lecture 3 we matched each question to a family of figures (composition, distribution, comparison, relationship) and built each family in Tableau with `insta-data.csv`.
+
+**Today: make figures clear and honest, spot the misleading ones, assemble a first dashboard, then compute new fields and breakdowns in Tableau.**
+
+## Learning Outcomes
+
+By the end of this lecture you will be able to:
+
+- Apply five design principles to make a figure clear and honest
+- Diagnose a misleading chart, and check an AI assistant's diagnosis
+- Connect several files and assemble a first dashboard in Tableau
+- Write calculated fields, including level-of-detail expressions
+- Build channel and device breakdowns you can defend to a client
+- Recognise Simpson's paradox in a marketing breakdown
+- Construct a first cohort triangle from your own traffic
+
+# 1. Customise your Figures
+
+## Customise Figures
+
+:::: {layout="[1,1.5]"}
+::: {#first-column}
+
+- Colours
+- Size of the dots
+- Shapes
+- Position (stack or dodge)
+- Orientation (vertical or horizontal)
+- Text content and font
+- Figure legend
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/viz_custom.png){fig-align="center"}
+
+:::
+::::
+
+## Use Figures {.smaller}
+
+**Use figures only if they ...**
+
+- are self-explanatory
+- help to understand your message (a figure is not a message)
+
+. . .
+
+**Don't duplicate the information**
+
+- Always give the key information in the text of your report, but
+- don't show a table and a figure with the same information
+
+. . .
+
+**Tell a story! Build a narrative around your figures**
+
+- A set of observations, facts or events, presented in an order that creates a reaction in the audience
+- Even if you think data are boring, make them interesting for your audience
+
+## Fundamentals of Data Visualization
+
+:::: {layout="[1.4,1]"}
+::: {#first-column}
+
+**Fundamentals of Data Visualization** by Claus O. Wilke
+
+Free online at [clauswilke.com/dataviz](https://clauswilke.com/dataviz/)
+
+It sets out the basic principles of data visualisation. The next slides take five of them, each shown as a **bad** figure next to a better one.
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/dataviz_principle_1.png){fig-align="center"}
+
+:::
+::::
+
+## Principle 1: Axes
+
+::: {.center}
+**Don't cheat with axes: include 0 when 0 is meaningful**
+:::
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/dataviz_principle_2.png)
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/dataviz_principle_3.png)
+
+:::
+::::
+
+A bar shows its value with its **length**, so it has to start at zero.
+
+## Principle 1: Axes
+
+::: {.center}
+**A shaded area shows its value too: it also starts at 0**
+:::
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/dataviz_principle_4.png)
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/dataviz_principle_5.png)
+
+:::
+::::
+
+To zoom in on small changes, drop the shading and keep the line.
+
+## Principle 1: Axes
+
+::: {.center}
+**Panels you compare must share the same axis**
+:::
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/dataviz_principle_6.png)
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/dataviz_principle_7.png)
+
+:::
+::::
+
+With its own axis in each panel, a 2-point change looks as big as a 10-point one.
+
+## Principle 2: Make It Easy
+
+::: {.center}
+**Make your figure easy to read and to understand**
+:::
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/dataviz_principle_8.png)
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/dataviz_principle_9.png)
+
+:::
+::::
+
+The same five numbers: sorted bars let you compare Kent and Washington at a glance.
+
+## Principle 3: Be Fancy
+
+::: {.center}
+**Use extra features when they help, such as transparency and jitter**
+:::
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/dataviz_principle_10.png)
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/dataviz_principle_11.png)
+
+:::
+::::
+
+When points pile up, even transparency is not enough: count them in small hexagons instead.
+
+## Principle 3: Be Fancy
+
+::: {.center}
+**Use extra features when they help, such as transparency and jitter**
+:::
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/dataviz_principle_12.png)
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/dataviz_principle_13.png)
+
+:::
+::::
+
+Transparency and a little jitter reveal the points hidden behind each other.
+
+## Principle 4: Colours
+
+::: {.center}
+**Use colours, but not too many**
+:::
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/dataviz_principle_14.png)
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/dataviz_principle_15.png)
+
+:::
+::::
+
+51 colours need a legend nobody can read: group them, and label the points that matter.
+
+## Principle 4: Colours
+
+::: {.center}
+**Keep the same colours for the same variables**
+:::
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/dataviz_principle_16.png)
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/dataviz_principle_17.png)
+
+:::
+::::
+
+And check the palette for colour-blind readers: about 1 man in 12 cannot tell red from green.
+
+## Principle 5: Details
+
+::: {.center}
+**Every detail counts, and lazy work is easily spotted**
+:::
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/dataviz_principle_18.png)
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/dataviz_principle_19.png)
+
+:::
+::::
+
+Label the lines directly: a legend sends the eye back and forth, here in a different order from the lines.
+
+## Principle 5: Details
+
+:::: {layout="[1.3,1]"}
+::: {#first-column}
+
+![](./figures/dd/dataviz_principle_20.png)
+
+:::
+
+::: {#second-column}
+
+**Be precise, and use the title, axes and captions to do it:**
+
+- a title and a subtitle that state the finding
+- axis titles with their units
+- labels on the few points worth naming
+- sensible precision: 10.4%, not 10.4056%
+- the data source
+
+:::
+::::
+
+# 2. What's Wrong Here?
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### What's wrong here?
+
+In pairs, for each of the next charts:
+
+1. Find what is wrong
+2. Name the principle it breaks
+
+About one minute per chart.
+
+## What's Wrong Here? {.smaller}
+
+![](./figures/dd/dataviz_exercise_2.png){fig-align="center" style="max-height:430px;"}
+
+::: {.fragment}
+**Principle 1.** The axis starts at 34%, so a rise from 35% to 39.6% is drawn as a bar more than five times taller.
+:::
+
+::: {style="font-size:0.7em;text-align:center;"}
+Source: Misleading Graphs in Real Life [{{< fa link >}}](https://www.statisticshowto.com/probability-and-statistics/descriptive-statistics/misleading-graphs/)
+:::
+
+## What's Wrong Here? {.smaller}
+
+![](./figures/dd/dataviz_exercise_6.jpeg){fig-align="center" style="max-height:430px;"}
+
+::: {.fragment}
+**Principle 1.** The steps of the axis are uneven (30, 60, 90, 100, 130, 160, 190, 240, 250, 300, ...): equal distances do not mean equal numbers, and the growth looks steadier than it was.
+:::
+
+::: {style="font-size:0.7em;text-align:center;"}
+Source: The Worst Covid-19 Misleading Graphs [{{< fa link >}}](https://www.datasciencecentral.com/the-worst-covid-19-misleading-graphs/)
+:::
+
+## What's Wrong Here? {.smaller}
+
+![](./figures/dd/dataviz_exercise_17.png){fig-align="center" style="max-height:430px;"}
+
+::: {.fragment}
+**Principle 1.** Each panel has its own scale, so Gutiérrez's 19% is drawn higher than Petro's 37%. And December, January and March are equally spaced, although February is missing.
+:::
+
+## What's Wrong Here? {.smaller}
+
+![](./figures/dd/dataviz_exercise_4.png){fig-align="center" style="max-height:430px;"}
+
+::: {.fragment}
+**Principles 2 and 3.** A pie shows the parts of one whole, but these slices add up to 193%, and the 3D tilt distorts their sizes.
+:::
+
+::: {style="font-size:0.7em;text-align:center;"}
+Source: The statisticians at Fox News use classic and novel graphical techniques to lead with data [{{< fa link >}}](https://simplystatistics.org/posts/2012-11-26-the-statisticians-at-fox-news-use-classic-and-novel-graphical-techniques-to-lead-with-data/)
+:::
+
+## What's Wrong Here? {.smaller}
+
+![](./figures/dd/dataviz_exercise_12.jpg){fig-align="center" style="max-height:430px;"}
+
+::: {.fragment}
+**Principles 4 and 5.** The rainbow colours mean nothing, and three bars are labelled 336 with three different heights: 2020 and 2021 are drawn taller than the 382 of 2016.
+:::
+
+::: {style="font-size:0.7em;text-align:center;"}
+Source: KCRA graph on the 7pm news, r/Sacramento [{{< fa link >}}](https://www.reddit.com/r/Sacramento/comments/tysyxz/kcra_graph_on_the_7pm_news/)
+:::
+
+## What's Wrong Here? {.smaller}
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/dataviz_exercise_13.png)
+
+:::
+
+::: {#second-column}
+
+::: {.fragment}
+![](./figures/dd/dataviz_exercise_14.png)
+:::
+
+:::
+::::
+
+::: {.fragment}
+**Principle 5.** The last point, 8.6%, is drawn at the level of 9.0%. Placed correctly (right), November is the largest change of the year.
+:::
+
+## What's Wrong Here? {.smaller}
+
+![](./figures/dd/dataviz_exercise_9.jpeg){fig-align="center" style="max-height:330px;"}
+
+::: {.fragment}
+**Relationship is not causation.** Two series that move together need not be linked: Nicolas Cage films do not drown people. The two y-axes (Principle 1) also let you make any two lines look alike.
+:::
+
+::: {style="font-size:0.7em;text-align:center;"}
+Source: Nick Cage Movies Vs. Drownings, and More Strange (but Spurious) Correlations [{{< fa link >}}](https://www.nationalgeographic.com/science/article/nick-cage-movies-vs-drownings-and-more-strange-but-spurious-correlations)
+:::
+
+## Land Doesn't Vote, People Do {.smaller}
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/dataviz_exercise_10.jpeg)
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/dataviz_exercise_11.gif)
+
+:::
+::::
+
+A county map colours **land**. Turn each county into a circle sized by its number of voters and the same result tells a very different story.
+
+::: {style="font-size:0.7em;text-align:center;"}
+Sources: Fact checking Trump's 'Impeach this' map [{{< fa link >}}](https://edition.cnn.com/2019/10/01/politics/trump-impeach-this-map-fact-check/index.html) and Land Doesn't Vote, People Do [{{< fa link >}}](https://demcastusa.com/2019/11/11/land-doesnt-vote-people-do-this-electoral-map-tells-the-real-story/)
+:::
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B" .smaller}
+
+### Ask an AI what's wrong
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/dataviz_exercise_1.png)
+
+:::
+
+::: {#second-column}
+
+1. Copy this chart: {{< fa brands windows >}} <kbd>⊞ Win</kbd> + <kbd>⇧ Shift</kbd> + <kbd>S</kbd> or {{< fa brands apple >}} <kbd>⌘ Cmd</kbd> + <kbd>⌃ Control</kbd> + <kbd>⇧ Shift</kbd> + <kbd>4</kbd>
+2. Paste it into an AI assistant and ask: *"What is wrong with this chart?"*
+3. Compare with your own answer: what did it find that you missed? What did it miss? Did it invent a fault?
+
+:::
+::::
+
+::: {#timer4_1 .timer seconds="300" starton="interaction"}
+:::
+
+## What's Wrong Here? {.smaller}
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/dd/dataviz_exercise_1.png)
+
+:::
+
+::: {#second-column}
+
+- The claim is about growth **since 1984**, but the chart starts in **2001**: you cannot check it
+- One bar is white and the others yellow: the colour carries **the conclusion**, not the data
+- 2021 follows the 2020 collapse, so it is a **rebound**: from 2019 to 2021, the chart's own numbers give about 2% growth in two years
+
+:::
+::::
+
+::: {style="font-size:0.7em;text-align:center;"}
+Source: Official Twitter account of The White House [{{< fa link >}}](https://twitter.com/WhiteHouse/status/1486709480351952901)
+:::
+
+# 3. Connect Several Files
+
 ## Connect to Multiple Data
 
 It is possible to add more than one file but it can be done with or without joining the data.
@@ -62,22 +540,110 @@ However you won't be able to use variable from both source for the same visualis
 
 ![](./figures/dd/tableau_add_data_2.png){fig-align="center" style="max-height:170px;"}
 
+# 4. Tableau Dashboard
 
-## Previously ...
+## Tableau Objective
 
-You can describe a single variable honestly. Now we combine variables, which is
-where the interesting mistakes live.
+### Obtain the highest mark in Assignment 1
 
-## Learning Outcomes
+- Use **Tableau Public**, and submit the link to a **Dashboard** (not a Story)
+- Work on each of the four assessment criteria (25% each):
+  - **Creativity**: menus, filters and interactions that do something
+  - **Analytical depth**: figures that answer a question worth asking
+  - **Design**: layout, colour, typography, restraint
+  - **Overall story**: title, narrative, and a conclusion with a recommendation
+- Get inspired by existing dashboards on [Tableau Public](https://public.tableau.com/app/discover)
 
-By the end of this lecture you will be able to:
+## Tableau Dashboard Showcase
 
-- Write calculated fields, including level-of-detail expressions
-- Build channel and device breakdowns you can defend to a client
-- Recognise Simpson's paradox in a marketing breakdown
-- Construct a first cohort triangle from your own traffic
+Federica Pinza's visualisation, DCU winner of the 2024 European Data Visualisation Challenge organised by EDHEC
 
-# 1. Calculated Fields
+![](./figures/dd/tableau_frederica.png){fig-align="center" style="max-height:430px;"}
+
+## Tableau Dashboard Showcase
+
+:::: {layout="[1,1.6]"}
+::: {#first-column}
+
+![](./figures/dd/tableau_good.png){fig-align="center"}
+
+:::
+
+::: {#second-column}
+
+[{{< fa globe >}} Link to the dashboard](https://public.tableau.com/app/profile/federica.pinza/viz/Aglobalfightforgenderequalityineducation/Dashboard1)
+
+One long page, read from top to bottom:
+
+- a headline and the key numbers
+- a map, a trend and a correlation
+- the causes, explained with icons and text
+- a conclusion with a call to action
+
+:::
+::::
+
+## Nice Interactions and Design
+
+![](./figures/dd/tableau_good_1.png){fig-align="center"}
+
+![](./figures/dd/tableau_good_3.png){fig-align="center" style="max-height:250px;"}
+
+## Meaningful Visualisations
+
+![](./figures/dd/tableau_good_2.png){fig-align="center" style="max-height:275px;"}
+
+![](./figures/dd/tableau_good_6.png){fig-align="center" style="max-height:210px;"}
+
+## Insightful Storytelling
+
+![](./figures/dd/tableau_good_5.png){fig-align="center"}
+
+![](./figures/dd/tableau_good_4.png){fig-align="center" style="max-height:370px;"}
+
+## Example Not to Follow! {.smaller}
+
+![](./figures/dd/tableau_bad.png){fig-align="center" style="max-height:320px;"}
+
+::: {.fragment}
+- Typos in the titles: "Wold", "Countires"
+- One colour per country on the map, and a pie with one slice per country: the colours carry no information
+- Raw field names as axis titles ("Obs Value"), two different fonts, and two bar charts on different scales
+- No text to say what the index measures, or what to conclude
+:::
+
+## Tableau Dashboard
+
+A dashboard is made by dropping several **sheets** on a page, organising their position, and adding **objects** (text, images, blank space, ...).
+
+Design features can then be changed to give the dashboard a professional feel.
+
+Interactions that make all the sheets move together (filters and actions) come in Lecture 7.
+
+## Tableau Dashboard {.smaller}
+
+![](./figures/dd/tableau_dashboard.gif){fig-align="center" style="max-height:450px;"}
+
+Drag the sheets from the left panel onto the page. **Tiled** keeps them in a tidy grid; **Floating** lets an object sit on top of the others.
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### Your first Loomrow dashboard
+
+One dashboard with three of your Lecture 3 sheets:
+
+- **Composition**: percent of posts by `format`
+- **Comparison**: box plots of `reach` by `format`
+- **Relationship**: `impressions` against `likes`
+
+Titles that state the finding, the five principles, and a text box: **which format should Loomrow post more of, and why?**
+
+Publish it on Tableau Public: start now, finish at home.
+
+::: {#timer4_2 .timer seconds="900" starton="interaction"}
+:::
+
+# 5. Calculated Fields
 
 ## Row Level versus Aggregate {.smaller}
 
@@ -182,7 +748,7 @@ On a cohort chart, why does that difference decide whether your cohort sizes
 change when someone clicks a filter?
 :::
 
-# 2. Breakdowns That Mean Something
+# 6. Breakdowns That Mean Something
 
 ## Channel
 
@@ -280,7 +846,7 @@ question you are answering.
 **Always show the sizes.** The paradox is invisible without the counts, which is
 Lecture 3's rule 2 arriving with consequences.
 
-# 3. Cohorts
+# 7. Cohorts
 
 ## What a Cohort Is
 
@@ -375,7 +941,7 @@ In Tableau, on your own data:
 
 **25 minutes**
 
-# 4. Vibe Coding Tableau Calculations
+# 8. Vibe Coding Tableau Calculations
 
 ## AI This Block: Chat with context
 
@@ -442,10 +1008,12 @@ which decisions are yours?
 
 ## Going Further
 
-- Sequoia, *Retention* — the triangle chart as investors read it
-- Tableau, *Level of Detail Expressions* whitepaper — FIXED, INCLUDE, EXCLUDE
+- Claus O. Wilke, [Fundamentals of Data Visualization](https://clauswilke.com/dataviz/), free online
+- The Economist, [Mistakes, we've drawn a few](https://medium.economist.com/mistakes-weve-drawn-a-few-8cdd8a42d368): their own misleading charts, and how they fixed them
+- Sequoia, *Retention*: the triangle chart as investors read it
+- Tableau, *Level of Detail Expressions* whitepaper: FIXED, INCLUDE, EXCLUDE
   and the order of operations
-- Wagner (1982), *Simpson's Paradox in Real Life* — short, and mostly about
+- Wagner (1982), *Simpson's Paradox in Real Life*: short, and mostly about
   medicine, which makes the marketing case land harder
 
 ## Next Lecture
@@ -454,3 +1022,27 @@ Segmentation: of all the splits you can now build, which ones actually pay.
 
 **Prepare**: bring your channel-by-device matrix. We will test its segments
 against three criteria.
+
+## {background="#43464B"}
+
+```{=html}
+<style>img.circle {border-radius:50%;}</style>
+```
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+<img class="circle" src="https://github.com/damien-dupre.png" />
+
+:::
+::: {#second-column}
+**Thanks for your attention and don't hesitate to ask if you have any questions!**
+
+[{{< fa brands mastodon >}} @damien_dupre](https://datasci.social/@damien_dupre)
+
+[{{< fa brands github >}} @damien-dupre](https://github.com/damien-dupre)
+
+[{{< fa link >}} https://damien-dupre.github.io](https://damien-dupre.github.io)
+
+[{{< fa paper-plane >}} damien.dupre@dcu.ie](mailto:damien.dupre@dcu.ie)
+:::
+::::
