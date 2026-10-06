@@ -334,7 +334,7 @@ of the level. How do you take the exception honestly?
   choosing the scales
 - **Colour as the only encoding**, which fails for about 8% of men
 - **Pie with nine slices**, which is a sorted bar chart wearing a disguise
-- **A rate with no denominator**, which is Lecture 3, again, forever
+- **A rate with no denominator**, which is Lecture 5, again, forever
 
 ## A Famous Failure, and Its Repair {.smaller}
 

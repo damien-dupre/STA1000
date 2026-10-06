@@ -1,22 +1,202 @@
 ---
 title: "Lecture 5: Comparison and Segmentation"
 subtitle: STA1000 - Data Analytics and Metrics
+filters:
+  - timer
 ---
 
 ## Previously ...
 
-You can slice the data many ways. Most slices are noise. Today: which ones pay.
+- In Lecture 4 we made figures clear and honest, then prepared the table behind them in Tableau: a pivot, calculated fields, and two files merged into one data source.
 
-## Learning Outcomes
+You can slice the data many ways. Most slices are noise. **Today: a first dashboard, then the breakdowns, segments and cohorts worth building, and which ones pay.**
+
+## Learning Outcomes {.smaller}
 
 By the end of this lecture you will be able to:
 
+- Assemble a first dashboard in Tableau
+- Write calculated fields, including level-of-detail expressions
 - Explain what customer heterogeneity is and which kinds of it predict behaviour
 - Judge a segment against measurability, substantiality and actionability
+- Build channel and device breakdowns you can defend to a client
+- Recognise Simpson's paradox in a marketing breakdown
 - Compare new versus returning, source / medium, device and geography honestly
 - Recognise when a segment difference is too small to act on
+- Construct a first cohort triangle from your own traffic
 
-# 1. Heterogeneity
+# 1. Tableau Dashboard
+
+## Tableau Objective
+
+### Obtain the highest mark in Assignment 1
+
+- Use **Tableau Public**, and submit the link to a **Dashboard** (not a Story)
+- Work on each of the four assessment criteria (25% each):
+  - **Creativity**: menus, filters and interactions that do something
+  - **Analytical depth**: figures that answer a question worth asking
+  - **Design**: layout, colour, typography, restraint
+  - **Overall story**: title, narrative, and a conclusion with a recommendation
+- Get inspired by existing dashboards on [Tableau Public](https://public.tableau.com/app/discover)
+
+## Tableau Dashboard Showcase
+
+Federica Pinza's visualisation, DCU winner of the 2024 European Data Visualisation Challenge organised by EDHEC
+
+![](./figures/dd/tableau_frederica.png){fig-align="center" style="max-height:430px;"}
+
+## Tableau Dashboard Showcase
+
+:::: {layout="[1,1.6]"}
+::: {#first-column}
+
+![](./figures/dd/tableau_good.png){fig-align="center"}
+
+:::
+
+::: {#second-column}
+
+[{{< fa globe >}} Link to the dashboard](https://public.tableau.com/app/profile/federica.pinza/viz/Aglobalfightforgenderequalityineducation/Dashboard1)
+
+One long page, read from top to bottom:
+
+- a headline and the key numbers
+- a map, a trend and a correlation
+- the causes, explained with icons and text
+- a conclusion with a call to action
+
+:::
+::::
+
+## Nice Interactions and Design
+
+![](./figures/dd/tableau_good_1.png){fig-align="center"}
+
+![](./figures/dd/tableau_good_3.png){fig-align="center" style="max-height:250px;"}
+
+## Meaningful Visualisations
+
+![](./figures/dd/tableau_good_2.png){fig-align="center" style="max-height:275px;"}
+
+![](./figures/dd/tableau_good_6.png){fig-align="center" style="max-height:210px;"}
+
+## Insightful Storytelling
+
+![](./figures/dd/tableau_good_5.png){fig-align="center"}
+
+![](./figures/dd/tableau_good_4.png){fig-align="center" style="max-height:370px;"}
+
+## Example Not to Follow! {.smaller}
+
+![](./figures/dd/tableau_bad.png){fig-align="center" style="max-height:320px;"}
+
+::: {.fragment}
+- Typos in the titles: "Wold", "Countires"
+- One colour per country on the map, and a pie with one slice per country: the colours carry no information
+- Raw field names as axis titles ("Obs Value"), two different fonts, and two bar charts on different scales
+- No text to say what the index measures, or what to conclude
+:::
+
+## Tableau Dashboard
+
+A dashboard is made by dropping several **sheets** on a page, organising their position, and adding **objects** (text, images, blank space, ...).
+
+Design features can then be changed to give the dashboard a professional feel.
+
+Interactions that make all the sheets move together (filters and actions) come in Lecture 7.
+
+## Tableau Dashboard {.smaller}
+
+![](./figures/dd/tableau_dashboard.gif){fig-align="center" style="max-height:450px;"}
+
+Drag the sheets from the left panel onto the page. **Tiled** keeps them in a tidy grid; **Floating** lets an object sit on top of the others.
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### Your first Loomrow dashboard
+
+One dashboard with three of your Lecture 3 sheets:
+
+- **Composition**: percent of posts by `format`
+- **Comparison**: box plots of `reach` by `format`
+- **Relationship**: `impressions` against `likes`
+
+Titles that state the finding, the five principles, and a text box: **which format should Loomrow post more of, and why?**
+
+Publish it on Tableau Public: start now, finish at home.
+
+::: {#timer5_1 .timer seconds="900" starton="interaction"}
+:::
+
+# 2. Calculated Fields
+
+## Conditional Logic
+
+Your source / medium values are a mess. They are supposed to be. Grouping them
+into named channels is the first calculated field everyone writes.
+
+```
+IF CONTAINS([Source], "google") AND [Medium] = "cpc" THEN "Paid Search"
+ELSEIF [Medium] = "organic" THEN "Organic Search"
+ELSEIF CONTAINS([Source], "linkedin")
+    OR CONTAINS([Source], "instagram")
+    OR [Source] = "t.co" THEN "Social"
+ELSEIF [Medium] = "email" THEN "Email"
+ELSEIF [Medium] = "referral" THEN "Referral"
+ELSEIF [Source] = "(direct)" THEN "Direct"
+ELSE "Other"
+END
+```
+
+. . .
+
+**Then check the size of "Other".** If it holds more than a few percent of your
+sessions, your grouping is hiding something rather than simplifying it.
+
+## The Grouping Is an Argument
+
+<!-- Speaker notes: the point to labour. A channel grouping is not a technical
+     artefact, it is a claim about which traffic sources are the same kind of
+     thing. Two analysts group differently and produce different strategies from
+     identical data. Nobody ever asks to see the CASE statement. -->
+
+A channel grouping asserts that these sources are the same kind of traffic and
+those are different.
+
+. . .
+
+Put `t.co` in Social and paid X campaigns become invisible. Put `(direct)` in
+its own channel and you have quietly labelled "we could not tell" as a marketing
+channel with a budget line.
+
+. . .
+
+**Every channel report anyone has ever shown you rests on a CASE statement you
+did not see.** Keep yours in your measurement plan.
+
+## Level of Detail Expressions
+
+An LOD expression computes at a grain other than the one in the view. It is how
+Tableau lets you say "per user, regardless of what is on the rows".
+
+```
+{ FIXED [User ID] : MIN([Date]) }
+```
+
+Each user's first-touch date, available on every row for that user.
+
+. . .
+
+This one expression is the building block of every cohort view you will ever
+build, and of the triangle chart later in this lecture.
+
+::: {.callout-note appearance="minimal"}
+`{FIXED}` ignores the filters on the view; `{INCLUDE}` and `{EXCLUDE}` do not.
+On a cohort chart, why does that difference decide whether your cohort sizes
+change when someone clicks a filter?
+:::
+
+# 3. Heterogeneity
 
 ## Customers Differ. On What? {.smaller}
 
@@ -58,7 +238,6 @@ that matters is **on which dimension**.
 *Computer skills across OECD countries. Somewhere under 10% of people are at
 Level 3. Everyone in this room is one of them.*
 
-
 ## So Why Does Everyone Segment by Demographics? {.smaller}
 
 <!-- Speaker notes: this is the good bit, because they have all been taught
@@ -94,7 +273,6 @@ answer change between a nappy brand and a car insurer?
 
 *Mozilla's Firefox user types. Note that each one is written so a product
 team could act on it. That is the test.*
-
 
 ## The Circularity Trap
 
@@ -137,8 +315,7 @@ Lecture 15, on your own users. It is last on this list for a reason.
 
 ![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_segmentation_process.png){fig-align="center" height="265px"}
 
-
-# 2. What Makes a Segment Worth Having
+# 4. What Makes a Segment Worth Having
 
 ## The Three Tests
 
@@ -185,7 +362,6 @@ collect, unify, comprehend, activate. **Activation is where most of them fail.**
 *Portfolio yield by credit score. The middle 36% of accounts are
 indistinguishable. The segments that matter are at the edges.*
 
-
 ## Substantial, and Small Numbers
 
 <!-- Speaker notes: with a student portfolio getting 40 sessions a week, most
@@ -221,7 +397,105 @@ Segments that regularly fail this test on a portfolio site:
 Naming a segment you deliberately did not pursue, and why, is worth more marks
 than a fourth chart of one you did.
 
-# 3. The Standard Comparisons
+# 5. Breakdowns That Mean Something
+
+## Channel
+
+From source / medium to a grouping you can defend, then the two questions:
+
+1. Does each channel behave differently on the metric you care about?
+2. Could you spend differently against each one tomorrow?
+
+. . .
+
+If both answers are no, you have built a nicer-looking version of the same
+number.
+
+## Device
+
+Device is a segment, not a curiosity. The mobile conversion gap is one of the
+most consistent findings in digital marketing, and it is usually a **design**
+finding rather than an audience one.
+
+. . .
+
+At portfolio volume, expect the gap to be visible and the sample to be too small
+to size it. Both facts belong in the report.
+
+## Simpson's Paradox
+
+<!-- Speaker notes: worth ten minutes of its own. A channel can look worse
+     overall and better within every device category. Once they have seen it
+     with numbers they never quite trust an aggregate again, which is the
+     desired state. -->
+
+A channel can convert **worse overall** and **better within every single device
+category**.
+
+. . .
+
+Not a paradox, and not rare. It happens whenever the segments differ in both
+their base rate and their share of the traffic.
+
+## Simpson's Paradox, With Numbers {.smaller}
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+**Mobile**
+
+| Channel | Sessions | Conv. | Rate |
+|---|---|---|---|
+| Email | 900 | 45 | **5.0%** |
+| Social | 100 | 4 | 4.0% |
+
+:::
+
+::: {#second-column}
+
+**Desktop**
+
+| Channel | Sessions | Conv. | Rate |
+|---|---|---|---|
+| Email | 100 | 12 | **12.0%** |
+| Social | 900 | 99 | 11.0% |
+
+:::
+::::
+
+. . .
+
+**Combined**: Email 57 / 1000 = 5.7%. Social 103 / 1000 = **10.3%**.
+
+. . .
+
+Email wins on mobile, wins on desktop, and loses overall, because email traffic
+is mostly mobile and mobile converts badly.
+
+::: {.callout-note appearance="minimal"}
+Which number goes in the client deck? Neither is wrong.
+:::
+
+## What to Do About It
+
+You cannot fix Simpson's paradox with a better chart. You can only decide which
+question you are answering.
+
+. . .
+
+- **"Which channel should I buy more of?"** needs the breakdown, because the mix
+  is part of what you are buying
+- **"Which channel converts better for the same kind of visitor?"** needs the
+  within-device rates
+- **"What happened last month?"** needs both, and the mix shift is often the
+  entire story
+
+. . .
+
+**Always show the sizes.** The paradox is invisible without the counts, which is
+the denominator rule of section 4 arriving with consequences.
+
+# 6. The Standard Comparisons
 
 ## New versus Returning
 
@@ -235,7 +509,7 @@ mix moves, without either underlying rate changing.
 
 . . .
 
-**This is Lecture 4's Simpson's paradox in its most common marketing costume.**
+**This is Simpson's paradox again, in its most common marketing costume.**
 
 ## Source and Medium
 
@@ -261,7 +535,7 @@ a map because Tableau makes maps easy.
 
 . . .
 
-**Device** we covered in Lecture 4. The addition here: a device gap is
+**Device** we covered in section 5. The addition here: a device gap is
 actionable in a way most segments are not, because you can change the design
 this week.
 
@@ -286,7 +560,100 @@ Does that make the analysis worthless, or does it make one sentence mandatory?
 What is the sentence?
 :::
 
-# 4. In Practice
+# 7. Cohorts
+
+## What a Cohort Is
+
+A **cohort** is the set of users first seen in the same period, followed
+forward.
+
+. . .
+
+A **segment** is a group defined by an attribute, measured now.
+
+. . .
+
+Cohorts are the only honest way to ask whether things are getting better,
+because they hold acquisition date constant. An overall retention rate mixes
+this month's new users with users acquired two years ago.
+
+## The C Matrix {.smaller}
+
+Let $C(t, t')$ be the number of users acquired in period $t$ who are still
+active in period $t' \ge t$.
+
+- $C(t,t)$ is simply the users acquired in $t$: the cohort's size
+- $C(t,t')$ is weakly decreasing in $t'$: cohorts only shrink
+- $C(\cdot,t)$ is everyone active in $t$, which is roughly what drives revenue
+- The difference between consecutive columns is attrition
+
+. . .
+
+Startups call the picture of this matrix a **triangle retention chart**. It is
+the single most informative chart about a subscription or repeat-purchase
+business, and it is the thing investors ask for.
+
+::: {.callout-note appearance="minimal"}
+Whether you label the columns with calendar months or with months-since-signup
+changes the shape of the chart completely. Which labelling answers "is our
+product getting better?" and which answers "how was March?"
+:::
+
+## The Cohort Matrix, Drawn {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_cohort_c_matrix.png){fig-align="center" height="350px"}
+
+*Rows are acquisition cohorts, columns are periods since acquisition. Reading
+across a row is a survival curve; reading down a column is a calendar snapshot.*
+
+## Building One in Tableau
+
+1. `{ FIXED [User ID] : MIN([Date]) }` → first-touch date
+2. `DATETRUNC('week', [First Touch])` → cohort label, on rows
+3. `DATEDIFF('week', [First Touch], [Date])` → periods since acquisition, on
+   columns
+4. `COUNTD([User ID])` → the cell value
+5. Divide by the cohort's own week-0 count for a percentage, and keep the raw
+   count as a label
+
+. . .
+
+Column 0 is 100% by construction. If it is not, your first-touch field is wrong.
+
+## What One Looks Like With Real Data {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_cohort_retention_heatmap.png){fig-align="center" height="350px"}
+
+*The triangle is not missing data. Recent cohorts simply have not lived long enough.*
+
+## The Portfolio Caveat
+
+Your site may produce cohorts of four people.
+
+. . .
+
+Build it anyway. The mechanics are the same at four users and four million, and
+the discipline of writing "cohort n = 4" beside a percentage is the thing being
+assessed.
+
+. . .
+
+**Documented judgement beats undocumented certainty**, including when the
+judgement is "this chart cannot support a conclusion".
+
+## Exercise {background="#43464B"}
+
+In Tableau, on your own data:
+
+1. Write a channel grouping calculated field, and report the share in "Other"
+2. Build a channel-by-device matrix of sessions and key events, counts visible
+3. Check whether any channel shows Simpson's paradox across device
+4. Create a first-touch date LOD field
+5. Produce a weekly cohort triangle of returning users, with cohort sizes shown
+
+**25 minutes**
+
+# 8. In Practice
 
 ## Live Demo {background="#43464B"}
 
@@ -310,7 +677,7 @@ On your own data:
 
 **20 minutes**
 
-# 5. AI for Segment Hypotheses
+# 9. AI for Calculations and Segment Hypotheses
 
 ## AI This Block: Chat with context
 
@@ -318,6 +685,62 @@ Where we are on the module's AI spine, set out in Lecture 1 and named properly
 in Lecture 12:
 
 > **Chat with context**
+
+## Calculated Fields Are Ideal for This
+
+Tableau's calculation language is verbose, thoroughly documented and heavily
+represented in training data. Assistants write it well, and the cost of a wrong
+answer is visible immediately.
+
+> "Write a Tableau calculated field that groups source and medium into Paid
+> Search, Organic Search, Social, Email, Referral and Direct. My Source values
+> include google, bing, linkedin.com, t.co, l.instagram.com and (direct)."
+
+. . .
+
+Give it your **actual** source values. Pasted from the data, not remembered.
+
+## LOD Expressions Especially
+
+> "Write a FIXED LOD expression giving each user's first session date, and a
+> second field giving the number of weeks between a row's date and that user's
+> first session date."
+
+. . .
+
+**Then check it.** Not by reading it:
+
+- Does the row count change after adding the field? It should not
+- Does one user you can trace by hand get the date you expect?
+- Is column 0 of the cohort chart exactly 100%?
+
+## The Delegation Boundary
+
+The assistant should write the **syntax**. You must own the **grouping**,
+because the grouping is the argument.
+
+. . .
+
+Ask it for a channel grouping and it will produce a sensible industry-standard
+one. Sensible and industry-standard is not the same as right for a one-page
+portfolio site with three traffic sources, one of which is your own phone.
+
+::: {.callout-note appearance="minimal"}
+Delegate the typing, keep the deciding. On this lecture's material, exactly
+which decisions are yours?
+:::
+
+## Exercise {background="#43464B"}
+
+1. Generate your channel grouping with an assistant, giving it your real source
+   values
+2. Generate the first-touch LOD field
+3. Verify both against five rows you check by hand
+4. Find one source value the grouping puts in the wrong bucket, and say what it
+   would have cost you
+5. Change one grouping decision on purpose and note which conclusion moves
+
+**15 minutes**
 
 ## Generating Candidates, Not Conclusions
 
@@ -362,14 +785,19 @@ Lecture 21.
 
 **10 minutes**
 
-## Going Further
+## Going Further {.smaller}
 
-- Kotler and Keller, *Marketing Management*, ch. on STP — the canonical criteria,
+- Tableau, *Level of Detail Expressions* whitepaper: FIXED, INCLUDE, EXCLUDE
+  and the order of operations
+- Kotler and Keller, *Marketing Management*, ch. on STP: the canonical criteria,
   worth reading critically against today's evidence
-- Yankelovich and Meer (2006), *Rediscovering Market Segmentation*, HBR — why so
+- Yankelovich and Meer (2006), *Rediscovering Market Segmentation*, HBR: why so
   much segmentation produces nothing
-- Sharp, *How Brands Grow*, ch. 9 — the sceptical case against segmentation
+- Sharp, *How Brands Grow*, ch. 9: the sceptical case against segmentation
   altogether, which you should be able to answer
+- Wagner (1982), *Simpson's Paradox in Real Life*: short, and mostly about
+  medicine, which makes the marketing case land harder
+- Sequoia, *Retention*: the triangle chart as investors read it
 
 ## Next Lecture
 
@@ -377,3 +805,27 @@ Turning views into something a client can read, and being critiqued on it.
 
 **Prepare**: bring one chart from your workbook that you are pleased with. It
 will be pulled apart.
+
+## {background="#43464B"}
+
+```{=html}
+<style>img.circle {border-radius:50%;}</style>
+```
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+<img class="circle" src="https://github.com/damien-dupre.png" />
+
+:::
+::: {#second-column}
+**Thanks for your attention and don't hesitate to ask if you have any questions!**
+
+[{{< fa brands mastodon >}} @damien_dupre](https://datasci.social/@damien_dupre)
+
+[{{< fa brands github >}} @damien-dupre](https://github.com/damien-dupre)
+
+[{{< fa link >}} https://damien-dupre.github.io](https://damien-dupre.github.io)
+
+[{{< fa paper-plane >}} damien.dupre@dcu.ie](mailto:damien.dupre@dcu.ie)
+:::
+::::

@@ -411,7 +411,7 @@ With `insta-data.csv`, one worksheet each:
 4. A box plot of `reach`, `post_id` on Detail: which post is the highest dot?
 5. `reach` as an **Average**, then as a **Median**: which would you report?
 
-::: {#timer3_2 .timer seconds="600" starton="interaction"}
+::: {#timer3_2 .timer seconds="360" starton="interaction"}
 :::
 
 ## Comparison in Tableau {.smaller}
@@ -494,9 +494,9 @@ Two Measures on **Columns** and **Rows**, each switched to **Dimension**. **Anal
 3. Average `reach` by `format`: which format wins now, and why?
 4. A scatterplot of `impressions` against `likes` with a trend line, then `format` on **Colour**: which format earns the most likes per impression?
 
-Save the workbook to your Tableau Public profile: Lecture 4 turns these sheets into a dashboard.
+Save the workbook to your Tableau Public profile: Lecture 5 turns these sheets into a dashboard.
 
-::: {#timer3_3 .timer seconds="600" starton="interaction"}
+::: {#timer3_3 .timer seconds="360" starton="interaction"}
 :::
 
 ## {background="#43464B"}

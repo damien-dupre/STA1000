@@ -34,6 +34,12 @@ with attribution.
 Screenshots of example dashboards. Used for non-commercial university teaching
 with attribution.
 
+## `economist_mistakes.png`: The Economist, *Mistakes, we've drawn a few*
+<https://medium.economist.com/mistakes-weve-drawn-a-few-8cdd8a42d368>
+The Economist's own before-and-after redraw of one of its charts, published on
+Medium. Used for non-commercial university teaching, with the source credited
+on the slide where it appears (Lecture 4, "A Must Read").
+
 ## Note on third-party content
 Several figures are screenshots or reproductions of material the course authors
 did not themselves own (newspaper graphics, journal figures, corporate

@@ -59,7 +59,7 @@ as a specification of the output table.
 . . .
 
 **Compute the rate after the aggregation, never before.** `conversions.sum() /
-sessions.sum()` is the rate of the totals. Averaging a per-row rate is Lecture 3
+sessions.sum()` is the rate of the totals. Averaging a per-row rate is Lecture 4
 returning in Python.
 
 ::: {.callout-note appearance="minimal"}

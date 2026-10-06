@@ -32,7 +32,7 @@ with like.
 
 . . .
 
-Lecture 4 built one in Tableau. Here we build it in five lines and then do
+Lecture 5 built one in Tableau. Here we build it in five lines and then do
 something with it.
 
 ## The C Matrix, Again
