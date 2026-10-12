@@ -1,410 +1,394 @@
 ---
-title: "Lecture 12: From Chat to Agent"
+title: "Lecture 12: Build the Site"
 subtitle: STA1000 - Data Analytics and Metrics
 ---
 
 ## Previously ...
 
-Eleven sessions. You have used an AI assistant in every one of them:
-
-- To explain a concept you had just met
-- To draft a consent banner and a privacy notice
-- To write Tableau calculated fields
-- To critique your own charts
+A semester analysing Loomrow's data: a published dashboard, and five lectures
+of Python on its posts and its GA4 export. Every number came from a file somebody
+else handed you.
 
 . . .
 
-Today we stop using it incidentally and name what is actually happening.
+Two questions a supplied dataset never forces:
 
-## Why Here
-
-Block 3 is called "Python as the marketer's power tool".
-
-. . .
-
-In 2026, the power tool is not Python. It is **Python plus something that writes
-Python**.
+- What was worth recording in the first place?
+- What can this number actually prove?
 
 . . .
 
-Pretending otherwise would teach you a version of the job that no longer exists.
-Teaching it without teaching verification would be worse.
+**Today we build the thing we are going to measure, so that both questions
+become yours.**
 
 ## Learning Outcomes
 
 By the end of this lecture you will be able to:
 
-- Distinguish chat, chat with context, and agentic use
-- Choose the right mode for a given analytics task
-- Verify AI-produced analysis rather than trusting it
-- State what an agent must not be given access to, and why
+- Build and publish a small multi-page site suitable for tracking
+- Identify the user actions on that site that carry commercial meaning
+- Write a statement of success **before** any tracking exists
 
-# 1. Three Modes
+# 1. Why Build Before Measuring
 
-## The Progression
+## The Problem With Borrowed Data
 
-:::: {layout="[1,1,1]"}
+<!-- Speaker notes: the standard analytics module hands students a clean sample
+     dataset. Students learn the tool but never learn the judgement, because
+     they never had to decide what was worth recording. Loomrow was deliberately
+     that module for six weeks; this is the pivot. -->
+
+`insta-data.csv` was clean, complete and rectangular. Somebody decided that
+`reach_followers` and `reach_non_followers` were worth splitting out, and you
+inherited that decision without ever making it.
+
+. . .
+
+That is the shape of most analytics teaching, and of a lot of analytics work. It
+produces people who are fluent in tools and helpless about measurement.
+
+. . .
+
+**From today the decisions are yours, and so are the consequences.**
+
+## The Portfolio as a Business
+
+Your site is not a CV. It is a **business with an objective**, and it is the
+object of study for the rest of the module.
+
+. . .
+
+That means it needs something a visitor can *do*:
+
+- Send an enquiry
+- Sign up to something
+- Download something
+- Book a slot
+
+. . .
+
+**A site nobody can act on generates page views and nothing else**, and page
+views cannot carry the second half of this module.
+
+## What You Are Signing Up To {.smaller}
+
+| Lecture | What your site has to support |
+|---|---|
+| 13 | A measurement plan and a live GA4 property |
+| 14 | A consent banner and a privacy notice you wrote |
+| 15 | An export with enough rows to be worth opening |
+| 15-20 | Your own data, in Python |
+| 17 | A funnel with a middle |
+| 22 | A story about your own traffic, presented and defended |
+
+. . .
+
+**The site has to be live by next week**, because Lecture 13 tags it and Lecture
+15 needs several weeks of accumulated traffic.
+
+# 2. Site Structure
+
+## Minimum Viable Structure
+
+Four pages. No more, for now.
+
+- **Home**: who you are and what you offer, above the fold
+- **Work**: two or three case studies, each its own page or anchor
+- **About**: the human bit
+- **Contact**: the page that exists to be a conversion
+
+. . .
+
+The fourth page is the one that matters. **One page must exist purely to be
+converted on**, whether that is a form, a download or a booking link.
+
+## Tooling Options {.smaller}
+
+| Option | Cost | Control | Tagging |
+|---|---|---|---|
+| **Quarto + GitHub Pages** | Free | Total | Trivial: one line in `_quarto.yml` |
+| **Plain HTML + GitHub Pages** | Free | Total | Trivial, but you write everything |
+| **Wix, Squarespace, Carrd** | Paid tiers | Limited | Possible, often behind a plan |
+| **Notion, Canva sites** | Free tiers | Very limited | Frequently impossible |
+
+. . .
+
+::: {.callout-note appearance="minimal"}
+**The hard constraint: you must be able to inject a script into `<head>` on every
+page.** Check this before you build anything. A platform that will not let you is
+a platform you cannot use for this module.
+:::
+
+. . .
+
+**The default for this module is Quarto published to GitHub Pages**, because it
+is free, versioned, and the tag goes in one file.
+
+## Why GitHub, Beyond Hosting
+
+GitHub is a code-collaboration platform that quietly became several other
+things. Two matter here:
+
+- **File and code storage with version control.** Every change to your site is
+  recorded, dated and reversible
+- **Online publication.** GitHub Pages hosts a static site straight out of a
+  repository, free, over HTTPS
+
+. . .
+
+You will use the same account again for Assignment 2.
+
+## Creating the Repository {.smaller}
+
+1. Top right, the `+` menu → **New repository**
+2. **A short, memorable name.** No spaces; `snake_case` or `kebab-case`
+3. Optionally a description
+4. **Public**. Pages does not serve a private repository on the free tier
+5. Tick **Add a README file**
+6. **Create repository**
+
+. . .
+
+::: {.callout-note appearance="minimal"}
+Name it carefully. The repository name becomes part of your public URL, and
+renaming it later breaks every link you have shared, including the ones in your
+GA4 property.
+:::
+
+## Turning On GitHub Pages
+
+1. **Settings** → **Pages** in the left pane
+2. Under **Branch**, change `None` to `main`, and **Save**
+3. **Actions**, and wait for *pages build and deployment* to finish
+
+. . .
+
+Your site is then at:
+
+```
+https://<username>.github.io/<repository>/
+```
+
+. . .
+
+So for the user `damien-dupre` and the repository `portfolio`, that is
+`https://damien-dupre.github.io/portfolio/`. **Write your URL down. Lecture 13
+needs it.**
+
+## The Quarto Site {.smaller}
+
+A Quarto website is a folder of `.qmd` files plus one configuration file:
+
+```{.yaml}
+project:
+  type: website
+
+website:
+  title: "Your Name"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: work.qmd
+        text: Work
+      - href: about.qmd
+        text: About
+      - href: contact.qmd
+        text: Contact
+```
+
+. . .
+
+`quarto render` turns it into a `_site/` folder of plain HTML. **That folder is
+what GitHub Pages serves.**
+
+## The One Line That Matters
+
+Also in `_quarto.yml`, and the reason this toolchain was chosen:
+
+```{.yaml}
+format:
+  html:
+    theme: cosmo
+    include-in-header: head.html
+```
+
+. . .
+
+Whatever is in `head.html` is injected into `<head>` on **every page of the
+site, from one file**. Next week that file holds your Google tag.
+
+. . .
+
+::: {.callout-note appearance="minimal"}
+A tag that fires on the homepage but not on the contact page is the single most
+common cause of a broken funnel. This pattern is how you avoid it.
+:::
+
+## Live Demo {background="#43464B"}
+
+<!-- Speaker notes: fifteen minutes, and it always runs long. Have a repository
+     pre-made as a fallback so the Pages build wait does not stall the room. -->
+
+1. Create the repository, public, with a README
+2. Four `.qmd` files and a `_quarto.yml`
+3. `quarto render`, and look at `_site/`
+4. Push, enable Pages, wait for the Action
+5. Open the live URL, then view source and find `<head>`
+
+# 3. Defining Success Before Tracking
+
+## The Pre-Registration Habit
+
+Experimental science has a rule: **write down what you expect to find before you
+look.** Otherwise every result is a finding, because the hypothesis moves.
+
+. . .
+
+Marketing analytics has no such norm, and suffers for it. A month of traffic can
+be made to look like a success by anyone allowed to choose the metric
+afterwards.
+
+. . .
+
+**So choose it now, while you still have no data and nothing to defend.**
+
+## The Success Statement {.smaller}
+
+One paragraph, written today, kept for the rest of the module:
+
+> *This site is for **[audience]**. Success is **[a specific action]**. A good
+> month is **[a number]** of them. I will conclude it is not working if
+> **[a condition]**.*
+
+. . .
+
+Worked example:
+
+> *This site is for Dublin agency recruiters hiring junior analysts. Success is a
+> completed contact form. A good month is five. I will conclude it is not working
+> if fewer than 100 people reach the work page in a month, because then the
+> problem is traffic, not the site.*
+
+. . .
+
+Note what the last clause buys you: a **failure condition that distinguishes two
+different problems**. That is what makes it worth writing.
+
+## Objectives Are Not Metrics
+
+:::: {layout="[1,1]"}
 ::: {#first-column}
 
-**Chat**
+**Not an objective**
 
-You ask, it answers in words or code. It cannot see your data. You copy, paste
-and run.
+- "Build my brand"
+- "Increase engagement"
+- "Get noticed"
 
-*The assistant knows things.*
+None of these names an action, so none of them can be recorded, so none of them
+can be wrong.
 
 :::
 
 ::: {#second-column}
 
-**Chat with context**
+**An objective**
 
-You attach a file, a screenshot, an export. It answers about **your** data.
+- "Five completed contact forms a month"
+- "Half of work-page visitors reach the bottom"
 
-*The assistant knows your situation.*
-
-:::
-
-::: {#third-column}
-
-**Agent**
-
-It runs code, reads the result, notices the error, fixes it, and repeats until
-done.
-
-*The assistant does the work.*
+Each names an action, a count and a period.
 
 :::
 ::::
 
 . . .
 
-Each mode is more capable than the last, and each removes one more of your
-opportunities to notice that it is wrong.
-
-## Mode 1: Chat
-
-What you have mostly been doing.
-
-> "What is the difference between a session and a user in GA4?"
-
-> "Write a Tableau calculated field that groups source and medium into channels."
-
-. . .
-
-**Strengths**: fast, cheap, no setup, safe. It cannot damage anything because it
-cannot touch anything.
-
-. . .
-
-**Limits**: it does not know your column names, your row counts, or that your
-date field is stored as text.
-
-## Mode 2: Chat With Context
-
-You give it the situation.
-
-> "Here is the first 20 rows of my GA4 export [attached]. The `date` column is
-> reading as text. Write the pandas to fix it and tell me what to check
-> afterwards."
-
-. . .
-
-**This is the single biggest upgrade available to you**, and most people never
-make it. They keep asking generic questions and getting generic answers.
-
-. . .
-
-**Limits**: it sees a sample, not the dataset. It cannot run anything, so it
-cannot know whether its answer worked.
-
-## Mode 3: Agent
-
-The assistant is given tools: a Python environment, a filesystem, sometimes a
-browser.
-
-. . .
-
-You state a goal. It writes code, runs it, reads the traceback, corrects itself,
-and continues.
-
-> "Load ga4_export.csv, clean the date and numeric columns, and report sessions
-> and conversion rate by channel and week. Tell me anything that looks wrong."
-
-. . .
-
-**This is genuinely different in kind.** The loop of run-observe-correct is the
-one you will be doing by hand from next lecture onwards.
-
-## One Model, Many Inputs and Outputs {.smaller}
-
-![Source: [Masterclass: LLMs for Data Science](https://github.com/avvorstenbosch/Masterclass-LLMs-for-Data-Science) (CC BY-NC-SA 4.0)](./figures/external/mcllm_multimodal_llm.png){fig-align="center" height="255px"}
-
-*Text, image, audio in; text, image, audio out. The agent wraps a loop and a
-set of tools around this.*
-
-
-## What Makes an Agent an Agent
-
-Three ingredients:
-
-1. **Tools**: it can execute, not only emit text
-2. **A loop**: it observes the result and acts again
-3. **Some autonomy**: it decides the next step without asking you each time
-
-. . .
-
-Remove any one and you are back to chat.
-
-. . .
-
-The third ingredient is where the risk lives.
-
-## Where You Will Meet Them
-
-- **Notebook assistants**: Colab's Gemini, Copilot in Jupyter
-- **Coding agents**: Claude Code, Cursor, Codex
-- **Chat with code execution**: Claude and ChatGPT running Python on an uploaded file
-- **Inside the platforms**: GA4's and Meta's own automated insights
-
-. . .
-
-For this module, **Claude** is the default in worked examples. ChatGPT and
-GitHub Copilot do the same things with different names. The mode matters, the
-brand does not.
-
-## Why This Is a Marketing Question {.smaller}
-
-![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_zuckerberg_advertising.png){fig-align="center" height="350px"}
-
-
-# 2. The Spine of This Module
-
-## One Step Per Block {.smaller}
-
-<!-- Speaker notes: this slide is the reason the lecture exists here. Put it up
-     again at the start of each block so students can see where they are. -->
-
-| Block | Lectures | AI mode | Used as |
-|---|---|---|---|
-| 1 See the data | 1-7 | Chat with context | Attach the file, not a description |
-| 2 Build the lab | 8-11 | Chat | A tutor. Explain, do not do |
-| 3 Python | 12-17 | Agentic coding | It writes and runs the analysis |
-| 4 Metrics | 18-22 | An analyst you interrogate | Argue the other side |
-| 5 Communication | 23-24 | A producer | Drafts the spec, report, deck |
-
-. . .
-
-Block 2 steps **back**, deliberately: it is the one place where the decisions
-have to be yours. Everywhere else, **you own the judgement anyway.**
-
-## The Direction of Travel
-
-Each block hands more execution to the machine and keeps more verification with
-you.
-
-. . .
-
-That is not a compromise. It is the actual job description of an analyst who
-uses these tools well.
-
-# 3. Verification
-
-## The Only Skill That Matters
-
-An AI assistant is a **confident** producer of plausible work.
-
-. . .
-
-Plausible and correct are different, and the gap is invisible from the output
-alone.
-
-. . .
-
-Everything in this section is about closing that gap cheaply.
-
-## The Four Checks
-
-**1. Shape.** Did the number of rows change when it should not have? Is the
-output the grain you asked for?
-
-. . .
-
-**2. Extremes.** Look at the largest and smallest values. Nonsense hides in the
-tails, not in the head of the table.
-
-. . .
-
-**3. A known case.** Pick one channel or one week you can compute by hand or read
-off GA4. Does it match?
-
-. . .
-
-**4. Reproduce.** Restart and run all. Then run it on last month's data.
-
-## Verification Is Not Reading the Code
-
-Reading the code catches syntax and obvious logic errors.
-
-. . .
-
-It does not catch:
-
-- The right operation on the wrong column
-- A join that silently dropped 40% of rows
-- A filter that excluded exactly the cases you cared about
-- A correct calculation of a metric that answers a different question
-
-. . .
-
-**Only checking the output against something you already know catches those.**
-
-## The Failure Mode You Will Actually Have
-
-<!-- Speaker notes: worth dwelling on. This is not hypothetical, it happens to
-     every student who submits agent-assisted work. -->
-
-You ask for conversion rate by channel. The agent produces a table. It looks
-right. It is formatted nicely. You put it in your report.
-
-. . .
-
-It computed key events divided by **users**, not by **sessions**.
-
-. . .
-
-Every number is wrong by a consistent factor, the ranking happens to be
-unchanged, and nothing about the output looks suspicious.
-
-. . .
-
-**The definition, not the code, was wrong.** No amount of reading the Python
-would have caught it. Checking one channel against GA4 would have.
-
-## Ask for the Assumptions
-
-A cheap habit that catches a lot:
-
-> "Before you write the code, list the assumptions you are making about the
-> data and the metric definitions."
-
-. . .
-
-The assumptions are where the errors are, and they are much faster to read than
-the code.
-
-## Exercise {background="#43464B" .smaller}
-
-Use an agent (Claude, ChatGPT with code execution, or Colab's assistant) on your
-own GA4 export:
-
-> "Load this export, clean it, and report sessions and key events by channel and
-> by week. List your assumptions before you start."
-
-Then, without looking at the code:
-
-1. Check the total sessions against your GA4 report
-2. Check one channel and one week by hand
-3. Find the largest and smallest values and ask whether they make sense
-4. Write down one assumption it made that you would have made differently
-
-**20 minutes**
-
-# 4. Limits, Cost and Safety
-
-## What Agents Are Bad At
-
-- **Small samples**: it will report a difference on n = 12 with no hesitation
-- **Your context**: it does not know your consent decline rate or that you tested
-  your own tags for a week
-- **Domain definitions**: sessions, users, key events, engaged sessions. It will
-  pick a plausible one
-- **Saying "I do not know"**: it will produce an answer regardless
-
-. . .
-
-Every one of these is a thing you learned to worry about in Lectures 3, 5 and 10.
-That is why this lecture is here and not in week one: you can now tell when the
-answer is wrong.
-
-## How Far They Can Actually Go {.smaller}
-
-![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_metr_three_fits.png){fig-align="center" height="320px"}
-
-*Task length completed at 50% reliability, with three fits to the same data.
-The disagreement after 2026 is the honest part of the picture.*
-
-
-## What Not to Give an Agent
-
-**Write access to your live GA4 property.** Configuration changes are not
-reversible and historical data does not restate. Lectures 9 and 10 explained why.
-
-. . .
-
-**Your live site, unsupervised.** A broken tag costs you weeks of data.
-
-. . .
-
-**Personal data.** Your GA4 export is pseudonymous, but a comments dataset with
-names in it is not. Lecture 10 applies to what you paste into a chat window.
-
-. . .
-
-**Client credentials.** Ever.
-
-## Who Gains, Who Loses {.smaller}
-
-![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_genai_effects_table.png){fig-align="center" height="350px"}
-
-*Most studies find generative AI narrows the gap between high and low
-performers. A few find the opposite. Note which tasks are which.*
-
-
-## Cost
-
-Agents are not free, in money or in time.
-
-. . .
-
-A long agentic session on a small dataset can cost more than doing it yourself,
-and a wrong answer you then have to debug costs far more.
-
-. . .
-
-**Rule of thumb**: chat for questions, context for one-off analysis, agents for
-work you will repeat or work large enough that the loop pays for itself.
-
-## Disclosure
-
-For this module:
-
-- **You may use AI for anything.** There is no penalty and no need to hide it.
-- **You must say what you used it for.** One short section in your notebook or
-  report: which tasks, which tool, what you changed.
-- **You are responsible for every number you submit.** "The AI produced it" is
-  not a defence, in this module or in a job.
-
-. . .
-
-This is the same principle as the measurement plan in Lecture 9, and the one the
-cleaning log will formalise in Lecture 17. The reader must be able to tell what
-you did.
+This distinction is the whole of Lecture 13, brought forward by a week.
 
 ## Exercise {background="#43464B"}
 
-In pairs, one of you plays the client.
+Write the success statement for your own site. Four sentences, in your notes,
+where you will still have them in April:
 
-1. The analyst presents a finding produced with an agent
-2. The client asks: "how do you know that is right?"
-3. The analyst answers without saying "the AI did it"
-4. Swap
+1. Who is the site for?
+2. What single action counts as success?
+3. How many of those make a good month?
+4. What would make you conclude it is not working?
 
-Then write, for your own portfolio work, the three sentences of your AI use
-disclosure.
+Then say it out loud to the person beside you. **If they can argue the number,
+it is specific enough.**
 
-**15 minutes**
+::: {#timer1 .timer seconds="900"}
+:::
+
+# 4. Vibe Coding Your Site
+
+## AI This Block: Chat
+
+Where we are on the module's AI spine, set out in Lecture 1 and named properly in
+Lecture 10:
+
+> **Chat.** A tutor. Ask it to explain, and to type. Not to decide.
+
+## Building a Site by Describing It
+
+An assistant will produce a working Quarto site from a description faster than
+you can write one, and this is a good use of it: the site is scaffolding, not the
+thing being assessed.
+
+. . .
+
+> "Create a four-page Quarto website: home, work, about, contact. The contact
+> page has a form. Give me `_quarto.yml` and one page as an example, and show me
+> where a script tag would go in `<head>` for every page."
+
+. . .
+
+Then read every line before you publish it. **You are publishing this under your
+own name, at a URL you will put on a CV.**
+
+## What You Must Still Decide Yourself
+
+- **What the site is for.** No assistant can tell you, and it will invent
+  something plausible if you let it
+- **Which action counts as a conversion.** A commercial judgement about your own
+  work
+- **Whether the generated page actually loads the tag** on every page, which you
+  verify by looking, not by asking
+
+. . .
+
+**Delegate the typing. Keep the deciding.** Students who let an assistant design
+their measurement cannot analyse their own data in April, and it shows.
+
+## Exercise {background="#43464B"}
+
+1. Generate a site skeleton by describing it to an assistant
+2. Read the output and list two things you would change
+3. Publish it to GitHub Pages and open the live URL
+4. View source on **two different pages** and confirm you can see where a script
+   in `<head>` would land
+
+Step 4 is the one Lecture 13 depends on. Do not leave without it.
+
+::: {#timer2 .timer seconds="900"}
+:::
+
+## Going Further
+
+- [Quarto: Creating a Website](https://quarto.org/docs/websites/)
+- [GitHub Pages: Getting Started](https://docs.github.com/en/pages)
+- [GitHub: Create a repo](https://docs.github.com/en/get-started/quickstart/create-a-repo)
+- Center for Open Science, on pre-registration, for where the habit in section 3
+  comes from
 
 ## Next Lecture
 
-Python I. You now know what you are doing when you let something else write it.
+We turn that success statement into a measurement plan, and into GA4 events.
+
+. . .
+
+**Bring your live URL and your four sentences.** Without both, next week is a
+spectator sport.

@@ -1,5 +1,6 @@
 """Figures for the STA1000 decks, generated from data/insta-data.csv.
-Lecture 3 uses them: the four families of figure on the Loomrow data.
+Lecture 3 uses them for the four families of figure on the Loomrow data, and
+Lecture 5 for date levels, a dual axis, and filter versus highlight.
 
 Run from the repository root:  python3 lectures/figures/loomrow/make_figures.py
 
@@ -459,3 +460,158 @@ for ax, f in zip(axes, FORMAT_ORDER):
     tidy(ax, grid_axis="both")
 axes[0].set_ylabel("Likes")
 save(fig, "viz_relationship_facets.png")
+
+
+# ============================================================================
+# LECTURE 5: DATES, TWO MEASURES ON ONE CHART, FILTER VERSUS HIGHLIGHT
+# Reach at three date levels, a date part with one line per year, spend and
+# revenue on independent then synchronised axes, and one bar chart filtered,
+# then highlighted.
+# ============================================================================
+
+GREY = "#898781"   # muted ink: the comparison year
+MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+SCALE = FuncFormatter(lambda v, _: "0" if v == 0
+                      else f"{v / 1e6:.1f}M" if v >= 1e6 else f"{v / 1000:,.0f}k")
+EUROS = FuncFormatter(lambda v, _: f"€{v / 1000:g}k" if v else "€0")
+LAST_DAY = df["posted_at"].max()
+monthly = df.set_index("posted_at").resample("MS")[
+    ["reach", "spend_eur", "attributed_revenue_eur"]].sum()
+xm = np.arange(len(monthly))
+month_ticks = [i for i, d in enumerate(monthly.index) if d.month in (1, 4, 7, 10)]
+month_labels = [f"{MONTH_NAMES[d.month - 1]}\n{d.year}" if d.month == 1
+                else MONTH_NAMES[d.month - 1] for d in monthly.index[month_ticks]]
+
+
+def line(ax, x, y, colour=BLUE):
+    ax.plot(x, y, color=colour, linewidth=2.4, marker="o", markersize=6,
+            markeredgecolor="white", markeredgewidth=1)
+
+
+# 16. ONE DATE, THREE LEVELS --------------------------------------------------
+yearly = df.groupby(df["posted_at"].dt.year)["reach"].sum()
+quarterly = df.groupby(df["posted_at"].dt.to_period("Q"))["reach"].sum()
+peak = monthly["reach"].idxmax()
+top_post = df.loc[df["reach"].idxmax()]
+fig, axes = plt.subplots(1, 3, figsize=(12.5, 4.4),
+                         gridspec_kw={"width_ratios": [1, 1.7, 2.8]})
+line(axes[0], [0, 1], yearly.values)
+axes[0].set_xticks([0, 1], [str(y) for y in yearly.index])
+axes[0].set_xlim(-0.4, 1.4)
+axes[0].set_title("YEAR")
+line(axes[1], np.arange(len(quarterly)), quarterly.values)
+axes[1].set_xticks(np.arange(len(quarterly)),
+                   [f"Q{p.quarter}\n{p.year}" if p.quarter == 1 else f"Q{p.quarter}"
+                    for p in quarterly.index])
+axes[1].set_title("QUARTER")
+line(axes[2], xm, monthly["reach"].values)
+axes[2].set_xticks(month_ticks, month_labels)
+axes[2].set_title("MONTH")
+i_peak = list(monthly.index).index(peak)
+axes[2].annotate(f"{peak:%B %Y}: {monthly.loc[peak, 'reach']:,.0f},\n"
+                 f"{top_post['reach']:,.0f} of them from {top_post['post_id']}",
+                 xy=(i_peak, monthly.loc[peak, "reach"]), xytext=(i_peak + 1.6, 560000),
+                 fontsize=13, color=INK, va="center",
+                 arrowprops=dict(arrowstyle="->", color=INK2, linewidth=1.3))
+axes[0].annotate("six months\nonly", xy=(1, yearly.iloc[1]), xytext=(0.62, 1.15e6),
+                 fontsize=13, color=INK, ha="center",
+                 arrowprops=dict(arrowstyle="->", color=INK2, linewidth=1.3))
+for ax in axes:
+    ax.set_ylim(bottom=0)
+    ax.yaxis.set_major_formatter(SCALE)
+    tidy(ax)
+axes[0].set_ylim(0, 2.6e6)
+axes[1].set_ylim(0, 1.3e6)
+axes[2].set_ylim(0, 800000)
+axes[0].set_ylabel("Reach (accounts)")
+fig.text(0.99, -0.02, f"One SUM(reach), three levels. The data stop on "
+         f"{LAST_DAY.day} {LAST_DAY:%B %Y}.", **NOTE)
+save(fig, "viz_date_levels.png")
+
+# 17. A DATE PART: ONE LINE PER YEAR ------------------------------------------
+fig, ax = plt.subplots(figsize=(8.0, 4.6))
+for year, colour in [(2025, GREY), (2026, BLUE)]:
+    s = (df[df["posted_at"].dt.year == year]
+         .groupby(df["posted_at"].dt.month)["reach"].sum())
+    line(ax, s.index, s.values, colour)
+    ax.text(s.index[-1] + 0.3, s.values[-1], str(year), color=INK,
+            va="center", fontsize=15, fontweight="bold")
+ax.set_xticks(range(1, 13), MONTH_NAMES)
+ax.set_xlim(0.6, 12.9)
+ax.set_ylim(0, 800000)
+ax.set_ylabel("Reach (accounts)")
+ax.yaxis.set_major_formatter(SCALE)
+ax.set_title("MONTH as a date part, YEAR on Colour")
+tidy(ax)
+save(fig, "viz_date_parts.png")
+
+# 18. TWO MEASURES: INDEPENDENT AXES, THEN SYNCHRONISED ------------------------
+spend, revenue = monthly["spend_eur"].values, monthly["attributed_revenue_eur"].values
+roas = df["attributed_revenue_eur"].sum() / df["spend_eur"].sum()
+fig, axes = plt.subplots(1, 2, figsize=(12.5, 4.4))
+right = axes[0].twinx()
+line(axes[0], xm, spend, BLUE)
+line(right, xm, revenue, ORANGE)
+axes[0].set_ylim(0, spend.max() * 1.1)
+right.set_ylim(0, revenue.max() * 1.1)
+axes[0].set_ylabel("Spend (blue)")
+right.set_ylabel("Revenue (orange)")
+right.yaxis.set_major_formatter(EUROS)
+right.spines["top"].set_visible(False)
+right.tick_params(colors=INK2)
+axes[0].set_title("Dual axis: two scales, one line on top of the other")
+for ax, cap in [(axes[1], revenue.max() * 1.1)]:
+    line(ax, xm, spend, BLUE)
+    line(ax, xm, revenue, ORANGE)
+    ax.set_ylim(0, cap)
+axes[1].set_title(f"Synchronised: €{roas:.2f} of revenue per €1 spent")
+for ax in axes:
+    ax.set_xticks(month_ticks, month_labels)
+    ax.yaxis.set_major_formatter(EUROS)
+    tidy(ax)
+axes[1].text(xm[-1] + 0.5, spend[-1], "spend", color=INK, va="center", fontsize=13)
+axes[1].text(xm[-1] + 0.5, revenue[-1], "revenue", color=INK, va="center", fontsize=13)
+for ax in (axes[0], right):
+    ax.set_xlim(-0.6, xm[-1] + 0.6)
+axes[1].set_xlim(-0.6, xm[-1] + 2.6)
+fig.text(0.99, -0.02, "SUM(spend_eur) and SUM(attributed_revenue_eur) by month: "
+         "months without a paid post are at zero.", **NOTE)
+save(fig, "viz_dual_axis.png")
+
+# 19. FILTER VERSUS HIGHLIGHT ------------------------------------------------
+# One bar chart, SUM(reach) by theme, with the same theme selected twice. The
+# filter removes the five other themes from the view, so the bar is left alone;
+# the highlighter keeps them, dimmed, so the bar can be judged against them.
+# Both panels share the axis and keep every theme in its row: the empty rows on
+# the left are the themes the filter removed.
+PICK = "sustainability"
+DIMMED = "#d0e1f6"   # BLUE at 22% on white, opaque so the grid stays behind
+reach_theme = df.groupby("theme")["reach"].sum().sort_values()   # largest at the top
+rows = np.arange(len(reach_theme))
+assert len(rows) == 6, "the note below says five other themes"
+i_pick = list(reach_theme.index).index(PICK)
+v_pick = reach_theme[PICK]
+fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.6), sharex=True)
+axes[0].barh(i_pick, v_pick, height=0.62, color=BLUE)
+axes[0].set_yticks([i_pick], [PICK])
+axes[0].text(0.5, 0.62, "the other five themes:\nremoved from the view",
+             transform=axes[0].transAxes, ha="center", va="center", fontsize=14,
+             color=INK2, linespacing=1.3)
+axes[1].barh(rows, reach_theme.values, height=0.62,
+             color=[BLUE if t == PICK else DIMMED for t in reach_theme.index])
+axes[1].set_yticks(rows, reach_theme.index)
+for ax, head, sub in [(axes[0], "Filter", f"{PICK}, alone"),
+                      (axes[1], "Highlighter", f"{PICK}, in context")]:
+    ax.set_title(sub, pad=10)
+    ax.text(0.5, 1.12, head, transform=ax.transAxes, ha="center", va="bottom",
+            fontsize=19, fontweight="bold")
+    ax.text(v_pick + 20000, i_pick, f"{v_pick:,.0f}", va="center", fontsize=15,
+            fontweight="bold")
+    ax.set_ylim(-0.6, len(rows) - 0.4)
+    ax.set_xlim(0, reach_theme.max() * 1.12)
+    ax.xaxis.set_major_formatter(SCALE)
+    ax.set_xlabel("Reach (accounts)")
+    ax.tick_params(axis="y", length=0)
+    tidy(ax, grid_axis="x")
+save(fig, "viz_filter_highlight.png")

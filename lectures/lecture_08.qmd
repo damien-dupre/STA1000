@@ -1,394 +1,416 @@
 ---
-title: "Lecture 8: Build the Site"
+title: "Lecture 8: Python III - Figures with pandas"
 subtitle: STA1000 - Data Analytics and Metrics
+jupyter: python3
+filters:
+  - timer
 ---
+
+```{python}
+#| include: false
+# The slides read the repository copy of the data; students read the file they
+# uploaded to Colab, which is the code shown on the slides. The figure size only
+# makes the figures fit a slide: Colab's default is a little taller.
+import pandas as pd
+import matplotlib.pyplot as plt
+pd.set_option("display.max_columns", 7)
+pd.set_option("display.max_rows", 12)
+plt.rcParams["figure.figsize"] = (8, 2.9)
+plt.rcParams["figure.dpi"] = 110
+insta = pd.read_csv("../data/insta-data.csv")
+insta["posted_at"] = pd.to_datetime(insta["posted_at"])
+insta["month"] = insta["posted_at"].dt.to_period("M")
+insta["engagements"] = insta["likes"] + insta["comments"] + insta["saves"] + insta["shares"]
+```
 
 ## Previously ...
 
-Six lectures analysing Loomrow's data, ending in a published dashboard. Every
-number in it came from a file somebody else handed you.
+- In Lecture 7 you calculated new columns, grouped the posts by format, month and campaign, and merged two files without multiplying the rows.
+
+**Today, three questions:**
+
+1. Which **figure** answers which question, in one line of pandas?
+2. How do you make a figure **say something**?
+3. How do you **save** a figure, and get a second opinion on it?
+
+## Today's Notebook
+
+A new notebook, `STA1000 Lecture 8`, and `insta-data.csv` uploaded. The first cell reuses Lecture 7:
+
+```{.python}
+import pandas as pd
+import matplotlib.pyplot as plt
+insta = pd.read_csv("insta-data.csv")
+insta["posted_at"] = pd.to_datetime(insta["posted_at"])
+insta["month"] = insta["posted_at"].dt.to_period("M")
+insta["engagements"] = insta["likes"] + insta["comments"] + insta["saves"] + insta["shares"]
+```
 
 . . .
 
-Two questions a supplied dataset never forces:
+No new library to install: pandas draws its figures with **matplotlib**, which Colab already has. `plt` is its short name, as `pd` is pandas'.
 
-- What was worth recording in the first place?
-- What can this number actually prove?
+# 1. One Line per Figure
 
-. . .
+## Tables In, Figures Out
 
-**Today we build the thing we are going to measure, so that both questions
-become yours.**
+```{python}
+insta["format"].value_counts().plot(kind="barh")
+```
 
-## Learning Outcomes
+`.plot()` draws the Series or the table in front of it: whatever you computed in Lecture 7 is one `.plot()` away from a figure.
 
-By the end of this lecture you will be able to:
+Colab also prints a line such as `<Axes: ylabel='format'>`: the name of what was drawn. Ignore it, or end the line with `;` to hide it.
 
-- Build and publish a small multi-page site suitable for tracking
-- Identify the user actions on that site that carry commercial meaning
-- Write a statement of success **before** any tracking exists
+## The Question Picks the Figure
 
-# 1. Why Build Before Measuring
+Lecture 3's four families of figure, plus time from Lecture 5:
 
-## The Problem With Borrowed Data
+::: {style="font-size:0.8em; line-height:1.3;"}
 
-<!-- Speaker notes: the standard analytics module hands students a clean sample
-     dataset. Students learn the tool but never learn the judgement, because
-     they never had to decide what was worth recording. Loomrow was deliberately
-     that module for six weeks; this is the pivot. -->
+| The question | The family | In pandas |
+|---|---|---|
+| How do the posts split? | Composition | `.value_counts().plot(kind="barh")` |
+| How does reach spread? | Distribution | `.plot(kind="hist")` |
+| Does reach differ by format? | Comparison | `.plot(kind="box", by="format")` |
+| Does revenue follow spend? | Relationship | `.plot(kind="scatter", x=..., y=...)` |
+| How does reach change? | Evolution | a table by month, then `.plot()` |
 
-`insta-data.csv` was clean, complete and rectangular. Somebody decided that
-`reach_followers` and `reach_non_followers` were worth splitting out, and you
-inherited that decision without ever making it.
-
-. . .
-
-That is the shape of most analytics teaching, and of a lot of analytics work. It
-produces people who are fluent in tools and helpless about measurement.
-
-. . .
-
-**From today the decisions are yours, and so are the consequences.**
-
-## The Portfolio as a Business
-
-Your site is not a CV. It is a **business with an objective**, and it is the
-object of study for the rest of the module.
-
-. . .
-
-That means it needs something a visitor can *do*:
-
-- Send an enquiry
-- Sign up to something
-- Download something
-- Book a slot
-
-. . .
-
-**A site nobody can act on generates page views and nothing else**, and page
-views cannot carry the second half of this module.
-
-## What You Are Signing Up To {.smaller}
-
-| Lecture | What your site has to support |
-|---|---|
-| 9 | A measurement plan and a live GA4 property |
-| 10 | A consent banner and a privacy notice you wrote |
-| 11 | An export with enough rows to be worth opening |
-| 13-16 | Your own data, in Python |
-| 19 | A funnel with a middle |
-| 24 | A story about your own traffic, presented and defended |
-
-. . .
-
-**The site has to be live by next week**, because Lecture 9 tags it and Lecture
-11 needs several weeks of accumulated traffic.
-
-# 2. Site Structure
-
-## Minimum Viable Structure
-
-Four pages. No more, for now.
-
-- **Home**: who you are and what you offer, above the fold
-- **Work**: two or three case studies, each its own page or anchor
-- **About**: the human bit
-- **Contact**: the page that exists to be a conversion
-
-. . .
-
-The fourth page is the one that matters. **One page must exist purely to be
-converted on**, whether that is a form, a download or a booking link.
-
-## Tooling Options {.smaller}
-
-| Option | Cost | Control | Tagging |
-|---|---|---|---|
-| **Quarto + GitHub Pages** | Free | Total | Trivial: one line in `_quarto.yml` |
-| **Plain HTML + GitHub Pages** | Free | Total | Trivial, but you write everything |
-| **Wix, Squarespace, Carrd** | Paid tiers | Limited | Possible, often behind a plan |
-| **Notion, Canva sites** | Free tiers | Very limited | Frequently impossible |
-
-. . .
-
-::: {.callout-note appearance="minimal"}
-**The hard constraint: you must be able to inject a script into `<head>` on every
-page.** Check this before you build anything. A platform that will not let you is
-a platform you cannot use for this module.
 :::
 
-. . .
+Start from the question, never from the list of `kind=`.
 
-**The default for this module is Quarto published to GitHub Pages**, because it
-is free, versioned, and the tag goes in one file.
+## Distribution: a Histogram
 
-## Why GitHub, Beyond Hosting
+```{python}
+insta[insta["reach"] < 50000]["reach"].plot(kind="hist", bins=40)
+```
 
-GitHub is a code-collaboration platform that quietly became several other
-things. Two matter here:
+`bins=40` cuts the range into 40 bars. The 6 posts above 50,000 are left out, or the other 425 would squeeze into the first bar. **Leaving data out is a choice: say it on the figure.**
 
-- **File and code storage with version control.** Every change to your site is
-  recorded, dated and reversible
-- **Online publication.** GitHub Pages hosts a static site straight out of a
-  repository, free, over HTTPS
+## Comparison: Box Plots
 
-. . .
+```{python}
+insta.plot(kind="box", column="reach", by="format", logy=True);
+```
 
-You will use the same account again in Lecture 13 for notebooks, and in
-Assignment 2.
+Lecture 3's box plots. `logy=True`: a **log scale**, each gridline ten times the one below, so LR0184's 535,086 and LR0015's 361 fit on one figure.
 
-## Creating the Repository {.smaller}
+## Comparison: a Grouped Table, as Bars
 
-1. Top right, the `+` menu → **New repository**
-2. **A short, memorable name.** No spaces; `snake_case` or `kebab-case`
-3. Optionally a description
-4. **Public**. Pages does not serve a private repository on the free tier
-5. Tick **Add a README file**
-6. **Create repository**
+```{python}
+by_format = insta.groupby("format")[["engagements", "reach"]].sum()
+by_format["engagement_rate"] = by_format["engagements"] / by_format["reach"] * 100
+by_format["engagement_rate"].sort_values().plot(kind="barh")
+```
 
-. . .
+Compute with Lecture 7, then draw: the rate of the totals per format, in percent. `.sort_values()` first, so the longest bar is on top.
 
-::: {.callout-note appearance="minimal"}
-Name it carefully. The repository name becomes part of your public URL, and
-renaming it later breaks every link you have shared, including the ones in your
-GA4 property.
+## Relationship: a Scatter Plot
+
+```{python}
+paid = insta[insta["is_paid"] == True]
+paid.plot(kind="scatter", x="spend_eur", y="attributed_revenue_eur")
+```
+
+One point per paid post. Revenue rises with spend, but loosely: at about €200 of spend, from €200 to €2,200 of revenue.
+
+## Evolution: a Line
+
+```{python}
+monthly = insta.groupby("month")["reach"].sum()
+monthly.plot()
+```
+
+A line is the default `kind`. The table by month from Lecture 7, drawn: the August 2025 reel, and a second year that sits higher than the first.
+
+## Several Lines: One Column per Line
+
+```{python}
+by_month = insta.pivot_table(index="month", columns="format", values="reach", aggfunc="sum")
+by_month.plot()
+```
+
+A table with several columns draws one line per column, and a legend: the pivot table of Lecture 7 is ready to draw.
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### Four families, on Loomrow
+
+1. **Composition**: the number of posts by `product_line`, as horizontal bars, the largest on top
+2. **Distribution**: a histogram of `likes`
+3. **Comparison**: box plots of `likes` by `theme`, on a log scale
+4. **Evolution**: the total `spend_eur` by month, as a line. When did Loomrow advertise?
+
+::: {#timer8_1 .timer seconds="420" starton="interaction"}
 :::
 
-## Turning On GitHub Pages
+## Solution
 
-1. **Settings** → **Pages** in the left pane
-2. Under **Branch**, change `None` to `main`, and **Save**
-3. **Actions**, and wait for *pages build and deployment* to finish
-
-. . .
-
-Your site is then at:
-
-```
-https://<username>.github.io/<repository>/
+```{python}
+#| layout-ncol: 2
+insta["product_line"].value_counts().sort_values().plot(kind="barh")
+plt.show()
+insta["likes"].plot(kind="hist", bins=40)
+plt.show()
 ```
 
-. . .
+`plt.show()` closes a figure before the next one starts: without it, both would land on the same axes. That is what the `plt` of the first cell is for.
 
-So for the user `damien-dupre` and the repository `portfolio`, that is
-`https://damien-dupre.github.io/portfolio/`. **Write your URL down. Lecture 9
-needs it.**
+## Solution (continued)
 
-## The Quarto Site {.smaller}
-
-A Quarto website is a folder of `.qmd` files plus one configuration file:
-
-```{.yaml}
-project:
-  type: website
-
-website:
-  title: "Your Name"
-  navbar:
-    left:
-      - href: index.qmd
-        text: Home
-      - href: work.qmd
-        text: Work
-      - href: about.qmd
-        text: About
-      - href: contact.qmd
-        text: Contact
+```{python}
+#| layout-ncol: 2
+insta.plot(kind="box", column="likes", by="theme", logy=True, rot=45)
+plt.show()
+insta.groupby("month")["spend_eur"].sum().plot()
+plt.show()
 ```
 
-. . .
+`rot=45` turns the labels. Loomrow advertises in bursts, around its campaigns: nothing in August 2025, its best month for reach.
 
-`quarto render` turns it into a `_site/` folder of plain HTML. **That folder is
-what GitHub Pages serves.**
+# 2. Make It Say Something
 
-## The One Line That Matters
-
-Also in `_quarto.yml`, and the reason this toolchain was chosen:
-
-```{.yaml}
-format:
-  html:
-    theme: cosmo
-    include-in-header: head.html
-```
-
-. . .
-
-Whatever is in `head.html` is injected into `<head>` on **every page of the
-site, from one file**. Next week that file holds your Google tag.
-
-. . .
-
-::: {.callout-note appearance="minimal"}
-A tag that fires on the homepage but not on the contact page is the single most
-common cause of a broken funnel. This pattern is how you avoid it.
-:::
-
-## Live Demo {background="#43464B"}
-
-<!-- Speaker notes: fifteen minutes, and it always runs long. Have a repository
-     pre-made as a fallback so the Pages build wait does not stall the room. -->
-
-1. Create the repository, public, with a README
-2. Four `.qmd` files and a `_quarto.yml`
-3. `quarto render`, and look at `_site/`
-4. Push, enable Pages, wait for the Action
-5. Open the live URL, then view source and find `<head>`
-
-# 3. Defining Success Before Tracking
-
-## The Pre-Registration Habit
-
-Experimental science has a rule: **write down what you expect to find before you
-look.** Otherwise every result is a finding, because the hypothesis moves.
-
-. . .
-
-Marketing analytics has no such norm, and suffers for it. A month of traffic can
-be made to look like a success by anyone allowed to choose the metric
-afterwards.
-
-. . .
-
-**So choose it now, while you still have no data and nothing to defend.**
-
-## The Success Statement {.smaller}
-
-One paragraph, written today, kept for the rest of the module:
-
-> *This site is for **[audience]**. Success is **[a specific action]**. A good
-> month is **[a number]** of them. I will conclude it is not working if
-> **[a condition]**.*
-
-. . .
-
-Worked example:
-
-> *This site is for Dublin agency recruiters hiring junior analysts. Success is a
-> completed contact form. A good month is five. I will conclude it is not working
-> if fewer than 100 people reach the work page in a month, because then the
-> problem is traffic, not the site.*
-
-. . .
-
-Note what the last clause buys you: a **failure condition that distinguishes two
-different problems**. That is what makes it worth writing.
-
-## Objectives Are Not Metrics
+## The Default Is a Draft
 
 :::: {layout="[1,1]"}
 ::: {#first-column}
 
-**Not an objective**
+**What pandas gives you**
 
-- "Build my brand"
-- "Increase engagement"
-- "Get noticed"
-
-None of these names an action, so none of them can be recorded, so none of them
-can be wrong.
+- A title? None
+- The y axis? No name, no unit, numbers in hundreds of thousands
+- The x axis? The name of a column
+- The frame? On four sides
 
 :::
 
 ::: {#second-column}
 
-**An objective**
+**What a reader needs**
 
-- "Five completed contact forms a month"
-- "Half of work-page visitors reach the bottom"
-
-Each names an action, a count and a period.
+- The **finding**, as the title
+- What is measured, and in which **unit**
+- Categories in a **meaningful order**
+- Only the ink that carries data
 
 :::
 ::::
 
 . . .
 
-This distinction is the whole of Lecture 9, brought forward by a week.
+pandas draws the data. **The finding is your job.**
 
-## Exercise {background="#43464B"}
+## The Title Does the Work {.smaller}
 
-Write the success statement for your own site. Four sentences, in your notes,
-where you will still have them in April:
+:::: {layout="[1,1.2]"}
+::: {#first-column}
 
-1. Who is the site for?
-2. What single action counts as success?
-3. How many of those make a good month?
-4. What would make you conclude it is not working?
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_title_does_the_work.png){fig-align="center" style="max-height:400px;"}
 
-Then say it out loud to the person beside you. **If they can argue the number,
-it is specific enough.**
-
-::: {#timer1 .timer seconds="900"}
 :::
 
-# 4. Vibe Coding Your Site
+::: {#second-column}
 
-## AI This Block: Chat
+**A title that names the fields**
 
-Where we are on the module's AI spine, set out in Lecture 1 and named properly in
-Lecture 12:
+"Reach by month, January 2025 to June 2026"
 
-> **Chat.** A tutor. Ask it to explain, and to type. Not to decide.
+**A title that states the finding**
 
-## Building a Site by Describing It
+"One reel made August 2025 Loomrow's best month"
 
-An assistant will produce a working Quarto site from a description faster than
-you can write one, and this is a good use of it: the site is scaffolding, not the
-thing being assessed.
+You know the finding before you read a single axis. If you cannot write the second title, the analysis is not finished.
 
-. . .
+:::
+::::
 
-> "Create a four-page Quarto website: home, work, about, contact. The contact
-> page has a form. Give me `_quarto.yml` and one page as an example, and show me
-> where a script tag would go in `<head>` for every page."
+## Title, Labels, Units
 
-. . .
+```{python}
+ax = monthly.plot(title="One reel made August 2025 Loomrow's best month",
+                  xlabel="", ylabel="Accounts reached")
+ax.spines[["top", "right"]].set_visible(False)
+```
 
-Then read every line before you publish it. **You are publishing this under your
-own name, at a URL you will put on a CV.**
+`title=`, `xlabel=`, `ylabel=` go in the same `.plot()`. `ax =` keeps the figure's **axes** to change them after: here, the frame on the top and right goes.
 
-## What You Must Still Decide Yourself
+## Order, Colour, Labels
 
-- **What the site is for.** No assistant can tell you, and it will invent
-  something plausible if you let it
-- **Which action counts as a conversion.** A commercial judgement about your own
-  work
-- **Whether the generated page actually loads the tag** on every page, which you
-  verify by looking, not by asking
+```{python}
+ax = by_format["engagement_rate"].sort_values().plot(
+    kind="barh", color="#2a78d6", xlabel="", ylabel="",
+    title="Carousels engage twice as well as reels (% of accounts reached)")
+ax.spines[["top", "right"]].set_visible(False)
+ax.bar_label(ax.containers[0], fmt="%.1f%%");
+```
 
-. . .
+**One colour**: colour would encode nothing here. `ax.bar_label()` writes each value at the end of its bar, Lecture 4's direct labels.
 
-**Delegate the typing. Keep the deciding.** Students who let an assistant design
-their measurement cannot analyse their own data in April, and it shows.
+## The Duck {.smaller}
 
-## Exercise {background="#43464B"}
+:::: {layout="[1,1]"}
+::: {#first-column}
 
-1. Generate a site skeleton by describing it to an assistant
-2. Read the output and list two things you would change
-3. Publish it to GitHub Pages and open the live URL
-4. View source on **two different pages** and confirm you can see where a script
-   in `<head>` would land
+**A building shaped like a duck**
 
-Step 4 is the one Lecture 9 depends on. Do not leave without it.
+![](./figures/external/smm635_big_duck.png){fig-align="center" style="max-height:300px;"}
 
-::: {#timer2 .timer seconds="900"}
 :::
 
-## Going Further
+::: {#second-column}
 
-- [Quarto: Creating a Website](https://quarto.org/docs/websites/)
-- [GitHub Pages: Getting Started](https://docs.github.com/en/pages)
-- [GitHub: Create a repo](https://docs.github.com/en/get-started/quickstart/create-a-repo)
-- Center for Open Science, on pre-registration, for where the habit in section 3
-  comes from
+**A chart shaped like a duck**
 
-## Next Lecture
+![](./figures/external/smm635_duck_chart.png){fig-align="center" style="max-height:300px;"}
 
-We turn that success statement into a measurement plan, and into GA4 events.
+:::
+::::
+
+::: {style="font-size:0.55em;text-align:center;"}
+Source: [SMM635 Data Visualisation, Bayes Business School](https://github.com/simoneSantoni/data-viz-smm635)
+:::
+
+Tufte's term: when the decoration becomes the structure, the chart is a duck. **Maximise the share of ink that shows data**: delete an element, and keep it deleted if the figure still works.
+
+## Before You Show Anyone
+
+1. The **title states the finding**, not the fields
+2. Every axis says **what** is measured, and in which **unit**
+3. Categories are **ordered** by value, not alphabetically
+4. **Bars start at zero**: pandas does it, unless you change it
+5. **Colour** only when it encodes something
+6. What you **left out**, or put on a log scale, is **said** on the figure
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### Fix this figure
+
+This runs, and it says nothing. Make it say something:
+
+```{.python}
+insta.groupby("product_line")["reach"].median().plot(kind="bar")
+```
+
+1. Horizontal bars, sorted, the largest on top
+2. A title that states the finding, and the unit
+3. No axis label that repeats the title; no frame on the top and right
+4. The value written at the end of each bar
+
+::: {#timer8_2 .timer seconds="420" starton="interaction"}
+:::
+
+## Solution
+
+```{python}
+median_reach = insta.groupby("product_line")["reach"].median().sort_values()
+ax = median_reach.plot(kind="barh", color="#2a78d6", xlabel="", ylabel="",
+    title="Outerwear posts reach a fifth more accounts (median reach per post)")
+ax.spines[["top", "right"]].set_visible(False)
+ax.bar_label(ax.containers[0], fmt="%.0f");
+```
+
+Four lines instead of one, and a figure a founder reads in three seconds. The gap is real but small: medians of about 4,900 to 6,200.
+
+# 3. Save It, Then Ask for a Second Opinion
+
+## Save a Figure
+
+```{.python}
+ax.figure.savefig("median-reach.png", dpi=200, bbox_inches="tight")
+```
+
+- `ax.figure` is the whole figure around the axes; `.savefig()` writes it as a file in the Files panel
+- `dpi=200`: sharp in a report or on a slide; `bbox_inches="tight"`: nothing cut off at the edges
+- Then download it from the Files panel
 
 . . .
 
-**Bring your live URL and your four sentences.** Without both, next week is a
-spectator sport.
+**Save with code, not with a screenshot**: next month, the same cell redraws the figure on the new data.
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### One figure for the founders
+
+Loomrow's founders ask: **"Which format should we pay to boost?"**
+
+1. Paid posts only: total `spend_eur` and `attributed_revenue_eur` by `format`
+2. The return on ad spend, `roas`, of each format
+3. One figure that answers the question, with a title that states the finding
+4. Save it as `roas-by-format.png`, and download it
+
+::: {#timer8_3 .timer seconds="480" starton="interaction"}
+:::
+
+## Solution {.smaller}
+
+```{python}
+paid = insta[insta["is_paid"] == True]
+by_format = paid.groupby("format")[["spend_eur", "attributed_revenue_eur"]].sum()
+by_format["roas"] = by_format["attributed_revenue_eur"] / by_format["spend_eur"]
+ax = by_format["roas"].sort_values().plot(kind="barh", color="#2a78d6", xlabel="", ylabel="",
+    title="Boosted reels return €3.58 a euro, images €2.57 (revenue per euro spent)")
+ax.spines[["top", "right"]].set_visible(False)
+ax.bar_label(ax.containers[0], fmt="€%.2f");
+```
+
+Reels **sell** most per euro; carousels engage most. **The question picks the figure.**
+
+## Ask an AI to Critique It
+
+In Lecture 4 you asked an AI what was wrong with the White House chart. Now ask about **your own** figure: attach the PNG you saved, not a description of it.
+
+> "Here is a figure for the founders of a fashion label. Critique it as a non-technical reader would see it: what would they misread, and what would they conclude that the data does not support?"
+
+. . .
+
+> "Rewrite this title as a finding, at three levels of confidence."
+
+The last clause of the first prompt matters: "critique this" gets you tidying; "what would they conclude that the data does not support?" gets you the failure.
+
+## What It Cannot See
+
+- Whether the finding is **true**: it critiques an image, not your data
+- Whether the comparison is the one your founders care about
+- Whether a rate has its **denominator**, unless the denominator is on the figure
+- Your audience, unless you describe it
+
+. . .
+
+It will make your figure more conventional. Keep what you can defend, and say what you changed: Lecture 1's policy.
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### A second opinion
+
+1. Attach `roas-by-format.png` to an AI assistant, or copy the figure: {{< fa brands windows >}} <kbd>⊞ Win</kbd> + <kbd>⇧ Shift</kbd> + <kbd>S</kbd> or {{< fa brands apple >}} <kbd>⌘ Cmd</kbd> + <kbd>⌃ Control</kbd> + <kbd>⇧ Shift</kbd> + <kbd>4</kbd>. Ask the first prompt
+2. Apply the two changes you agree with
+3. Write down one piece of advice you rejected, and why
+4. Ask for the title at three levels of confidence, and keep the one your data supports
+
+::: {#timer8_4 .timer seconds="420" starton="interaction"}
+:::
+
+## {background="#43464B"}
+
+```{=html}
+<style>img.circle {border-radius:50%;}</style>
+```
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+<img class="circle" src="https://github.com/damien-dupre.png" />
+
+:::
+::: {#second-column}
+**Thanks for your attention and don't hesitate to ask if you have any questions!**
+
+[{{< fa brands mastodon >}} @damien_dupre](https://datasci.social/@damien_dupre)
+
+[{{< fa brands github >}} @damien-dupre](https://github.com/damien-dupre)
+
+[{{< fa link >}} https://damien-dupre.github.io](https://damien-dupre.github.io)
+
+[{{< fa paper-plane >}} damien.dupre@dcu.ie](mailto:damien.dupre@dcu.ie)
+:::
+::::

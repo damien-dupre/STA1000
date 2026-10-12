@@ -1,5 +1,5 @@
 ---
-title: "Lecture 5: Comparison and Segmentation"
+title: "Lecture 5: Advanced Features in Tableau"
 subtitle: STA1000 - Data Analytics and Metrics
 filters:
   - timer
@@ -9,35 +9,327 @@ filters:
 
 - In Lecture 4 we made figures clear and honest, then prepared the table behind them in Tableau: a pivot, calculated fields, and two files merged into one data source.
 
-You can slice the data many ways. Most slices are noise. **Today: a first dashboard, then the breakdowns, segments and cohorts worth building, and which ones pay.**
+**Today, three questions:**
 
-## Learning Outcomes {.smaller}
+1. How does Tableau handle **dates** and **locations**?
+2. How do you make a figure **interactive**?
+3. How do you turn your figures into a **dashboard** where they work together?
 
-By the end of this lecture you will be able to:
+# 1. Date and Location Types in Tableau
 
-- Assemble a first dashboard in Tableau
-- Write calculated fields, including level-of-detail expressions
-- Explain what customer heterogeneity is and which kinds of it predict behaviour
-- Judge a segment against measurability, substantiality and actionability
-- Build channel and device breakdowns you can defend to a client
-- Recognise Simpson's paradox in a marketing breakdown
-- Compare new versus returning, source / medium, device and geography honestly
-- Recognise when a segment difference is too small to act on
-- Construct a first cohort triangle from your own traffic
+## Space and Time Variables
 
-# 1. Tableau Dashboard
+:::: {layout="[1.5,1]"}
+::: {#first-column}
 
-## Tableau Objective
+So far, two types of variables:
 
-### Obtain the highest mark in Assignment 1
+- **Categorical**, made of characters: the **Dimensions** in Tableau
+- **Continuous**, made of numbers: the **Measures** in Tableau
 
-- Use **Tableau Public**, and submit the link to a **Dashboard** (not a Story)
-- Work on each of the four assessment criteria (25% each):
-  - **Creativity**: menus, filters and interactions that do something
-  - **Analytical depth**: figures that answer a question worth asking
-  - **Design**: layout, colour, typography, restraint
-  - **Overall story**: title, narrative, and a conclusion with a recommendation
-- Get inspired by existing dashboards on [Tableau Public](https://public.tableau.com/app/discover)
+Tableau has special features for two more types: **Date** variables, with a calendar icon, and **Location** variables, with a globe icon.
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/tableau_data_icons.png){fig-align="center" style="width:100%; max-height:440px;"}
+
+:::
+::::
+
+## Date Type Variables
+
+A **date** refers to a specific time: any combination of year, month, day, hour, minute and second.
+
+"March 23, 1984", "03/23/84", "23/03/1984" and "1984-03-23" have **different formats but refer to the same date**. Lecture 2: insist on **YYYY-MM-DD** (ISO 8601), which sorts correctly.
+
+In `insta-data.csv`, `posted_at` (`2025-01-08 20:00:00`) should come in as a **Date & Time**, with a calendar icon. If it shows Abc or #, click the icon and choose **Date & Time**.
+
+## Line and Area Charts
+
+:::: {layout="[1.2,1]"}
+::: {#first-column}
+
+A date usually goes on **Columns**, the X axis, to show how another variable changes over time.
+
+The other variable goes on **Rows**, with a **statistical aggregation**: SUM by default, but COUNT, AVERAGE or MEDIAN are in the menu of the pill.
+
+Tableau starts with the **YEAR**: click the **+** on the date pill to go down to the quarter, the month, the day.
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/tableau_linecharts.png){fig-align="center" style="max-height:450px;"}
+
+:::
+::::
+
+## One Date, Three Levels {.smaller}
+
+![](./figures/loomrow/viz_date_levels.png){fig-align="center" style="max-height:330px;"}
+
+The same `SUM(reach)` tells three stories. By **year**, 2026 looks like a decline, but it has only six months. By **quarter**, one quarter stands out. By **month**, it is one month, and mostly one post: Lecture 3's reel. **Check the level before you read the line.**
+
+## Date Parts or Date Values?
+
+:::: {layout="[1,1.4]"}
+::: {#first-column}
+
+![](./figures/dd/tableau_date_menu.png){fig-align="center" style="max-height:450px;"}
+
+:::
+
+::: {#second-column}
+
+The menu of a date pill ({{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click) has two lists:
+
+**Date parts**, at the top: "May" means every May, whatever the year. The pill is **blue**, discrete.
+
+**Date values**, below: "May 2015" means that month only. The pill is **green**, continuous: a timeline.
+
+**Exact Date** keeps the full date and time of every row.
+
+:::
+::::
+
+## Two Measures, One Chart {.smaller}
+
+![](./figures/dd/tableau_dual_axis.gif){fig-align="center" style="max-height:340px;"}
+
+1. Drag a second measure onto **Rows**, next to the first: two charts, one above the other
+2. Open the menu of the second pill → **Dual Axis**: one chart, with a second axis on the right
+
+::: {style="font-size:0.7em;text-align:center;"}
+The recordings in this lecture use a Covid-19 sample: the clicks are the same with your own data.
+:::
+
+## Synchronise the Axes
+
+![](./figures/loomrow/viz_dual_axis.png){fig-align="center" style="max-height:290px;"}
+
+With **Dual Axis**, each measure keeps its own scale: €4,170 of spend and €15,425 of revenue are drawn at the same height, the trick of Lecture 4's Nicolas Cage chart. When both measures share a unit, open the menu of the right axis → **Synchronise Axis**.
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### Loomrow over time
+
+With `insta-data.csv`:
+
+1. Check that `posted_at` has a calendar icon
+2. `reach` by month: which month peaks? Which Lecture 3 post explains it?
+3. `spend_eur` and `attributed_revenue_eur` by month on a synchronised dual axis: how much revenue per euro spent?
+
+::: {#timer5_1 .timer seconds="300" starton="interaction"}
+:::
+
+## Location Type Variables
+
+A list of geographical places: continents, countries, regions, counties, cities, postcodes ...
+
+A location variable should come in with a **globe icon**. If it shows Abc (text) or # (numbers, e.g., postcodes), click its icon → **Geographic Role** → **Country/Region**, **City**, ...
+
+![](https://help.tableau.com/current/pro/desktop/en-us/Img/maps_getstarted6.gif){fig-align="center" style="max-height:260px;"}
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Get Started Mapping with Tableau [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/buildexamples_maps.htm)
+:::
+
+## Mapping with Tableau {.smaller}
+
+![](./figures/dd/tableau_map.gif){fig-align="center" style="max-height:330px;"}
+
+1. Put the location variable on **Columns** or **Rows**, then open **Show Me**: Tableau generates the **Latitude** and **Longitude**
+2. Choose a **symbol map**, where each place is a point (good for cities), or a **filled map**, where each place is filled with colour (not for cities)
+3. Put another variable on **Colour** or **Size**
+
+## Filled or Symbol Map?
+
+Lecture 4: **land doesn't vote, people do**. A filled map gives the most ink to the largest area, whatever its value.
+
+- A **count** (purchases, spend, followers): a **symbol map**, with the count on **Size**
+- A **rate** (return on ad spend, conversion rate): a **filled map**, with the rate on **Colour**
+
+::: {.fragment}
+Maps are easy in Tableau: make one only when geography changes a decision.
+:::
+
+## A Second File, With Countries {.smaller}
+
+`insta-data.csv` has no location, but Meta Ads Manager breaks the results of the 127 paid posts down by country: `ads-by-country.csv`, one row per post and country.
+
+| post_id | country | amount_spent_eur | purchases | purchase_value_eur |
+|---|---|---|---|---|
+| LR0040 | Ireland | 202.33 | 8 | 877.84 |
+| LR0040 | United Kingdom | 59.64 | 1 | 104.24 |
+| LR0042 | Ireland | 93.82 | 5 | 507.76 |
+| LR0042 | United Kingdom | 44.71 | 1 | 96.47 |
+
+- Merge it with a **relationship** on `post_id`, as in Lecture 4: each table keeps its own rows
+- Check the totals: `SUM(amount_spent_eur)` is €24,345.78, the `spend_eur` of `insta-data.csv`
+- With a **join**, each paid post appears once per country: `SUM(spend_eur)` jumps to €106,899.36
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### Map Loomrow's ads
+
+From Loop, download `ads-by-country.csv`, then with `insta-data.csv`:
+
+1. Relate the two files on `post_id`, and check the totals
+2. `country` should have a globe icon: a symbol map of `purchases`. Where do the sales come from?
+3. A filled map of the return on ad spend, `SUM([Purchase Value Eur]) / SUM([Amount Spent Eur])`: where does a euro go furthest?
+4. Belgium and Italy: how many purchases behind them?
+
+::: {#timer5_2 .timer seconds="420" starton="interaction"}
+:::
+
+# 2. Interactive Customisations in Tableau
+
+## Aliases
+
+An **alias** renames the categories a variable displays. Only the labels change: the original values are kept for the calculations.
+
+![](./figures/dd/tableau_alias_dialog.png){fig-align="center"}
+
+In the Data pane, open the menu of a Dimension ({{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click) → **Aliases...**. Here, in a Titanic dataset, the 0 and 1 of `Survived` now read *Did not survive* and *Survived*.
+
+## Tooltips {.smaller}
+
+:::: {layout="[1,1.4]"}
+::: {#first-column}
+
+The **tooltip** is the box that appears when the cursor hovers over, or clicks on, a mark.
+
+It gives the actual numbers behind the figure, and tells a short story about what is currently seen.
+
+Edit it from **Tooltip** on the **Marks** card. Fields between `< >` change with the mark under the cursor.
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/tableau_tooltip_editor.png){fig-align="center"}
+
+:::
+::::
+
+## Write the Tooltip as a Sentence
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+**Default**, on `reach` by month:
+
+::: {style="font-size:1.25em;"}
+```
+Month of Posted At:  August 2025
+Reach:               685,460
+```
+:::
+
+**Rewritten**:
+
+::: {style="font-size:1.25em;"}
+```
+In <MONTH(Posted At)>,
+<CNTD(Post Id)> posts reached
+<SUM(Reach)> accounts. The best
+one alone: <MAX(Reach)>.
+```
+:::
+
+:::
+
+::: {#second-column}
+
+**Shows**:
+
+*In August 2025, 26 posts reached 685,460 accounts. The best one alone: 535,086.*
+
+<br>
+
+To use a field that is not in the view, drag it onto **Tooltip** on the Marks card, then set its aggregation from the menu of its pill: **Count (Distinct)** for `post_id`, **Maximum** for `reach`.
+
+:::
+::::
+
+## A Figure in the Tooltip {.smaller}
+
+![](./figures/dd/tableau_sheet_tooltip.gif){fig-align="center" style="max-height:360px;"}
+
+Instead of a value, a tooltip can show a whole figure: in the tooltip editor, **Insert** → **Sheets** → the sheet to show. Hover a country, and its own time series appears. With Loomrow: hover a month, and see its reach by `format`.
+
+## Filters
+
+Show **only specific data** with the **Filters** shelf: drag a variable onto it, then choose which categories to keep (Dimension) or which range of values (Measure).
+
+![](https://help.tableau.com/current/pro/desktop/en-us/Img/filtering-drag.gif){fig-align="center" style="max-height:320px;"}
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Filter Data from Your Views, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/filtering.htm)
+:::
+
+## Filter and Highlighter Menus {.smaller}
+
+:::: {layout="[1,1.5]"}
+::: {#first-column}
+
+![](./figures/dd/tableau_show_filter_menu.png){fig-align="center"}
+
+:::
+
+::: {#second-column}
+
+A **menu** lets the reader make their own selection. Open the menu of a pill in the view:
+
+- **Show Filter**: keeps the selected values and removes the others
+- **Show Highlighter**: keeps every value and dims the ones not selected
+
+Customise each card from its own drop-down arrow: list, drop-down, slider, ...
+
+:::
+::::
+
+## Filter or Highlight? {.smaller}
+
+![](./figures/loomrow/viz_filter_highlight.png){fig-align="center" style="max-height:370px;"}
+
+The **filter** leaves sustainability alone: 507,491 accounts, but is that a lot? The **highlighter** keeps the other themes, dimmed: sustainability is the lowest of the six.
+
+**Filter** when the rest of the data does not matter, **highlight** when the comparison with the rest does.
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Highlight Data Points in Context, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/actions_highlight_highlighter.htm). To go further: Highlight vs Filter Actions in Tableau: When Should You Use Each?, Andy Kriebel (video) [{{< fa link >}}](https://www.youtube.com/watch?v=Ezq644Th3SM)
+:::
+
+## Time Animation Player {.smaller}
+
+Put a date on the **Pages** shelf: the view becomes a series of pages, one per month (or year, or day), with **playback controls** to play them in a row.
+
+![](https://help.tableau.com/current/pro/desktop/en-us/Img/pages6.gif){fig-align="center" style="max-height:300px;"}
+
+Tick **Show History** to keep the marks of the previous pages on screen. With Loomrow: `impressions` against `likes`, and `posted_at` as a month on **Pages**.
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Shelves and Cards Reference, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/buildmanual_shelves.htm)
+:::
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### Make your figures smart
+
+On your Loomrow sheets:
+
+1. Alias `is_paid`: **False** as Organic, **True** as Paid
+2. Rewrite the tooltip of `reach` by month as a sentence
+3. `reach` by `theme`: a filter on `theme`, then a highlighter. Select customer in each: where does it rank?
+4. Your scatterplot, by month on **Pages**: press play
+
+::: {#timer5_3 .timer seconds="360" starton="interaction"}
+:::
+
+# 3. Tableau Dashboard
 
 ## Tableau Dashboard Showcase
 
@@ -97,13 +389,22 @@ One long page, read from top to bottom:
 - No text to say what the index measures, or what to conclude
 :::
 
+## Design Strategy
+
+Creating a perfect Tableau dashboard is easy if you follow these steps:
+
+1. **Basic figures**: create many figures that can support your story, and leave them with all their default parameters
+2. **Basic dashboard**: put the most relevant figures in a dashboard, with its title, text and pictures, but no design work yet
+3. **Figure improvement**: go back to the worksheet of each figure and customise it: colour, size, shapes, title, captions, axes and interactions
+4. **Dashboard improvement**: go back to the dashboard and customise it: background, colours, fonts, layout and actions
+
 ## Tableau Dashboard
 
 A dashboard is made by dropping several **sheets** on a page, organising their position, and adding **objects** (text, images, blank space, ...).
 
 Design features can then be changed to give the dashboard a professional feel.
 
-Interactions that make all the sheets move together (filters and actions) come in Lecture 7.
+Interactions that make all the sheets move together come with step 4: the dashboard actions.
 
 ## Tableau Dashboard {.smaller}
 
@@ -111,700 +412,111 @@ Interactions that make all the sheets move together (filters and actions) come i
 
 Drag the sheets from the left panel onto the page. **Tiled** keeps them in a tidy grid; **Floating** lets an object sit on top of the others.
 
-## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+## Dashboard Actions {.smaller}
 
-### Your first Loomrow dashboard
+On a dashboard, a highlighter already works on every sheet with the same variable, but a filter only on its own sheet (to extend it: its menu on the **Filters** shelf → **Apply to Worksheets** → **All Using This Data Source**). **Actions** go further: they make all the figures react together.
 
-One dashboard with three of your Lecture 3 sheets:
+:::: {layout="[1,1.2]"}
+::: {#first-column}
+
+![](./figures/dd/tableau_public_actions.png){fig-align="center"}
+
+:::
+
+::: {#second-column}
+
+**Dashboard** → **Actions...** → **Add Action**, then choose:
+
+1. what triggers it: **Hover**, **Select** (a click) or **Menu**
+2. which sheet it comes from
+3. which sheets it changes
+
+A **Highlight** action on Hover is the easiest way to make a dashboard smart. A **Filter** action on Hover or Select changes the figures under the reader's eyes: prefer **Menu**.
+
+:::
+::::
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B" .smaller}
+
+### Your Loomrow dashboard
+
+Four sheets, two from Lecture 3 and two from today:
 
 - **Composition**: percent of posts by `format`
 - **Comparison**: box plots of `reach` by `format`
-- **Relationship**: `impressions` against `likes`
+- **Time**: `reach` by month
+- **Map**: return on ad spend by `country`
 
-Titles that state the finding, the five principles, and a text box: **which format should Loomrow post more of, and why?**
+Titles that state the finding, and a text box: **which format should Loomrow post more of, and why?**
 
-Publish it on Tableau Public: start now, finish at home.
+Then two actions: a **Highlight** on Hover from the composition sheet, and a **Filter** on Menu from the map. Start now, finish at home.
 
-::: {#timer5_1 .timer seconds="900" starton="interaction"}
+::: {#timer5_4 .timer seconds="600" starton="interaction"}
 :::
 
-# 2. Calculated Fields
+## Publish
 
-## Conditional Logic
+**Publishing** saves a dashboard online, for everybody to open. In Tableau Public in the browser, **publishing is saving**: **Publish As...**, top right.
 
-Your source / medium values are a mess. They are supposed to be. Grouping them
-into named channels is the first calculated field everyone writes.
+![](./figures/dd/tableau_publish_as.png){fig-align="center" style="max-height:80px;"}
 
-```
-IF CONTAINS([Source], "google") AND [Medium] = "cpc" THEN "Paid Search"
-ELSEIF [Medium] = "organic" THEN "Organic Search"
-ELSEIF CONTAINS([Source], "linkedin")
-    OR CONTAINS([Source], "instagram")
-    OR [Source] = "t.co" THEN "Social"
-ELSEIF [Medium] = "email" THEN "Email"
-ELSEIF [Medium] = "referral" THEN "Referral"
-ELSEIF [Source] = "(direct)" THEN "Direct"
-ELSE "Other"
-END
-```
-
-. . .
-
-**Then check the size of "Other".** If it holds more than a few percent of your
-sessions, your grouping is hiding something rather than simplifying it.
-
-## The Grouping Is an Argument
-
-<!-- Speaker notes: the point to labour. A channel grouping is not a technical
-     artefact, it is a claim about which traffic sources are the same kind of
-     thing. Two analysts group differently and produce different strategies from
-     identical data. Nobody ever asks to see the CASE statement. -->
-
-A channel grouping asserts that these sources are the same kind of traffic and
-those are different.
-
-. . .
-
-Put `t.co` in Social and paid X campaigns become invisible. Put `(direct)` in
-its own channel and you have quietly labelled "we could not tell" as a marketing
-channel with a budget line.
-
-. . .
-
-**Every channel report anyone has ever shown you rests on a CASE statement you
-did not see.** Keep yours in your measurement plan.
-
-## Level of Detail Expressions
-
-An LOD expression computes at a grain other than the one in the view. It is how
-Tableau lets you say "per user, regardless of what is on the rows".
-
-```
-{ FIXED [User ID] : MIN([Date]) }
-```
-
-Each user's first-touch date, available on every row for that user.
-
-. . .
-
-This one expression is the building block of every cohort view you will ever
-build, and of the triangle chart later in this lecture.
-
-::: {.callout-note appearance="minimal"}
-`{FIXED}` ignores the filters on the view; `{INCLUDE}` and `{EXCLUDE}` do not.
-On a cohort chart, why does that difference decide whether your cohort sizes
-change when someone clicks a filter?
-:::
-
-# 3. Heterogeneity
-
-## Customers Differ. On What? {.smaller}
-
-"Heterogeneity" is a long word for the fact that customers differ. The question
-that matters is **on which dimension**.
-
-:::: {layout="[1,1]"}
+:::: {layout="[1.3,1]"}
 ::: {#first-column}
 
-**Predicts behaviour well**
+[{{< fa triangle-exclamation >}}]{style="color:#e34948;"} **Everything you publish is public**, the data included.
 
-- Product needs: usage intensity, frequency, context
-- Prior experience with the category
-- Information: what they already know
-- Occasion and context
+On the published page, **Share** gives the link; **Download** gives an image, a PDF, or the workbook with its data (`.twbx`).
+
+[{{< fa triangle-exclamation >}}]{style="color:#e34948;"} For your assignment, publish your dashboard and submit its **URL** on Loop.
 
 :::
 
 ::: {#second-column}
 
-**Predicts behaviour weakly**
-
-- Demographics: age, gender, income
-- Location, in most categories
-- Stated attitudes
-- Psychographics
+![](./figures/dd/tableau_published.png){fig-align="center" style="max-height:290px;"}
 
 :::
 ::::
 
-. . .
+# 4. Assignment 1 Brief
 
-**Needs beat demographics, by a distance**, and by more than marketers expect.
+## Assignment Instructions
 
-## You Are Not Your Customer {.smaller}
+### Context
 
-![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_computer_skills_distribution.png){fig-align="center" height="340px"}
+You are the marketing analyst at an international company, just hired. Instagram is effectively the label's whole top of the funnel, and the founders want to know what 18 months of posts tell them.
 
-*Computer skills across OECD countries. Somewhere under 10% of people are at
-Level 3. Everyone in this room is one of them.*
+### Task
 
-## So Why Does Everyone Segment by Demographics? {.smaller}
+With the data you will receive by email, **tell a story (i.e., a narrative) behind the data in ONE Tableau dashboard**, ending with a recommendation.
 
-<!-- Speaker notes: this is the good bit, because they have all been taught
-     demographic personas on another module and nobody has told them the
-     evidence is weak. Handle it as "here is why the default persists", not
-     "your other module is wrong". -->
+### Submission
 
-Three honest reasons:
+Submit the URL of your Tableau Public dashboard on the STA1000 Loop page. **Deadline: November 22nd at 12pm midday**
 
-1. Demographics are **easily measurable**, and often the only thing you can buy
-2. They are **visually perceivable**, so people believe they understand them
-3. Many people **identify themselves** in those terms
+## Tableau Objective
 
-. . .
+### Obtain the highest mark in Assignment 1
 
-None of those is "they predict purchasing".
+- Use **Tableau Public**, and submit the link to a **Dashboard** (not a Story)
+- Work on each of the four assessment criteria (25% each):
+  - **Creativity**: menus, filters and interactions that do something
+  - **Analytical depth**: figures that answer a question worth asking
+  - **Design**: layout, colour, typography, restraint
+  - **Overall story**: title, narrative, and a conclusion with a recommendation
+- Get inspired by existing dashboards on [Tableau Public](https://public.tableau.com/app/discover)
 
-. . .
+## Get Inspired
 
-**The exceptions are real**: makeup, nappies, sports kit and footwear are
-categories where demographics correlate strongly with needs. Notice what those
-categories have in common.
+Past challenges are an excellent way to see outstanding dashboards:
 
-::: {.callout-note appearance="minimal"}
-Is segmenting by gender sexist? Literally, yes: it treats people differently by
-a protected characteristic. When is that acceptable, and who decides? Does your
-answer change between a nappy brand and a car insurer?
-:::
+- [Google Big Data Viz Challenge (2012)](https://www.tableau.com/big-data-viz-challenge-entries)
+- [Do Good Data Viz Challenge (2016)](https://www.tableau.com/tableau-foundation-challenge)
+- [Women in Analytics Data Viz Competition](https://www.dataconnectconf.com/previous-competitions)
+- [Data Visualization Society, State of the Industry Challenge](https://www.datavisualizationsociety.org/soti-challenge)
+- [Iron Viz](https://www.tableau.com/community/iron-viz), Tableau's own championship
 
-## A Segmentation Someone Published {.smaller}
-
-![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_firefox_personas.png){fig-align="center" height="320px"}
-
-*Mozilla's Firefox user types. Note that each one is written so a product
-team could act on it. That is the test.*
-
-## The Circularity Trap
-
-Suppose you segment your visitors by which product they bought.
-
-. . .
-
-**This gets you nowhere.** You have used the outcome as the input. The segments
-are defined by the thing you were trying to predict, so they predict it
-perfectly and tell you nothing about who to target next.
-
-. . .
-
-The same error in your own portfolio: segmenting by "converted" and "did not
-convert", then reporting that the converters converted more.
-
-::: {.callout-note appearance="minimal"}
-Where is the boundary? "Visitors who viewed the pricing page" is close to the
-outcome but not the outcome. Is it a usable segment?
-:::
-
-## How to Pick Attributes
-
-You want to segment on attributes that drive sales, retention or profit. Six
-routes to candidates, roughly in order of cost:
-
-1. Theory and experience
-2. Consulting the people who talk to customers
-3. Your own database, explored
-4. Market research
-5. Finding out what competitors are doing
-6. Letting the data pick, with a clustering or a heterogeneous-choice model
-
-. . .
-
-Route 6 is where k-means and its relatives live. We reach it properly in
-Lecture 15, on your own users. It is last on this list for a reason.
-
-## Segmentation as a Process, Not a Chart {.smaller}
-
-![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_segmentation_process.png){fig-align="center" height="265px"}
-
-# 4. What Makes a Segment Worth Having
-
-## The Three Tests
-
-**Measurable.** You can identify who is in the segment, from data you actually
-have, at the moment you need to act.
-
-. . .
-
-**Substantial.** The segment is large enough to be worth serving. Small can be
-fine, and a niche can sustain a business, but there is a floor below which the
-operation cannot pay for itself.
-
-. . .
-
-**Actionable.** You could do something different for this segment tomorrow. If
-the answer is "nothing we could change", it is a description, not a segment.
-
-::: {.callout-note appearance="minimal"}
-Add a fourth test: **different**. The segments must actually behave differently
-on the metric you care about. Which of the four does a typical marketing persona
-deck usually fail?
-:::
-
-## Measurable, and the Trap Inside It
-
-A segment that is measurable **after the fact** but not **at the point of
-action** is useless for targeting.
-
-. . .
-
-"High-lifetime-value customers" is measurable in your database in two years'
-time. Whether you can identify one on their first visit is a different, harder
-and more valuable question.
-
-. . .
-
-This is the whole business of a customer data platform, and its four jobs:
-collect, unify, comprehend, activate. **Activation is where most of them fail.**
-
-## Measurable, and Worth Measuring {.smaller}
-
-![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_yield_by_fico_score.png){fig-align="center" height="340px"}
-
-*Portfolio yield by credit score. The middle 36% of accounts are
-indistinguishable. The segments that matter are at the edges.*
-
-## Substantial, and Small Numbers
-
-<!-- Speaker notes: with a student portfolio getting 40 sessions a week, most
-     segment differences are noise. Name it now rather than letting them
-     over-interpret in the portfolio. Lecture 21 gives them the tools; here they
-     only need the instinct. -->
-
-A 100% conversion rate on 2 sessions.
-
-. . .
-
-A segment that converts at 8% versus one at 4%, on 25 sessions each: that is two
-conversions versus one.
-
-. . .
-
-**Rate differences on small denominators are almost always noise.** You will not
-have the tools to say how much until Lecture 21. Until then, the rule is: put
-the denominator on the slide and let the room see it.
-
-## Actionable
-
-Segments that regularly fail this test on a portfolio site:
-
-- **Browser version.** You are not building a version-specific experience
-- **Screen resolution.** Unless it is a responsive-design bug, in which case it
-  is a bug, not a segment
-- **Hour of day**, at low volume. Interesting, unactionable, and unstable
-- **Country**, when you serve one city
-
-. . .
-
-Naming a segment you deliberately did not pursue, and why, is worth more marks
-than a fourth chart of one you did.
-
-# 5. Breakdowns That Mean Something
-
-## Channel
-
-From source / medium to a grouping you can defend, then the two questions:
-
-1. Does each channel behave differently on the metric you care about?
-2. Could you spend differently against each one tomorrow?
-
-. . .
-
-If both answers are no, you have built a nicer-looking version of the same
-number.
-
-## Device
-
-Device is a segment, not a curiosity. The mobile conversion gap is one of the
-most consistent findings in digital marketing, and it is usually a **design**
-finding rather than an audience one.
-
-. . .
-
-At portfolio volume, expect the gap to be visible and the sample to be too small
-to size it. Both facts belong in the report.
-
-## Simpson's Paradox
-
-<!-- Speaker notes: worth ten minutes of its own. A channel can look worse
-     overall and better within every device category. Once they have seen it
-     with numbers they never quite trust an aggregate again, which is the
-     desired state. -->
-
-A channel can convert **worse overall** and **better within every single device
-category**.
-
-. . .
-
-Not a paradox, and not rare. It happens whenever the segments differ in both
-their base rate and their share of the traffic.
-
-## Simpson's Paradox, With Numbers {.smaller}
-
-:::: {layout="[1,1]"}
-::: {#first-column}
-
-**Mobile**
-
-| Channel | Sessions | Conv. | Rate |
-|---|---|---|---|
-| Email | 900 | 45 | **5.0%** |
-| Social | 100 | 4 | 4.0% |
-
-:::
-
-::: {#second-column}
-
-**Desktop**
-
-| Channel | Sessions | Conv. | Rate |
-|---|---|---|---|
-| Email | 100 | 12 | **12.0%** |
-| Social | 900 | 99 | 11.0% |
-
-:::
-::::
-
-. . .
-
-**Combined**: Email 57 / 1000 = 5.7%. Social 103 / 1000 = **10.3%**.
-
-. . .
-
-Email wins on mobile, wins on desktop, and loses overall, because email traffic
-is mostly mobile and mobile converts badly.
-
-::: {.callout-note appearance="minimal"}
-Which number goes in the client deck? Neither is wrong.
-:::
-
-## What to Do About It
-
-You cannot fix Simpson's paradox with a better chart. You can only decide which
-question you are answering.
-
-. . .
-
-- **"Which channel should I buy more of?"** needs the breakdown, because the mix
-  is part of what you are buying
-- **"Which channel converts better for the same kind of visitor?"** needs the
-  within-device rates
-- **"What happened last month?"** needs both, and the mix shift is often the
-  entire story
-
-. . .
-
-**Always show the sizes.** The paradox is invisible without the counts, which is
-the denominator rule of section 4 arriving with consequences.
-
-# 6. The Standard Comparisons
-
-## New versus Returning
-
-Different funnels, different intent, different appropriate metrics.
-
-. . .
-
-A blended conversion rate over both describes nobody: it is a weighted average
-of a first-visit rate and a considered-return rate, and it moves whenever the
-mix moves, without either underlying rate changing.
-
-. . .
-
-**This is Simpson's paradox again, in its most common marketing costume.**
-
-## Source and Medium
-
-Intent varies more by source than by almost anything else you can measure.
-
-. . .
-
-Someone arriving from a search for your service and someone arriving from a
-social feed are at different points of the same journey, and comparing their
-conversion rates as though they were competing channels is a category error that
-still shapes budgets.
-
-::: {.callout-note appearance="minimal"}
-Your own site: which of your sources reflect intent, and which reflect
-interruption? Should they ever appear in the same bar chart?
-:::
-
-## Geography and Device
-
-**Geography** is genuinely useful for a business with regional operations, and
-mostly noise for a student portfolio. Say so in the report rather than producing
-a map because Tableau makes maps easy.
-
-. . .
-
-**Device** we covered in section 5. The addition here: a device gap is
-actionable in a way most segments are not, because you can change the design
-this week.
-
-## The Consent Segment You Cannot See
-
-Your declined-consent visitors are a segment. They are invisible, they are
-probably not random, and every comparison you make excludes them.
-
-. . .
-
-Lecture 10 established this. It matters here because **segmentation on consented
-data is segmentation of the consenting**.
-
-. . .
-
-If privacy-conscious visitors differ in ways related to your outcome, and there
-is evidence they do, then every segment comparison in your portfolio carries the
-same unmeasured bias.
-
-::: {.callout-note appearance="minimal"}
-Does that make the analysis worthless, or does it make one sentence mandatory?
-What is the sentence?
-:::
-
-# 7. Cohorts
-
-## What a Cohort Is
-
-A **cohort** is the set of users first seen in the same period, followed
-forward.
-
-. . .
-
-A **segment** is a group defined by an attribute, measured now.
-
-. . .
-
-Cohorts are the only honest way to ask whether things are getting better,
-because they hold acquisition date constant. An overall retention rate mixes
-this month's new users with users acquired two years ago.
-
-## The C Matrix {.smaller}
-
-Let $C(t, t')$ be the number of users acquired in period $t$ who are still
-active in period $t' \ge t$.
-
-- $C(t,t)$ is simply the users acquired in $t$: the cohort's size
-- $C(t,t')$ is weakly decreasing in $t'$: cohorts only shrink
-- $C(\cdot,t)$ is everyone active in $t$, which is roughly what drives revenue
-- The difference between consecutive columns is attrition
-
-. . .
-
-Startups call the picture of this matrix a **triangle retention chart**. It is
-the single most informative chart about a subscription or repeat-purchase
-business, and it is the thing investors ask for.
-
-::: {.callout-note appearance="minimal"}
-Whether you label the columns with calendar months or with months-since-signup
-changes the shape of the chart completely. Which labelling answers "is our
-product getting better?" and which answers "how was March?"
-:::
-
-## The Cohort Matrix, Drawn {.smaller}
-
-![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_cohort_c_matrix.png){fig-align="center" height="350px"}
-
-*Rows are acquisition cohorts, columns are periods since acquisition. Reading
-across a row is a survival curve; reading down a column is a calendar snapshot.*
-
-## Building One in Tableau
-
-1. `{ FIXED [User ID] : MIN([Date]) }` → first-touch date
-2. `DATETRUNC('week', [First Touch])` → cohort label, on rows
-3. `DATEDIFF('week', [First Touch], [Date])` → periods since acquisition, on
-   columns
-4. `COUNTD([User ID])` → the cell value
-5. Divide by the cohort's own week-0 count for a percentage, and keep the raw
-   count as a label
-
-. . .
-
-Column 0 is 100% by construction. If it is not, your first-touch field is wrong.
-
-## What One Looks Like With Real Data {.smaller}
-
-![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_cohort_retention_heatmap.png){fig-align="center" height="350px"}
-
-*The triangle is not missing data. Recent cohorts simply have not lived long enough.*
-
-## The Portfolio Caveat
-
-Your site may produce cohorts of four people.
-
-. . .
-
-Build it anyway. The mechanics are the same at four users and four million, and
-the discipline of writing "cohort n = 4" beside a percentage is the thing being
-assessed.
-
-. . .
-
-**Documented judgement beats undocumented certainty**, including when the
-judgement is "this chart cannot support a conclusion".
-
-## Exercise {background="#43464B"}
-
-In Tableau, on your own data:
-
-1. Write a channel grouping calculated field, and report the share in "Other"
-2. Build a channel-by-device matrix of sessions and key events, counts visible
-3. Check whether any channel shows Simpson's paradox across device
-4. Create a first-touch date LOD field
-5. Produce a weekly cohort triangle of returning users, with cohort sizes shown
-
-**25 minutes**
-
-# 8. In Practice
-
-## Live Demo {background="#43464B"}
-
-1. Segment comparison view in Tableau, rates with counts alongside
-2. New versus returning on the key event, then the mix shift over time that
-   explains the blended rate
-3. A segment that looks striking, with n shown, and the room deciding whether to
-   believe it
-4. Writing the caveat sentence together
-
-## Exercise {background="#43464B"}
-
-On your own data:
-
-1. Build a new versus returning comparison on your key event
-2. Add the raw counts next to every rate
-3. Identify one segment that passes all four tests, and one that fails, naming
-   the test it fails
-4. Write what you would do differently for the segment that passes
-5. Write the sentence about who is missing from all of it
-
-**20 minutes**
-
-# 9. AI for Calculations and Segment Hypotheses
-
-## AI This Block: Chat with context
-
-Where we are on the module's AI spine, set out in Lecture 1 and named properly
-in Lecture 12:
-
-> **Chat with context**
-
-## Calculated Fields Are Ideal for This
-
-Tableau's calculation language is verbose, thoroughly documented and heavily
-represented in training data. Assistants write it well, and the cost of a wrong
-answer is visible immediately.
-
-> "Write a Tableau calculated field that groups source and medium into Paid
-> Search, Organic Search, Social, Email, Referral and Direct. My Source values
-> include google, bing, linkedin.com, t.co, l.instagram.com and (direct)."
-
-. . .
-
-Give it your **actual** source values. Pasted from the data, not remembered.
-
-## LOD Expressions Especially
-
-> "Write a FIXED LOD expression giving each user's first session date, and a
-> second field giving the number of weeks between a row's date and that user's
-> first session date."
-
-. . .
-
-**Then check it.** Not by reading it:
-
-- Does the row count change after adding the field? It should not
-- Does one user you can trace by hand get the date you expect?
-- Is column 0 of the cohort chart exactly 100%?
-
-## The Delegation Boundary
-
-The assistant should write the **syntax**. You must own the **grouping**,
-because the grouping is the argument.
-
-. . .
-
-Ask it for a channel grouping and it will produce a sensible industry-standard
-one. Sensible and industry-standard is not the same as right for a one-page
-portfolio site with three traffic sources, one of which is your own phone.
-
-::: {.callout-note appearance="minimal"}
-Delegate the typing, keep the deciding. On this lecture's material, exactly
-which decisions are yours?
-:::
-
-## Exercise {background="#43464B"}
-
-1. Generate your channel grouping with an assistant, giving it your real source
-   values
-2. Generate the first-touch LOD field
-3. Verify both against five rows you check by hand
-4. Find one source value the grouping puts in the wrong bucket, and say what it
-   would have cost you
-5. Change one grouping decision on purpose and note which conclusion moves
-
-**15 minutes**
-
-## Generating Candidates, Not Conclusions
-
-Use it to widen the list of segments worth considering, then apply the tests
-yourself.
-
-> "I run a portfolio site for a freelance designer in Dublin. What visitor
-> segments might behave differently on an enquiry form? Rank them by how likely
-> they are to matter at 200 sessions a month, and say which I could actually
-> identify in a GA4 export."
-
-. . .
-
-The second clause is the one that turns a generic list into a usable one.
-
-## The Trap
-
-<!-- Speaker notes: it will happily propose twelve segments, and testing twelve
-     segments on small traffic guarantees a spurious finding. This is the
-     multiple-comparisons problem arriving three lectures before they have the
-     vocabulary for it. Plant it here, pay it off in 19. -->
-
-More hypotheses means more chances to find noise.
-
-. . .
-
-Test twelve segments on 200 sessions and something will look significant. Not
-because it is, but because you looked twelve times.
-
-. . .
-
-**Pick two before you look.** Write them down. This is the same pre-registration
-discipline as the success statement in Lecture 8, and it will return in
-Lecture 21.
-
-## Exercise {background="#43464B"}
-
-1. Generate ten candidate segments
-2. Reject eight using measurable / substantial / actionable / different
-3. Say what made the surviving two different
-4. Commit to which two you will test, in writing, **before** you build the view
-
-**10 minutes**
-
-## Going Further {.smaller}
-
-- Tableau, *Level of Detail Expressions* whitepaper: FIXED, INCLUDE, EXCLUDE
-  and the order of operations
-- Kotler and Keller, *Marketing Management*, ch. on STP: the canonical criteria,
-  worth reading critically against today's evidence
-- Yankelovich and Meer (2006), *Rediscovering Market Segmentation*, HBR: why so
-  much segmentation produces nothing
-- Sharp, *How Brands Grow*, ch. 9: the sceptical case against segmentation
-  altogether, which you should be able to answer
-- Wagner (1982), *Simpson's Paradox in Real Life*: short, and mostly about
-  medicine, which makes the marketing case land harder
-- Sequoia, *Retention*: the triangle chart as investors read it
-
-## Next Lecture
-
-Turning views into something a client can read, and being critiqued on it.
-
-**Prepare**: bring one chart from your workbook that you are pleased with. It
-will be pulled apart.
+![](https://media.makeameme.org/created/use-tableau-you.jpg){fig-align="center" style="max-height:200px;"}
 
 ## {background="#43464B"}
 

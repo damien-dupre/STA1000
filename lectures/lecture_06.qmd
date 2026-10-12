@@ -1,474 +1,518 @@
 ---
-title: "Lecture 6: Visualisation for Stakeholders"
+title: "Lecture 6: Python I - Colab and pandas"
 subtitle: STA1000 - Data Analytics and Metrics
+jupyter: python3
+filters:
+  - timer
 ---
+
+```{python}
+#| include: false
+# The slides read the repository copy of the data; students read the file they
+# uploaded to Colab, which is the code shown on the slides.
+import pandas as pd
+pd.set_option("display.max_columns", 7)
+pd.set_option("display.max_rows", 8)
+pd.set_option("display.width", 80)
+insta = pd.read_csv("../data/insta-data.csv")
+```
 
 ## Previously ...
 
-Lecture 4 gave you five principles: honest axes, easy reading, restraint, colour
-that means something, details that are right. Those keep a chart from being
-wrong.
+- Lectures 2 to 5 took the Loomrow posts through Tableau: a file, the right figures, calculated fields, two files merged, and a dashboard. Assignment 1 is due mid-November.
 
-. . .
+**Today, three questions:**
 
-They do not make it **land**. You have views that answer your questions; a client
-has different questions, and about ninety seconds of attention.
+1. Why do the same work again in **Python**?
+2. Where do you **run** Python, with nothing to install?
+3. How do you **open, question and filter** a table with **pandas**?
 
-## Learning Outcomes
+# 1. Why Python?
 
-By the end of this lecture you will be able to:
-
-- Distinguish an analyst's view from a client's view, and build both
-- Apply the ranking of visual channels to a marketing chart
-- Identify the standard ways a chart misleads, deliberately or otherwise
-- Critique a real marketing dashboard, and survive having yours critiqued
-
-# 1. What a Chart Is For
-
-## Why We Bother
-
-- Humans are extremely good at reading visual patterns and poor at reading
-  tables
-- Charts reveal properties of the data nobody thought to test for
-- They are understandable to non-specialists, which is most of the people who
-  make decisions
-- They are a *lingua franca* across functions: finance, product and marketing
-  can argue over the same chart
-
-. . .
-
-**A chart succeeds when it raises the next question.** "I wonder why that is" is
-the sound of someone accepting the fact and moving to the explanation.
-
-::: {.callout-note appearance="minimal"}
-Charts rarely settle an argument on their own. If a chart will not settle it,
-what is it for?
-:::
-
-## What Excellence Looks Like {.smaller}
-
-![Source: [SMM635 Data Visualisation, Bayes Business School](https://github.com/simoneSantoni/data-viz-smm635)](./figures/external/smm635_graphical_excellence.png){fig-align="center" height="255px"}
-
-*Ideas, ink, space, time. A good chart spends the least ink on the fewest
-ideas that carry the point.*
-
-
-## One Dataset, Many Charts
-
-The same small dataset can be drawn a hundred different ways, each emphasising a
-different comparison.
-
-. . .
-
-One shows change over time within a country. One shows the ranking at a single
-date. One shows regional grouping. One shows one country overtaking another.
-
-. . .
-
-**None of them is dishonest. They answer different questions.** The choice of
-which comparison to foreground is the analyst's, and it is rarely visible to the
-audience.
-
-## One Dataset, Six Charts {.smaller}
-
-![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_one_dataset_six_charts.png){fig-align="center" height="350px"}
-
-*World Heritage sites in three countries, 2004 and 2022. Each chart makes a
-different comparison easy and the others hard.*
-
-
-## Each Chart Makes One Point
-
-Graphics journalists work to a hard rule: **one chart, one point, obvious how to
-read it.**
-
-In practice, most good charts say one of four things:
-
-1. The number went up or down recently
-2. The number moved when something happened
-3. One line, or one group of lines, diverges from the rest
-4. The distribution has two lumps rather than one
-
-. . .
-
-Scientific and analyst charts are often the opposite: four variables, six
-symbols, and the explanation two pages away.
-
-::: {.callout-note appearance="minimal"}
-Take the chart you brought. Which of the four points does it make? If it makes
-two, which one loses?
-:::
-
-## The Four Points a Chart Usually Makes {.smaller}
-
-:::: {.columns style="gap:0px;"}
-::: {.column style="width:50%;line-height:0;"}
-![](./figures/external/mgt100_merrill_number_goes_up.png){fig-align="center" height="200px"}
-
-![](./figures/external/mgt100_merrill_lines_diverge.png){fig-align="center" height="200px"}
-:::
-::: {.column style="width:50%;line-height:0;"}
-![](./figures/external/mgt100_merrill_event.png){fig-align="center" height="200px"}
-
-![](./figures/external/mgt100_merrill_bimodal.png){fig-align="center" height="200px"}
-:::
-::::
-
-::: {style="font-size:0.5em;"}
-Number goes up, lines diverge, something happened, the distribution is bimodal. Jeremy Merrill, Washington Post, via [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)
-:::
-
-
-# 2. Two Audiences
-
-## What an Analyst Needs
-
-- Detail, at the grain the question lives at
-- Uncertainty made visible
-- The ability to drill down and check
-- Access to the raw rows when something looks wrong
-- Ugly is fine. Fast is better
-
-## What a Client Needs
-
-- One number, its direction, and what to do about it
-- The comparison that makes the number mean something
-- The caveat, once, in words
-- No vocabulary they have to learn to read the chart
-
-. . .
-
-**These are not the same chart with different formatting.** They are usually
-different charts, and the analyst's chart is the one that produced the client's.
-
-## The Title Does the Work {.smaller}
+## Same Data, Another Tool
 
 :::: {layout="[1,1]"}
 ::: {#first-column}
 
-**Analyst title**
+**Tableau**
 
-"Sessions by source / medium, weekly, 2026-01 to 2026-03"
-
-Describes the fields.
+- You **click**: drag, drop, filter
+- Excellent to explore, and to show
+- The steps live in your head: to redo them next month, you click them all again
 
 :::
 
 ::: {#second-column}
 
-**Client title**
+**Python**
 
-"Referral traffic has replaced search as our main source since February"
+- You **write** each step as a line
+- The lines are the record: they can be checked, shared, and rerun on next month's file in one click
+- The language AI assistants write best, and one that analyst job ads ask for
 
-States the finding.
+:::
+::::
+
+::: {.fragment}
+Tableau to show the data, Python to prepare and question it. You need both.
+:::
+
+## Python, but Only pandas
+
+We do **not** learn programming: no loops, no functions of our own. We learn **pandas**, the Python library for tables, where everything you clicked in Tableau has its line:
+
+::: {style="font-size:0.6em; line-height:1.3;"}
+
+| In Tableau | In pandas | Lecture |
+|---|---|---|
+| Connect to a text file | `pd.read_csv("insta-data.csv")` | 6 |
+| The Abc, # and calendar icons | `insta.info()` | 6 |
+| The Filters shelf | `insta[insta["format"] == "reel"]` | 6 |
+| A calculated field | `insta["rate"] = insta["likes"] / insta["reach"]` | 7 |
+| A dimension on Rows, `SUM` of a measure | `insta.groupby("format")["reach"].sum()` | 7 |
+| A relationship, or a join | `pd.merge(posts, ads, on="post_id", how="left")` | 7 |
+| Show Me | `insta["format"].value_counts().plot(kind="bar")` | 8 |
+
+:::
+
+Lecture 9 puts it all to work on the data of Loomrow's website, exported from Google Analytics 4.
+
+# 2. Google Colab
+
+## Google Colab
+
+In your browser:
+
+1. Go to <https://colab.research.google.com>
+2. Sign in with a Google account: your DCU one works
+3. **File** → **New notebook in Drive**
+
+. . .
+
+**Nothing to install.** Python and pandas run on Google's computers, not on your laptop.
+
+Your notebook is a `.ipynb` file saved in your Google Drive, in a folder called **Colab Notebooks**. Rename it from its title, top left.
+
+## A Notebook Is Made of Cells
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+**Code cells**
+
+Hold Python. Run one, and its result appears underneath.
+
+Add one with **+ Code**.
+
+:::
+
+::: {#second-column}
+
+**Text cells**
+
+Hold your notes: what the next cell is for, and what you found.
+
+Add one with **+ Text**.
 
 :::
 ::::
 
 . . .
 
-If you cannot write the second title, you have not finished the analysis. The
-chart is not the deliverable, the sentence is.
+A notebook is a **report and an analysis at the same time**. A notebook with forty code cells and no text is not an analysis: it is a transcript.
 
-<!-- Speaker notes: make them do this live for one chart each. It is the single
-     highest-yield change in the whole lecture and it takes thirty seconds per
-     chart. It also exposes charts that do not have a finding, which is the more
-     valuable diagnosis. -->
+## Run a Cell
 
-## A Title That Does the Work {.smaller}
+| Action | {{< fa brands windows >}} Windows | {{< fa brands apple >}} Mac |
+|:--|:--|:--|
+| Run the cell, move to the next | <kbd>Shift</kbd> + <kbd>Enter</kbd> | <kbd>⇧ Shift</kbd> + <kbd>↩ Return</kbd> |
+| Run the cell, stay on it | <kbd>Ctrl</kbd> + <kbd>Enter</kbd> | <kbd>⌘ Cmd</kbd> + <kbd>↩ Return</kbd> |
+| Insert a code cell below | <kbd>Ctrl</kbd> + <kbd>M</kbd>, then <kbd>B</kbd> | <kbd>⌘ Cmd</kbd> + <kbd>M</kbd>, then <kbd>B</kbd> |
+| Turn the cell into text | <kbd>Ctrl</kbd> + <kbd>M</kbd>, then <kbd>M</kbd> | <kbd>⌘ Cmd</kbd> + <kbd>M</kbd>, then <kbd>M</kbd> |
 
-![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_title_does_the_work.png){fig-align="center" height="350px"}
+Or click the {{< fa circle-play >}} button at the left of the cell.
 
-*You know the finding before you have read a single axis label.*
+## The Runtime
 
+The first cell you run connects the notebook to a **runtime**: a computer at Google that holds your Python session.
 
-# 3. Encoding
-
-## The Ranking of Visual Channels {.smaller}
-
-Cleveland and McGill established, experimentally, how accurately people read
-quantities from different visual channels. Best to worst:
-
-1. **Position** along a common scale
-2. **Position** along non-aligned scales
-3. **Length**
-4. **Angle** and slope
-5. **Area**
-6. **Volume**, curvature
-7. **Colour** hue, saturation
+- Everything you create lives there: tables, results, uploaded files
+- Left idle for too long, or after 12 hours at most, the runtime is stopped and all of it is gone. Your **code** is safe in the notebook; your **results** are not
+- Cells run **in the order you run them**, not in the order they appear
 
 . . .
 
-Everything above the line in a good chart is doing its work with the top three.
+**Runtime** → **Restart session and run all**: if the notebook runs from top to bottom, it works. If it fails, it never did.
 
-::: {.callout-note appearance="minimal"}
-A pie chart encodes quantity as angle and area, positions four and five. What
-does it buy in exchange for that cost, and when is the trade worth it?
+## Get Loomrow into Colab
+
+Your file is on your laptop; Python runs at Google. Upload the file to the runtime:
+
+1. From Loop, download `insta-data.csv`
+2. In Colab, click the {{< fa folder >}} **Files** icon in the left sidebar
+3. Drag the file into the panel, or use its upload button
+4. It appears in the list: pandas can now read it by its name
+
+. . .
+
+[{{< fa triangle-exclamation >}}]{style="color:#e34948;"} **Uploaded files are deleted with the runtime.** Next session, upload them again.
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B" .smaller}
+
+### Your first notebook
+
+1. Open Colab and create a new notebook, named `STA1000 Lecture 6`
+2. Add a text cell: `# Loomrow`, and one sentence on what the file contains
+3. Upload `insta-data.csv`
+4. In a code cell, run the three lines below. How many rows and columns does Colab report under the table?
+
+```{.python}
+import pandas as pd
+insta = pd.read_csv("insta-data.csv")
+insta
+```
+
+::: {#timer6_1 .timer seconds="300" starton="interaction"}
 :::
 
-## Chart Choice by Question
+# 3. Open a Table with pandas
 
-| Question | Chart |
+## Load pandas
+
+```{python}
+import pandas as pd
+```
+
+- `import` loads a library into the session: once per session, in the first cell
+- `as pd` gives it a short name. Everybody uses `pd`: every example online and every AI answer assumes it
+
+. . .
+
+Then every pandas command starts with `pd.` or with the name of a table.
+
+## Read the File
+
+```{.python}
+insta = pd.read_csv("insta-data.csv")
+```
+
+- `pd.read_csv()` reads a CSV file into a table, which pandas calls a **DataFrame**
+- `insta =` stores that table under a name of your choice. From now on, `insta` **is** the table
+- The name of the file goes **between quotes**, exactly as it is spelt in the Files panel
+
+. . .
+
+Nothing is shown: `=` stores, it does not display. To see the table, run its name.
+
+## Show the Table
+
+```{python}
+insta
+```
+
+Colab shows the first and last rows, and the size underneath.
+
+## Rows, Columns, Names
+
+```{python}
+insta.shape
+```
+
+```{python}
+insta.head(3)
+```
+
+- `.shape`: the number of rows, then of columns
+- `.head()`: the first 5 rows, or as many as you ask for. `.tail()`: the last ones
+- `.columns`: the names of the columns
+
+## The Type of Each Column
+
+:::: {layout="[1.1,1]"}
+::: {#first-column}
+
+```{.python}
+insta.info()
+```
+
+```
+ #   Column           Non-Null Count  Dtype
+---  ------           --------------  -----
+ 0   post_id          431 non-null    object
+ 1   posted_at        431 non-null    object
+ 2   format           431 non-null    object
+ ...
+ 5   campaign         206 non-null    object
+ 6   is_paid          431 non-null    bool
+ ...
+ 10  reach            431 non-null    int64
+ ...
+ 23  spend_eur        431 non-null    float64
+```
+
+:::
+
+::: {#second-column}
+
+::: {style="font-size:0.75em; line-height:1.3;"}
+
+| pandas | Tableau |
 |---|---|
-| How has it changed? | Line |
-| How do categories compare? | Bar, sorted by value not alphabetically |
-| What is the distribution? | Histogram, or box plot for comparisons |
-| What is the composition? | Stacked bar, rarely a pie |
-| Where does it drop off? | Funnel, with counts at every step |
-| Is there a relationship? | Scatter, with the n stated |
+| `object`: text | Abc |
+| `int64`: whole numbers | # |
+| `float64`: decimals | # |
+| `bool`: True or False | T\|F |
+| `datetime64`: dates | calendar |
 
-. . .
+Newer versions of pandas write `str` for text.
 
-**Start from the question, not from the chart menu.** Tableau's Show Me panel
-inverts that order, which is why it is so easy to produce a beautiful chart of
-nothing.
-
-## The Data-Ink Ratio
-
-Tufte's principle: **maximise the share of ink that represents data.**
-
-. . .
-
-Remove, in this order: 3D effects, background fills, heavy gridlines, borders,
-redundant legends, decorative images, drop shadows.
-
-. . .
-
-Add back only what a reader needs to decode the chart. The test is subtraction:
-delete an element and see whether the chart still works.
-
-## The Data-Ink Ratio, Concretely {.smaller}
-
-:::: {layout="[1,1]"}
-::: {#first-column}
-
-**Default**
-
-![](./figures/external/smm635_scatter_traditional.png){fig-align="center" height="265px"}
+**Non-Null Count**: `campaign` has 206 values out of 431. The 225 others are **missing**: posts outside any campaign.
 
 :::
-
-::: {#second-column}
-
-**Same data, less ink**
-
-![](./figures/external/smm635_scatter_tufte.png){fig-align="center" height="265px"}
 
 :::
 ::::
 
-::: {style="font-size:0.55em;text-align:center;"}
-Source: [SMM635 Data Visualisation, Bayes Business School](https://github.com/simoneSantoni/data-viz-smm635)
-:::
+## Fix the Dates
 
-*The right-hand version deletes the frame and spends the freed ink on the
-marginal distributions. Nothing was lost.*
+In Lecture 5, Tableau recognised `posted_at` as a date. pandas reads it as text, `object`, and one line converts it:
 
+```{python}
+insta["posted_at"] = pd.to_datetime(insta["posted_at"])
+insta["posted_at"].head(3)
+```
 
-## Chart Junk, and Its Modern Forms
+`insta["posted_at"] =` on the left **replaces** the column with what is on the right. Lecture 7 uses the dates.
 
-The 1980s version was 3D bars and a picture of a duck. The current version is
-subtler:
+## One Column
 
-- A rainbow palette on an ordered variable
-- Colour used to encode a category **and** decorate the background
-- Animated transitions between states nobody asked to compare
-- An interactive filter for a dimension with two values
-- A dashboard with eleven tiles, because there were eleven metrics
+```{python}
+insta["reach"]
+```
+
+- The name of the table, square brackets, and the name of the column in quotes
+- Spelt **exactly** as in the file: `insta["Reach"]` fails, the column is `reach`
+- One column is a **Series**: a list of values with the row numbers on its left
+
+## The Key Figures of a Column
+
+```{python}
+insta["reach"].describe()
+```
+
+Lecture 3's key figures in one line. The mean (9,788) is almost twice the median (5,184): a few huge posts pull it up, starting with LR0184 and its 535,086 accounts.
 
 . . .
 
-**Every element on a dashboard competes for attention with every other.** That
-is the cost, and it is paid by the reader.
+One at a time: `.mean()`, `.median()`, `.sum()`, `.min()`, `.max()`. A cell shows only its **last** result: to see several, wrap each in `print()`.
 
-## The Duck {.smaller}
+## Count the Categories
+
+```{python}
+insta["format"].value_counts()
+```
+
+```{python}
+insta["format"].value_counts(normalize=True)
+```
+
+`normalize=True` turns the counts into proportions, Lecture 3's composition: 47% of the posts are reels.
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### A first look at Loomrow
+
+1. How many rows and columns? With `.info()`: which columns hold text, numbers, and True or False?
+2. The mean and the median of `likes`: which is larger, and why?
+3. The share of posts in each `product_line`
+4. The total of `spend_eur` and of `attributed_revenue_eur`: how many euros of revenue for each euro spent?
+
+::: {#timer6_2 .timer seconds="360" starton="interaction"}
+:::
+
+## Solution {.smaller}
+
+```{python}
+print(insta.shape)
+print(insta["likes"].mean())
+print(insta["likes"].median())
+print(insta["product_line"].value_counts(normalize=True))
+print(insta["attributed_revenue_eur"].sum() / insta["spend_eur"].sum())
+```
+
+`.info()`: 5 text columns, 19 numbers, `is_paid` True or False, `posted_at` a date once converted. Mean 463 against median 278 likes: the same skew as reach. And €3.16 of revenue for each euro, the answer to Lecture 5's dual-axis exercise.
+
+# 4. Select, Filter, Sort
+
+## Several Columns
+
+```{python}
+insta[["post_id", "format", "reach"]]
+```
+
+**Two** pairs of square brackets: the outer pair selects, the inner pair makes a list of names. One pair gives one column; two pairs give a table.
+
+## Filter the Rows
+
+```{python}
+reels = insta[insta["format"] == "reel"]
+reels.shape
+```
+
+- `insta["format"] == "reel"` is True or False for every row; `insta[...]` keeps the rows where it is True
+- The **Filters** shelf of Tableau, written down
+- `==` compares, `=` stores: `insta["format"] = "reel"` would replace every format with "reel"
+
+. . .
+
+The other comparisons: `!=` (different), `>`, `>=`, `<`, `<=`.
+
+## Two Conditions at Once
+
+```{python}
+insta[(insta["format"] == "reel") & (insta["reach"] > 50000)]
+```
+
+- `&` keeps the rows where **both** conditions are True; `|` where **either** is
+- Each condition in its **own brackets**. Without them, Python reads `"reel" & insta["reach"]` first, and fails
+
+## Sort the Rows
+
+```{python}
+top = insta.sort_values("reach", ascending=False)
+top[["post_id", "posted_at", "format", "reach"]].head(5)
+```
+
+`ascending=False` puts the largest first. Lecture 3's reel, LR0184, tops the list with a reach almost four times the next one.
+
+## Keep a Result, Save a Result
+
+```{.python}
+paid = insta[insta["is_paid"] == True]
+paid.to_csv("paid-posts.csv", index=False)
+```
+
+- `paid =` keeps the result under a new name. `insta` is unchanged: nothing you filter or sort is lost
+- `.to_csv()` writes the table as a file in the Files panel: {{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click on it → **Download**
+- `index=False` stops pandas writing its row numbers as an extra column
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### Question the posts
+
+1. The 5 posts with the largest reach: their `post_id`, `format` and `product_line`
+2. How many posts are paid, and what is their median `reach`?
+3. Reels with a reach above 50,000: how many, and in which product lines?
+4. The paid Knitwear posts: how many, and how much was spent on them? Save them as `paid-knitwear.csv`, and download the file
+
+::: {#timer6_3 .timer seconds="420" starton="interaction"}
+:::
+
+## Solution
+
+```{python}
+top = insta.sort_values("reach", ascending=False)
+print(top[["post_id", "format", "product_line"]].head(5))
+paid = insta[insta["is_paid"] == True]
+print(paid.shape, paid["reach"].median())
+big_reels = insta[(insta["format"] == "reel") & (insta["reach"] > 50000)]
+print(big_reels["product_line"].value_counts())
+knit = insta[(insta["product_line"] == "Knitwear") & (insta["is_paid"] == True)]
+print(knit.shape, knit["spend_eur"].sum().round(2))
+```
+
+## Solution (continued)
+
+```{.python}
+knit.to_csv("paid-knitwear.csv", index=False)
+```
+
+Then **Files** → {{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click on `paid-knitwear.csv` → **Download**.
+
+. . .
+
+- 127 paid posts, with a median reach of 5,585: barely more than the 5,184 of all posts
+- Three reels above 50,000: two Accessories, one Knitwear. Only one of the three was paid
+- 27 paid Knitwear posts, €5,092.52 of spend
+
+# 5. When It Breaks
+
+## Read the Last Line
+
+Python stops at the first problem, and prints a **traceback**: the lines it went through, then the error.
+
+```
+KeyError                                  Traceback (most recent call last)
+...
+KeyError: 'Reach'
+```
+
+. . .
+
+Skip the middle. **The last line names the problem**: here, there is no column called `Reach`. The column is `reach`.
+
+## Five Errors You Will Meet Today {.smaller}
+
+| The last line says | What happened | The fix |
+|---|---|---|
+| `NameError: name 'insta' is not defined` | The cell that creates `insta` was not run, or the runtime restarted | Run the cells from the top |
+| `KeyError: 'Reach'` | No column with that exact name | Copy the name from `insta.columns` |
+| `FileNotFoundError: ... 'insta_data.csv'` | The file is not in the Files panel, or the name differs | Upload it again; copy its name |
+| `SyntaxError: ... Maybe you meant '==' instead of '='?` | A bracket, a quote, or a `=` for `==` | Python often suggests the fix: read it |
+| `TypeError: Cannot perform 'rand_' with a dtyped [int64] array ...` | Two conditions joined by `&` without their brackets | One pair of brackets around each condition |
+
+## Ask, Then Check
+
+Colab has an AI assistant built in, Gemini, if your account offers it; any chatbot does the same job.
+
+- Ask it to **explain** an error, or a line you do not understand
+- Lecture 1's policy holds: use it, say so, and you are responsible for every number you submit
+- In these lectures, ask it to explain rather than to write: a line you cannot read is a line you cannot check
+
+. . .
+
+Lecture 10 hands it the keyboard, once you can tell when it is wrong.
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### Break it, fix it
+
+Each line has one mistake. Run **each line in its own cell**, read the last line of the error, and fix it:
+
+```{.python}
+insta = pd.read_csv("insta_data.csv")
+insta["Reach"].median()
+insta[insta["format"] = "image"]
+insta[insta["format"] == "reel" & insta["reach"] > 50000]
+```
+
+::: {.fragment}
+The fixes: `"insta-data.csv"` with a hyphen; `"reach"` in lower case; `==` to compare; brackets around each condition.
+:::
+
+::: {#timer6_4 .timer seconds="300" starton="interaction"}
+:::
+
+## {background="#43464B"}
+
+```{=html}
+<style>img.circle {border-radius:50%;}</style>
+```
 
 :::: {layout="[1,1]"}
 ::: {#first-column}
-
-**A building shaped like a duck**
-
-![](./figures/external/smm635_big_duck.png){fig-align="center" height="265px"}
+<img class="circle" src="https://github.com/damien-dupre.png" />
 
 :::
-
 ::: {#second-column}
+**Thanks for your attention and don't hesitate to ask if you have any questions!**
 
-**A chart shaped like a duck**
+[{{< fa brands mastodon >}} @damien_dupre](https://datasci.social/@damien_dupre)
 
-![](./figures/external/smm635_duck_chart.png){fig-align="center" height="265px"}
+[{{< fa brands github >}} @damien-dupre](https://github.com/damien-dupre)
 
+[{{< fa link >}} https://damien-dupre.github.io](https://damien-dupre.github.io)
+
+[{{< fa paper-plane >}} damien.dupre@dcu.ie](mailto:damien.dupre@dcu.ie)
 :::
 ::::
-
-::: {style="font-size:0.55em;text-align:center;"}
-Source: [SMM635 Data Visualisation, Bayes Business School](https://github.com/simoneSantoni/data-viz-smm635)
-:::
-
-*Tufte's term. When the decoration becomes the structure, the chart is the duck.*
-
-
-## Honest Charting: Five Rules
-
-1. Start axes at zero, or say clearly that you have not
-2. Show all the relevant data and label it accurately
-3. Bin, smooth and aggregate judiciously, and say which you did
-4. Show uncertainty when it would change the reading
-5. Cite the source, including the date you pulled it
-
-. . .
-
-**A misleading chart can indicate bad faith.** Two goals here: not being
-misread, and spotting when someone else is misleading you.
-
-::: {.callout-note appearance="minimal"}
-Rule 1 has a genuine exception: a series where the interesting variation is 2%
-of the level. How do you take the exception honestly?
-:::
-
-## The Standard Failures
-
-- **Truncated axis** on a bar chart, which turns a 3% difference into a
-  landslide
-- **Dual axes**, which let you manufacture any crossing point you like by
-  choosing the scales
-- **Colour as the only encoding**, which fails for about 8% of men
-- **Pie with nine slices**, which is a sorted bar chart wearing a disguise
-- **A rate with no denominator**, which is Lecture 5, again, forever
-
-## A Famous Failure, and Its Repair {.smaller}
-
-:::: {layout="[1,1]"}
-::: {#first-column}
-
-**As published**
-
-![](./figures/external/smm635_fuel_economy.png){fig-align="center" height="265px"}
-
-:::
-
-::: {#second-column}
-
-**As it should have been**
-
-![](./figures/external/smm635_fuel_economy_redo.png){fig-align="center" height="265px"}
-
-:::
-::::
-
-::: {style="font-size:0.55em;text-align:center;"}
-Source: [SMM635 Data Visualisation, Bayes Business School](https://github.com/simoneSantoni/data-viz-smm635)
-:::
-
-*A 53% increase in fuel economy standards drawn as a 783% increase in line
-length. The redraw uses the same numbers.*
-
-
-# 4. Critique
-
-## Live Critique {background="#43464B"}
-
-Two real dashboards on screen: the GA4 default home, and one agency or Looker
-Studio gallery template.
-
-For each, as a room:
-
-1. Who is the audience, judging only by what is on it?
-2. What decision could it support?
-3. Which tile would you delete first, and what would you notice sooner?
-4. Which number on it has no denominator?
-
-## Exercise {background="#43464B"}
-
-In pairs:
-
-1. Take one chart from your own Tableau workbook
-2. Rewrite its title as a finding rather than a field name
-3. Redesign it for a client rather than for yourself
-4. Swap with your partner and critique theirs against the channel ranking and
-   the five honesty rules
-5. List the three changes that most improved it
-
-**25 minutes**
-
-# 5. AI as a Design Critic
-
-## AI This Block: Chat with context
-
-Where we are on the module's AI spine, set out in Lecture 1 and named properly
-in Lecture 12:
-
-> **Chat with context**
-
-## Paste the Chart, Ask What Is Wrong
-
-Screenshot critique is one of the strongest uses of a multimodal assistant,
-because the encoding rules are explicit, well documented and heavily written
-about.
-
-> "Here is a chart from my dashboard [screenshot]. Critique it against the
-> Cleveland and McGill ranking of visual channels. Say specifically what a
-> non-technical client would misread, and what they would conclude that the data
-> does not support."
-
-. . .
-
-The last clause matters. "Critique this chart" gets you a list of tidying. "What
-would they wrongly conclude" gets you the failure.
-
-## Two More Prompts Worth Keeping
-
-> "Rewrite this chart title as a finding rather than a field name. Give me three
-> versions at different levels of confidence."
-
-. . .
-
-> "What would a CFO ask when they see this? What would a marketing manager ask?
-> Which of those questions can this chart answer?"
-
-. . .
-
-The three-confidence-levels trick is useful because it forces you to choose how
-strong a claim your data supports, rather than defaulting to the strongest
-phrasing that sounds fine.
-
-## What It Cannot See
-
-- Whether the finding is **true**. It is critiquing an image, not your data
-- Whether the comparison is the one your client cares about
-- Whether the number has a denominator, unless the denominator is on the chart
-- Your audience, unless you describe them, and it will not ask
-
-::: {.callout-note appearance="minimal"}
-It will make your chart prettier and more conventional. Under what circumstances
-is "more conventional" the wrong direction?
-:::
-
-## Exercise {background="#43464B"}
-
-1. Screenshot one of your charts ({{< fa brands windows >}} <kbd>⊞ Win</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd>, {{< fa brands apple >}} <kbd>⌘ Cmd</kbd> + <kbd>⇧ Shift</kbd> + <kbd>4</kbd>) and ask for a critique
-2. Apply the two changes you agree with
-3. Note one piece of its advice you rejected, and why
-4. Ask it to rewrite the title at three confidence levels, and pick the one your
-   data supports
-
-**15 minutes**
-
-## Going Further
-
-- Cleveland and McGill (1984), *Graphical Perception* — the source of the
-  ranking, and it is readable
-- Tufte, *The Visual Display of Quantitative Information* — ch. 2 on graphical
-  integrity, ch. 4 on data-ink
-- Cairo, *The Functional Art* — the design process framework, and the best
-  bridge between journalism and analysis
-- Wilke, *Fundamentals of Data Visualization* — free online, and the practical
-  reference you will actually keep open
-
-## Next Lecture
-
-Block 3 begins. We move to Python for the analyses Tableau makes awkward, and we
-stop and name what we are doing with AI.
-
-**Prepare**: nothing to build. Come with the question about AI you have been
-not asking.

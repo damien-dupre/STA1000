@@ -1,283 +1,336 @@
 ---
-title: "Lecture 17: Cleaning and the Audit Trail"
+title: "Lecture 17: Funnel and Conversion Analysis"
 subtitle: STA1000 - Data Analytics and Metrics
 ---
 
 ## Previously ...
 
-Four lectures of analysis. All of it assumed the data was real.
+You know what a conversion is worth. Now: where do people stop?
 
 ## Learning Outcomes
 
 By the end of this lecture you will be able to:
 
-- Identify bot traffic, self-referrals and spam in a GA4 property
-- Apply exclusions without destroying the record of what you excluded
-- Document the judgement calls behind a cleaned dataset
+- Define a funnel from your own site's events
+- Compute step conversion and drop-off rates
+- Distinguish a leak worth fixing from noise
 
-# 1. What Contaminates Marketing Data
+# 1. Defining the Funnel
 
-## Bots and Crawlers
+## From Events to Steps {.smaller}
 
-GA4 filters traffic from the **IAB known-bot list** automatically, and you cannot
-turn it off or see what it removed.
-
-. . .
-
-What it misses: anything not on the list. Scrapers, uptime monitors, link
-previewers, and the growing population of AI crawlers reading your pages.
+A funnel is an **ordered list of events**, and you already defined the events. In
+Lecture 13 you wrote a measurement plan; this is the week it gets marked.
 
 . . .
 
-**Signatures worth looking for:**
+A workable four-step funnel on a portfolio site:
 
-- Engagement time of zero, on every session
-- Exactly one page per session, always the same one
-- Arrivals clustered at 03:00 local time
-- A single unusual `hostname`, or a browser version nobody uses
-
-## Self-Referrals
-
-Your own domain appearing in the acquisition report as a traffic source.
-
-. . .
-
-**Cause**: something starts a new session mid-visit. The usual culprits are a UTM
-parameter on an internal link (Lecture 9 warned you), a payment or booking page on
-another domain, or a subdomain GA4 does not know is yours.
-
-. . .
-
-**Fix**: Admin → Data streams → Configure tag settings → **List unwanted
-referrals**, and add your own domains.
-
-. . .
-
-Until you do, your acquisition report says your best traffic source is yourself,
-and every channel comparison you make is wrong.
-
-## Internal Traffic
-
-You, reloading your own contact page forty times in Lecture 9 to check the tag
-fired.
-
-. . .
-
-**This is in every one of your properties, right now**, and on a site with forty
-sessions a week it is not a rounding error. It is the majority of your data.
-
-. . .
-
-Admin → Data settings → Data filters → **Internal traffic**, defined by IP
-address. Set it to **Active**, not Testing, or it records the rule and filters
-nothing.
+| Step | Event | Meaning |
+|---|---|---|
+| 1 | `page_view` on any page | Arrived |
+| 2 | `view_work` or `scroll` past 50% | Engaged |
+| 3 | `page_view` on `/contact` | Considered |
+| 4 | `generate_lead` | Converted |
 
 . . .
 
 ::: {.callout-note appearance="minimal"}
-Your home IP is probably dynamic and campus is shared. This filter is imperfect
-by construction, which is exactly why it belongs in the cleaning log rather than
-in your assumptions.
+**If you cannot build a funnel from your own events, your measurement plan was
+wrong.** That is a finding, not a failure, and it is worth writing up.
 :::
 
-## Referral Spam and Ghost Traffic
+## The Funnel, As Everyone Draws It {.smaller}
 
-Some hits never touched your site at all. Spammers send events directly to
-measurement IDs they have guessed or scraped, to get their domain to appear in
-your reports.
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_purchase_funnel.png){fig-align="center" height="340px"}
 
-. . .
+*Probably the most reused framework in marketing analytics. Its value is that
+each step names a decision someone can act on.*
 
-Blocking referrers is whack-a-mole. **The durable defence is a hostname filter**:
-your real traffic always carries your own hostname, and ghost traffic almost
-never does.
 
-. . .
+## Open Versus Closed Funnels
 
-Keep only rows where `hostname` is your domain. One rule, and it holds against
-spam you have not seen yet.
+:::: {layout="[1,1]"}
+::: {#first-column}
 
-## Development and Test Events
+**Closed**
 
-The `generate_lead` events you fired in Lecture 9 to prove the tag worked are
-indistinguishable, in the export, from real enquiries.
+A user must enter at step 1 and pass through every step in order.
 
-. . .
+Strict, and the right default for a checkout.
 
-Two defences, in order of preference:
+:::
 
-1. **Prevent**: use GA4's DebugView and the `debug_mode` parameter while testing,
-   so test hits are separable at source
-2. **Exclude**: drop every event before your launch date, and every event
-   matching your own test parameters
+::: {#second-column}
 
-. . .
+**Open**
 
-**Exclusion by date is the one every one of you will need**, because none of you
-did the first one.
+A user can join at any step.
 
-# 2. Cleaning Without Lying
+Generous, and closer to how people use a small site: many arrive straight on the
+contact page from a link.
 
-## The Cardinal Rule
-
-<!-- Speaker notes: the difference between cleaning and fabrication is the
-     audit trail, not the operation. -->
-
-**Never modify the raw export.**
+:::
+::::
 
 . . .
 
-The raw file is evidence. It is read-only, it keeps the date you pulled it in its
-filename, and nothing ever writes to it.
+GA4's Funnel exploration is **open by default**, with a *Make open funnel*
+toggle. The two settings give different numbers on the same data, and neither is
+labelled on the chart you export.
 
 . . .
 
-Every exclusion is a **step in a script** that reads raw and writes clean. If the
-clean file is lost, you rerun the script. If somebody questions a number, you show
-them the step.
+**State which one you used.**
+
+## Time Windows
+
+A funnel with no window is not a measurement. "Did they convert?" needs
+"...within what?"
+
+. . .
+
+- **Same session**: strict, and the only honest window for an impulse purchase
+- **7 days**: reasonable for a considered B2C purchase
+- **30 days**: standard for B2B and for anything involving a second person
+
+. . .
+
+Widen the window and the conversion rate rises, every time, with no change to the
+site. **So the window has to be fixed before you compare two periods**, and it has
+to be reported next to the rate.
+
+# 2. Reading a Funnel
+
+## Step Rate Versus Overall Rate {.smaller}
+
+Two different denominators, and reports mix them constantly.
+
+| Step | Users | Step rate | Overall rate |
+|---|---|---|---|
+| 1 Arrived | 400 | — | 100% |
+| 2 Engaged | 180 | 45% of step 1 | 45% |
+| 3 Considered | 90 | 50% of step 2 | 22.5% |
+| 4 Converted | 27 | 30% of step 3 | 6.8% |
+
+. . .
+
+- **Step rate** answers *how leaky is this step?*
+- **Overall rate** answers *how many made it all the way?*
+
+. . .
+
+Step 3 looks like the best-performing step (50%) and step 4 the worst (30%), but
+**step 2 loses 220 people and step 4 loses 63.** Rates rank steps; counts rank
+opportunities.
+
+## Where the Big Number Is
+
+The instinct is to attack the worst step rate. Usually wrong.
+
+. . .
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+**Step with 1,000 users at 60%**
+
+Improve it 5 points → **50 more people**
+
+:::
+
+::: {#second-column}
+
+**Step with 20 users at 10%**
+
+Improve it 40 points → **8 more people**
+
+:::
+::::
+
+. . .
+
+The second is a far more impressive result and a far worse use of a week.
+
+. . .
+
+**Multiply the rate improvement by the volume before you choose what to fix.**
+This is the same arithmetic as Lecture 5's "which segments pay", one lecture
+later and with the decision attached.
+
+## Segmented Funnels
+
+The aggregate funnel is an average of funnels, and Lecture 3 told you what
+averages do.
+
+. . .
+
+Split by **device** and the leak usually moves: a form that works on desktop and
+fails on mobile shows up as a mediocre step rate overall and a catastrophic one on
+phones.
+
+. . .
+
+Split by **channel** and the leak moves again: traffic from a badly targeted ad
+drops out at step 2 because it should never have arrived.
 
 . . .
 
 ::: {.callout-note appearance="minimal"}
-The difference between cleaning and fabricating is not the operation. Deleting
-rows is both. The difference is whether the reader can see that you did it.
+Watch the sample size as you split. Four segments on 400 users is 100 users a
+segment, and Lecture 19 is about what that does to your confidence.
 :::
 
-## The Cleaning Log {.smaller}
+## What People Actually Do At Each Step {.smaller}
 
-One table, kept alongside the script, and shipped with the analysis.
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_ecommerce_analytics_bubbles.png){fig-align="center" height="340px"}
 
-| Rule | Rationale | Rows | Applied | By |
-|---|---|---|---|---|
-| `hostname != mysite.ie` | Ghost spam | 412 | 2026-01-14 | Me |
-| Sessions before 2025-10-02 | Pre-launch tag testing | 87 | 2026-01-14 | Me |
-| IP 10.x.x.x | My own machine | 233 | 2026-01-14 | Me |
-| Zero duration, one page | Bot signature | 51 | 2026-01-16 | Me |
+*Techniques used against funnel goals, by difficulty and by value. Note how
+few of the high-value ones are hard.*
 
-. . .
 
-**Rows removed is not optional.** A rule with no count is a claim; a rule with a
-count is a fact somebody else can check.
+# 3. Diagnosis
 
-## Reproducible Cleaning
+## Is It a Leak or a Filter?
 
-```
-data/
-  raw/ga4_export_2026-01-14.csv        <- never edited
-  clean/sessions_clean.csv             <- output, regenerable
-notebooks/
-  01_clean.ipynb                       <- raw in, clean out, prose throughout
-  02_analyse.ipynb                     <- reads clean only
-```
+<!-- Speaker notes: a drop-off between browsing and pricing is often the funnel
+     doing its job. Not every drop is a problem to solve. -->
+
+Not every drop is a problem.
 
 . . .
 
-The cleaning notebook does one job and says why at every step, in the prose cells
-you have been writing since Lecture 13.
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+**A filter**
+
+The step is doing its job: it qualifies intent.
+
+A pricing page that loses people who were never going to buy has saved everyone
+time.
+
+:::
+
+::: {#second-column}
+
+**A leak**
+
+The step loses people who wanted to continue.
+
+A form that fails validation without saying why.
+
+:::
+::::
 
 . . .
 
-**The test: delete `clean/` and rerun. If you cannot get the same file back, you
-do not have a pipeline, you have a memory.**
+**The test**: would the people who dropped out have converted if the step were
+easier? For a filter, no. Removing a filter raises the step rate and lowers the
+quality of everything downstream.
 
-## Judgement Calls Are Not Errors {.smaller}
+## Instrumentation Failure Looks Like a Leak
 
-Two competent analysts, given the same export, will disagree about:
-
-- Whether a 3-second session is a bounce or a bot
-- Whether the viral outlier belongs in the average
-- Where the launch date really was
-- Whether to exclude a whole country or accept the noise
+A 100% drop-off is almost never behaviour. **It is a missing tag.**
 
 . . .
 
-**None of those disagreements is a mistake.** Analysis is full of defensible
-choices, and pretending otherwise is how people end up hiding them.
+Ordered by how often it is the answer:
+
+1. The event never fires on that page
+2. The event fires under a different name (`Sign_Up` and `sign_up` are two events)
+3. The event fires before the page it is meant to measure
+4. The tag is not in `<head>` on that page at all
 
 . . .
 
-What is not acceptable is that the reader cannot tell which choice you made.
-**Documented judgement beats undocumented certainty**, which is the sentence this
-module opened with in Lecture 1.
+**Check all four before you redesign anything.** Lecture 13 told you to verify the
+tag on every page; this is the lecture where not doing it becomes expensive.
 
-# 3. Practice
+## Live Demo {background="#43464B"}
+
+<!-- Speaker notes: the point of the comparison is that the two numbers will not
+     match, and that this is normal rather than alarming. Budget time to sit
+     with the discrepancy instead of explaining it away. -->
+
+1. Build a four-step Funnel exploration in GA4
+2. Toggle open and closed, and watch the numbers move
+3. Change the window from same-session to 7 days, and watch them move again
+4. Export, and rebuild the same funnel in pandas from the raw events
+5. **Compare.** They will not match exactly. Work out which differences are
+   thresholding, which are the window, and which are your code
 
 ## Exercise {background="#43464B"}
 
-On your own property:
+On your own site:
 
-1. Configure internal traffic filtering and a hostname filter
-2. Write a cleaning script from raw export to clean dataset
-3. Produce a cleaning log with at least four documented rules
-4. Report your key metric before and after cleaning, and explain the gap
+1. Define a three or four step funnel from your key events
+2. Compute step and overall conversion rates
+3. Segment by device and report where the leak moves
+4. Propose one change, and state what result would convince you it worked
 
-::: {#timer1 .timer seconds="1800"}
+::: {#timer1 .timer seconds="1500"}
 :::
 
-# 4. AI and the Audit Trail
+# 4. AI for Funnel Diagnosis
 
-## AI This Block: Agentic coding
+## AI This Block: An analyst you interrogate
 
-Where we are on the module's AI spine, introduced in Lecture 12:
+Where we are on the module's AI spine, introduced in Lecture 10:
 
-> **Agentic coding.** It writes and runs the analysis. You decide what counts as
-> clean.
+> **An analyst you interrogate.** Ask it to argue the other side, then check the
+> side it dismissed.
 
-## AI-Written Steps Are Still Your Steps
+## Leak, Filter, or Broken Tag {.smaller}
 
-An agent will happily write you fifteen cleaning rules in four seconds, and most
-of them will be reasonable.
+Give it the numbers and **withhold your interpretation**, so that its answer is
+about the data rather than about your theory.
 
-. . .
-
-**The log does not care who wrote the rule.** Every exclusion still needs a
-rationale in your own words, and a row count you have looked at.
+> "My funnel is 400, 180, 175, 0. Give me every explanation for the final step,
+> ordered by how likely it is."
 
 . . .
 
-The specific risk here: an agent's rules are plausible in general and wrong about
-**your** site. It does not know that your launch date was late because the Pages
-build failed, or that your flatmate's IP is not internal traffic.
+Then the follow-up that does the work:
 
-## The Extra Column {.smaller}
-
-One more column on the template from section 2, and it is the one an examiner
-will look for.
-
-| Rule | Rationale | Rows | Applied | Source |
-|---|---|---|---|---|
-| Exclude `hostname != mysite.ie` | Ghost spam | 412 | 2026-01-14 | Written by me |
-| Exclude sessions under 1s | Bot signature | 88 | 2026-01-14 | Agent-suggested, verified |
-| Exclude `country = 'Vietnam'` | — | — | — | **Agent-suggested, rejected** |
+> "For each explanation, what single check would rule it out?"
 
 . . .
 
-The rejected row stays in the log. **A rule you declined is part of the trail**,
-and it is often the most interesting line on the page.
+**That second prompt is the useful one.** A ranked list of causes is interesting;
+a ranked list of checks is a plan for the next twenty minutes.
 
-## The Rule
+> "My funnel is 400, 180, 175, 0. Give me every explanation for the final step,
+> ordered by how likely it is."
 
-An agent may **propose** an exclusion. Only you may **accept** one.
+## It Should Say "Check the Tag" First
 
-. . .
-
-Acceptance means you can finish this sentence without looking anything up:
-
-> *I removed these rows because ______, and I know it removed ______ rows.*
+A zero at the last step has one overwhelmingly likely cause, and it is not
+copywriting.
 
 . . .
 
-**If you cannot, the rule does not go in**, however sensible it looked.
+If the assistant opens with call-to-action advice, button colours or page
+redesign, that tells you **how it was trained**, not what is wrong with your
+funnel. Marketing text on the open web is mostly about optimisation, because
+optimisation is what agencies sell.
+
+. . .
+
+**Check the instrumentation explanation first, whatever it ranked.** This is
+verification in the sense Lecture 10 gave the word: you are not reading its
+answer, you are checking it against something you can observe.
 
 ## Exercise {background="#43464B"}
 
-1. Ask an agent to propose cleaning rules for your export
-2. Accept the ones you can justify, reject the rest
-3. Record the rejected ones and your reason, which is also part of the trail
+1. Give an assistant your funnel counts with no interpretation
+2. Ask for ranked explanations
+3. Check the instrumentation explanation first, whatever it ranked
+4. Note whether its ranking matched what you found
 
 ::: {#timer2 .timer seconds="900"}
 :::
 
 ## Next Lecture
 
-Block 4: the metrics a marketing decision actually turns on.
+Which channel gets the credit: attribution.

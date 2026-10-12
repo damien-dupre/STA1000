@@ -1,510 +1,430 @@
 ---
-title: "Lecture 7: Dashboard Build"
+title: "Lecture 7: Python II - Calculate, Group and Merge"
 subtitle: STA1000 - Data Analytics and Metrics
+jupyter: python3
+filters:
+  - timer
 ---
+
+```{python}
+#| include: false
+# The slides read the repository copies of the data; students read the files they
+# uploaded to Colab, which is the code shown on the slides.
+import pandas as pd
+pd.set_option("display.max_columns", 7)
+pd.set_option("display.max_rows", 12)
+pd.set_option("display.width", 80)
+insta = pd.read_csv("../data/insta-data.csv")
+insta["posted_at"] = pd.to_datetime(insta["posted_at"])
+posts = pd.read_csv("../data/merge/insta-posts.csv")
+ads = pd.read_csv("../data/merge/meta-ads.csv")
+countries = pd.read_csv("../data/maps/ads-by-country.csv")
+```
 
 ## Previously ...
 
-Five lectures in Tableau. You have the four families of figure, calculated
-fields, segments, and the design principles a stakeholder view has to meet.
+- In Lecture 6 you opened `insta-data.csv` in Colab, read the type of each column, and filtered and sorted its rows with pandas.
+
+**Today, three questions:**
+
+1. How do you **calculate** a new column, and use the **dates**?
+2. How do you **group** the rows, to compare formats, months or campaigns?
+3. How do you **merge** two files, and check that nothing went wrong?
+
+## Today's Notebook
+
+A new notebook, `STA1000 Lecture 7`. From Loop, upload four files: `insta-data.csv`, `insta-posts.csv`, `meta-ads.csv` and `ads-by-country.csv`. Then, in the first cell:
+
+```{.python}
+import pandas as pd
+insta = pd.read_csv("insta-data.csv")
+insta["posted_at"] = pd.to_datetime(insta["posted_at"])
+```
 
 . . .
 
-Today you assemble them into the client deliverable, which is also
-**Assignment 1**.
+The first cell of every notebook does the same three things: load pandas, read the file, fix the types. **Runtime** → **Restart session and run all** should always bring you back here.
 
-## Learning Outcomes
+# 1. Calculate
 
-By the end of this lecture you will be able to:
+## A New Column
 
-- Design a dashboard around a decision rather than around available data
-- Structure a dashboard as title, story and visualisations
-- Add interactivity with filter and highlight actions, and useful tooltips
-- Publish to Tableau Public and hand the result to somebody else
+```{python}
+insta["engagements"] = insta["likes"] + insta["comments"] + insta["saves"] + insta["shares"]
+insta[["post_id", "likes", "comments", "saves", "shares", "engagements"]].head(3)
+```
 
-# 1. Design First
+- A **calculated field**, as in Tableau: the formula applies to every row at once, with no loop
+- The name on the left is yours: if it does not exist yet, the column is added at the end of the table
 
-## Start With the Decision
+## A Rate
 
-Open a blank page, not Tableau. Write one sentence:
+```{python}
+insta["engagement_rate"] = insta["engagements"] / insta["reach"]
+insta[["post_id", "format", "engagements", "reach", "engagement_rate"]].head(3)
+```
 
-> *This dashboard exists so that ______ can decide ______.*
+`+`, `-`, `*` and `/` work between columns, or with a number: `insta["reach"] / 1000` gives the reach in thousands.
+
+## Average of the Rates, or Rate of the Totals?
+
+```{python}
+print(insta["engagement_rate"].mean())
+print(insta["engagements"].sum() / insta["reach"].sum())
+```
+
+Lecture 4's row level against aggregate, in two lines:
+
+- The **average of the rates**, 6.4%, gives each of the 431 posts the same weight
+- The **rate of the totals**, 5.7%, gives each account reached the same weight
 
 . . .
 
-If you cannot finish the sentence, you are not ready to build. Everything that
-follows is judged against it: a view that cannot change that decision does not
-go on the page.
+"Loomrow's engagement rate" is the second: **divide the totals**, never average the rates.
 
-::: {.callout-note appearance="minimal"}
-This is Lecture 1's test, applied to a whole page rather than a single number.
+## Date Parts and Date Values
+
+```{python}
+insta["year"] = insta["posted_at"].dt.year
+insta["weekday"] = insta["posted_at"].dt.day_name()
+insta["month"] = insta["posted_at"].dt.to_period("M")
+insta[["posted_at", "year", "weekday", "month"]].head(3)
+```
+
+`.dt` opens the date toolbox of a date column. As in Lecture 5:
+
+- **Date parts**: `.dt.year`, `.dt.month`, `.dt.day_name()`: "Monday" means every Monday
+- **Date values**: `.dt.to_period("M")` means that month only, 2025-01; `"Q"` for quarters, `"W"` for weeks
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### Calculated fields
+
+1. Add `engagements` and `engagement_rate` as above. Which 3 posts have the highest rate, and what is their reach?
+2. Add `follow_rate`: `follows_from_post` over `reach`. Compare the average of the rates with the rate of the totals
+3. Add `weekday`: on which day does Loomrow post most?
+4. Add `month`: which three months had the most posts?
+
+::: {#timer7_1 .timer seconds="420" starton="interaction"}
 :::
 
-## Dashboards Are Not All the Same Thing {.smaller}
+## Solution
 
-Three broad types, and they are built differently:
+```{python}
+top = insta.sort_values("engagement_rate", ascending=False)
+top[["post_id", "format", "reach", "engagement_rate"]].head(3)
+```
 
-| Type | Purpose | Design consequence |
+The top rates come from tiny posts: 403 accounts reached, 616, 2,912. A rate needs its denominator next to it.
+
+```{python}
+insta["follow_rate"] = insta["follows_from_post"] / insta["reach"]
+print(insta["follow_rate"].mean())
+print(insta["follows_from_post"].sum() / insta["reach"].sum())
+```
+
+## Solution (continued)
+
+```{python}
+insta["weekday"].value_counts().head(3)
+```
+
+```{python}
+insta["month"].value_counts().head(3)
+```
+
+Mondays, by a whisker. And March 2025, the SS25 launch, has the most posts.
+
+# 2. Group
+
+## Split, Apply, Combine
+
+```{python}
+insta.groupby("format")["reach"].median()
+```
+
+Read it left to right:
+
+1. `.groupby("format")`: **split** the rows by format, as when `format` goes on Rows in Tableau
+2. `["reach"]`: the measure to compute
+3. `.median()`: the aggregation, applied to each group, and **combined** into one result. Or `.sum()`, `.mean()`, `.count()`
+
+## Several Measures at Once
+
+```{python}
+by_format = insta.groupby("format")[["reach", "engagements", "spend_eur"]].sum()
+by_format
+```
+
+Two pairs of brackets again, for a list of columns. The result is a table with one row per format, and the formats as row names.
+
+## A Rate per Group: Divide the Totals
+
+```{python}
+by_format["engagement_rate"] = by_format["engagements"] / by_format["reach"]
+by_format
+```
+
+Group the counts first, then divide: the rate of the totals, per format. Reels reach the most accounts but have the lowest rate: 4.0%, against 8.4% for carousels.
+
+## Several Figures per Group
+
+```{python}
+insta.groupby("format")["reach"].agg(["count", "mean", "median"])
+```
+
+`.agg()` takes a list of aggregations. `count` is the number of posts behind each figure: always show it next to a mean, and the mean next to the median.
+
+## Two Dimensions: a Pivot Table
+
+```{python}
+insta.pivot_table(index="format", columns="is_paid", values="reach", aggfunc="sum")
+```
+
+- `index`: the rows; `columns`: the columns; `values`: the measure; `aggfunc`: the aggregation
+- Tableau's crosstab, with `format` on Rows and `is_paid` on Columns. An Excel pivot table, written down
+
+## Over Time
+
+```{python}
+monthly = insta.groupby("month")["reach"].sum()
+monthly.sort_values(ascending=False).head(3)
+```
+
+Group by a date value, and each month becomes a row: Lecture 5's line chart, as a table. August 2025 is the month of the viral reel. Lecture 8 draws the line.
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### Group the posts
+
+1. The median `reach` by `product_line`: which line reaches furthest?
+2. Total `reach` and `engagements` by `theme`, then the engagement rate of each theme: which engages most, and which least?
+3. Paid posts only: total `spend_eur` and `attributed_revenue_eur` by `campaign`, then the revenue per euro spent (`roas`) of each campaign
+4. Total `reach` by `year`: does 2026 reach fewer accounts than 2025?
+
+::: {#timer7_2 .timer seconds="480" starton="interaction"}
+:::
+
+## Solution
+
+```{python}
+insta.groupby("product_line")["reach"].median().sort_values(ascending=False).head(2)
+```
+
+```{python}
+by_theme = insta.groupby("theme")[["reach", "engagements"]].sum()
+by_theme["engagement_rate"] = by_theme["engagements"] / by_theme["reach"]
+by_theme.sort_values("engagement_rate", ascending=False)
+```
+
+**Outerwear** reaches furthest. **Customer** posts engage most; **behind the scenes** least, dragged down by LR0184.
+
+## Solution (continued) {.smaller}
+
+```{python}
+paid = insta[insta["is_paid"] == True]
+by_campaign = paid.groupby("campaign")[["spend_eur", "attributed_revenue_eur"]].sum()
+by_campaign["roas"] = by_campaign["attributed_revenue_eur"] / by_campaign["spend_eur"]
+by_campaign.sort_values("roas", ascending=False).round(2)
+```
+
+```{python}
+insta.groupby("year")["reach"].sum()
+```
+
+**ROAS**, the return on ad spend: €6.97 a euro at Black Friday. And 2026 has **6 months** of data: compare the same months (Lecture 5).
+
+# 3. Merge
+
+## Two Files, One Key
+
+Lecture 4 split the Loomrow data in two, as it arrives from two platforms:
+
+```{.python}
+posts = pd.read_csv("insta-posts.csv")
+ads = pd.read_csv("meta-ads.csv")
+```
+
+```{python}
+print(posts.shape, ads.shape)
+ads.head(3)
+```
+
+`insta-posts.csv` has the 431 posts, from Instagram; `meta-ads.csv` the 127 boosted posts, from Meta Ads Manager. **The key** they share: `post_id`.
+
+## pd.merge()
+
+```{python}
+both = pd.merge(posts, ads, on="post_id", how="left")
+both.shape
+```
+
+- `pd.merge(left, right, ...)`: the two tables, in that order
+- `on="post_id"`: the key, a column present in both
+- `how="left"`: keep every row of the left table, matched or not
+
+The ad columns are added at the end: 23 + 3 = 26 columns, `insta-data.csv` again.
+
+## Which Rows Survive?
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+| `how=` | Keeps | Rows |
 |---|---|---|
-| **Monitoring** | Is anything wrong right now? | Few numbers, large, with thresholds |
-| **Analytic** | Why did this happen? | Filters, breakdowns, detail on demand |
-| **Communication** | Here is what we found | Narrative order, written story, fixed conclusion |
-
-. . .
-
-**Assignment 1 is a communication dashboard.** It is read once, by somebody who
-was not in the room, and it has to end somewhere.
-
-*See [Dashboard Design Patterns](https://dashboarddesignpatterns.github.io/) for
-the full taxonomy.*
-
-## The Four-Step Build {.smaller}
-
-The order matters, and almost everybody gets it wrong by polishing too early.
-
-1. **Basic figures.** Build many worksheets, all on default settings. Do not
-   style anything
-2. **Basic dashboard.** Assemble the ones that survive, with the title, text and
-   images in place, and no design work at all
-3. **Improve the figures.** Now go back into each worksheet: colour, size, shape,
-   titles, captions, axes, tooltips
-4. **Improve the dashboard.** Background, fonts, layout, containers, actions
-
-. . .
-
-**Steps 1 and 2 decide whether the dashboard is any good.** Steps 3 and 4 decide
-whether it looks it. Doing them in the other order wastes a weekend.
-
-## The Sketch
-
-Five minutes, pen and paper, before step 2.
-
-- What is the **first** thing the reader's eye lands on?
-- What is above the fold, and what needs scrolling?
-- Which views are the argument, and which are the evidence?
-
-. . .
-
-**Reading order follows the decision**, not the order you happened to build
-things in.
-
-## Layout Conventions
-
-Most communication dashboards that work look similar, because Western readers
-scan the same way:
-
-- **Headline numbers top-left**: the finding, in figures
-- **The trend beneath them**: how it got there
-- **Breakdowns below**: who and what is driving it
-- **Detail last**, or on demand through a filter
-
-. . .
-
-Convention is not a lack of imagination. It is how the reader finds the argument
-without being taught your layout first.
-
-## A Dashboard That Answers One Question {.smaller}
-
-![Source: [Quarto Dashboards, posit::conf(2024)](https://github.com/posit-conf-2024/quarto-dashboards)](./figures/external/qd_dashboard_customer_churn.png){fig-align="center" height="340px"}
-
-*Three numbers at the top, the reasons underneath, the detail last. You can
-say what decision it supports in one sentence.*
-
-## Two More, For Comparison {.smaller}
-
-:::: {layout="[1,1]"}
-::: {#first-column}
-
-**Focused**
-
-![](./figures/external/qd_dashboard_stock_explorer.png){fig-align="center" height="255px"}
+| `"inner"` | the keys in **both** | 127 |
+| `"left"` | every row on the **left** | 431 |
+| `"right"` | every row on the **right** | 127 |
+| `"outer"` | every key, from **either** | 431 |
 
 :::
 
 ::: {#second-column}
 
-**Dense**
+Lecture 4's join types, with the same counts.
 
-![](./figures/external/qd_dashboard_housing_market.png){fig-align="center" height="255px"}
+`"left"` is almost always the one: keep all your observations, and add information where it exists.
+
+`"inner"`, the default when `how` is left out, drops the 304 organic posts **without a word**.
 
 :::
 ::::
 
-::: {style="font-size:0.55em;text-align:center;"}
-Source: [Quarto Dashboards, posit::conf(2024)](https://github.com/posit-conf-2024/quarto-dashboards)
-:::
+## Missing Values After a Merge
 
-*Both are competent. Only one of them can be read from the back of a room.*
+A post with no ad has nothing to match in `meta-ads.csv`: its ad columns are **missing**, `NaN`.
 
-## What to Leave Out
+```{python}
+print(both["spend_eur"].isna().sum())
+both["spend_eur"] = both["spend_eur"].fillna(0)
+print(both["spend_eur"].sum().round(2))
+```
 
-<!-- Speaker notes: students will want to show everything they built over the
-     block. The discipline of removal is the assessed skill, and it is the one
-     they resist hardest. -->
+- `.isna().sum()` counts the missing values: 304, the organic posts
+- `.fillna(0)` replaces them with 0. Right here, because no ad means €0 spent. Wrong for a missing price or a missing age: decide, and say so
 
-Every chart must earn its place by changing a decision. The usual offenders:
+## Check Every Merge: Rows and a Total
 
-- A view that duplicates another in a different shape
-- A count that nobody would act on
-- A breakdown with four posts in a category
-- Anything included because it was hard to build
+Before and after each merge, two checks:
+
+1. **The number of rows**: did it change, and should it have?
+2. **A total you know**: €24,345.78 of spend, as in Meta Ads Manager
 
 . . .
 
-**A dashboard is what is left after the removals.** Assignment 1 is marked on
-storytelling, and a story with seven endings has none.
+```{.python}
+countries = pd.read_csv("ads-by-country.csv")
+```
 
-## Ten Rules Worth Taping to the Wall {.smaller}
+```{python}
+wrong = pd.merge(insta, countries, on="post_id")
+print(countries.shape, wrong.shape)
+print(wrong["spend_eur"].sum())
+```
+
+`ads-by-country.csv` has **one row per post and country**: each paid post is repeated once per country, and so is its `spend_eur`. Lecture 5's €106,899.36.
+
+## Group First, Then Merge
+
+The question was the spend by country: it needs no merge at all.
+
+```{python}
+by_country = countries.groupby("country")[["amount_spent_eur", "purchase_value_eur"]].sum()
+by_country["roas"] = by_country["purchase_value_eur"] / by_country["amount_spent_eur"]
+by_country.sort_values("amount_spent_eur", ascending=False).head(4).round(2)
+```
+
+When the merge is needed, put the **detailed** table on the left, and bring in the descriptions from the other one: `pd.merge(countries, insta[["post_id", "campaign"]], on="post_id", how="left")` keeps 551 rows.
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### Rebuild the Loomrow file
+
+1. Merge `insta-posts.csv` and `meta-ads.csv` with `how="left"`. Check the rows, and the number of missing `spend_eur`
+2. The same with `how="inner"`: how many rows, and which posts are gone?
+3. Fill the missing values of the three ad columns with 0, then check the totals: €24,345.78 spent, €76,928.88 of revenue
+4. Save the result as `insta-rebuilt.csv`, and download it
+
+::: {#timer7_3 .timer seconds="420" starton="interaction"}
+:::
+
+## Solution
+
+```{python}
+both = pd.merge(posts, ads, on="post_id", how="left")
+print(both.shape, both["spend_eur"].isna().sum())
+print(pd.merge(posts, ads, on="post_id", how="inner").shape)
+ad_columns = ["spend_eur", "attributed_purchases", "attributed_revenue_eur"]
+both[ad_columns] = both[ad_columns].fillna(0)
+print(both[ad_columns].sum())
+```
+
+```{.python}
+both.to_csv("insta-rebuilt.csv", index=False)
+```
+
+The inner merge keeps only the 127 boosted posts: the 304 organic ones are gone.
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B" .smaller}
+
+### Where should Loomrow advertise?
+
+With `ads-by-country.csv`:
+
+1. Total `amount_spent_eur`, `purchases` and `purchase_value_eur` by `country`, sorted by spend
+2. The return on ad spend, `roas`, of each country
+3. Bring in the `campaign` of each post from `insta-data.csv`, with a merge that keeps the 551 rows
+4. A pivot table of the spend, with countries as rows and campaigns as columns: which campaign went furthest into Europe?
+
+::: {#timer7_4 .timer seconds="480" starton="interaction"}
+:::
+
+## Solution {.smaller}
+
+```{python}
+columns = ["amount_spent_eur", "purchases", "purchase_value_eur"]
+by_country = countries.groupby("country")[columns].sum()
+by_country["roas"] = by_country["purchase_value_eur"] / by_country["amount_spent_eur"]
+by_country.sort_values("amount_spent_eur", ascending=False).round(2)
+```
+
+Ireland: 54% of the spend, €4.06 a euro. The decision is the **United Kingdom**: a fifth of the budget, at €1.92. Belgium's €3.55 rests on 15 purchases, Italy's €0.65 on 2.
+
+## Solution (continued) {.smaller}
+
+```{python}
+with_campaign = pd.merge(countries, insta[["post_id", "campaign"]], on="post_id", how="left")
+print(with_campaign.shape)
+```
+
+```{python}
+spend = with_campaign.pivot_table(index="country", columns="campaign",
+                                  values="amount_spent_eur", aggfunc="sum")
+spend.round(0)
+```
+
+A blank cell, `NaN`, is a country the campaign never reached. **Black Friday** reached 8 countries; SS25 Launch only Ireland and the United Kingdom.
+
+## {background="#43464B"}
+
+```{=html}
+<style>img.circle {border-radius:50%;}</style>
+```
 
 :::: {layout="[1,1]"}
 ::: {#first-column}
-
-1. Do not overwhelm the viewer
-2. Avoid visual clutter
-3. Do not add data because you have it
-4. Be consistent: one palette, one date format, one number format
-5. Make interaction visible; a filter nobody notices does not exist
+<img class="circle" src="https://github.com/damien-dupre.png" />
 
 :::
-
 ::: {#second-column}
+**Thanks for your attention and don't hesitate to ask if you have any questions!**
 
-6. Manage complexity: progressive detail, not everything at once
-7. Group related charts together
-8. Avoid saying the same thing twice
-9. Context beats completeness
-10. Iterate. Nobody's first layout is their last
+[{{< fa brands mastodon >}} @damien_dupre](https://datasci.social/@damien_dupre)
 
+[{{< fa brands github >}} @damien-dupre](https://github.com/damien-dupre)
+
+[{{< fa link >}} https://damien-dupre.github.io](https://damien-dupre.github.io)
+
+[{{< fa paper-plane >}} damien.dupre@dcu.ie](mailto:damien.dupre@dcu.ie)
 :::
 ::::
-
-# 2. The Three Key Elements
-
-## Title, Story, Visualisations
-
-Every dashboard in this module carries three things. Images, buttons and menus
-are optional; these are not.
-
-1. A **title** that pinpoints the problem
-2. A written **story**: introduction, analysis, conclusion
-3. **Multiple visualisations**, in a deliberate order
-
-. . .
-
-Most student dashboards have the third and neither of the others, and lose marks
-on Overall Story for exactly that reason.
-
-## The Title Does the Work {.smaller}
-
-A title states the problem, asks a question, or is simply memorable enough to be
-read. Real examples from Tableau Public:
-
-- *Healthcare Crisis in Rural America* — names the problem
-- *#CollegeGameday: Can My Family Out-Pick the Pundits?* — asks a question
-- *NBA Lords of the Rings* — catchy enough that you look
-
-. . .
-
-What a title is not: `Dashboard 1`, `Instagram Analysis`, or `Loomrow Data`.
-Those name the contents. **Name the finding.**
-
-## The Story {.smaller}
-
-:::: {layout="[1,1]"}
-::: {#first-column}
-
-**Introduction**
-
-The context. Who is Loomrow, what do they sell, what were they asking?
-
-**Analysis**
-
-Walk the reader through the visualisations, extracting the point of each. Link
-them: by time, by geography, by logic, by increasing complexity.
-
-:::
-
-::: {#second-column}
-
-**Conclusion**
-
-Summarise, then **recommend**. What should they do on Monday?
-
-A conclusion that only summarises has stopped one step short of the job.
-
-:::
-::::
-
-. . .
-
-Three short paragraphs of text on the dashboard itself. Not a separate document,
-and not spoken over it.
-
-## The Visualisations
-
-1. Place them in an order that matches the story, not the order you built them
-2. Make sure each one has been through step 3: styled, titled, captioned
-3. Add a caption where the finding is not obvious from the chart alone
-4. Wire up the global interactive features, which is the next section
-
-## Exercise {background="#43464B"}
-
-For the Loomrow dashboard you are going to submit:
-
-1. Write the decision sentence
-2. Write a title that names the finding, not the contents
-3. Sketch the layout on paper: what is above the fold, and in what order
-
-Swap with the person beside you. **Can they say what your dashboard is for
-without you explaining it?**
-
-::: {#timer1 .timer seconds="600"}
-:::
-
-# 3. Interactivity
-
-## Local Filters and Highlighters
-
-On a single worksheet, {{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click a field and choose **Show Filter** to put a control
-beside the view.
-
-. . .
-
-- A **filter** removes rows. The chart is recalculated on what is left
-- A **highlighter** keeps every row and dims the ones you did not pick
-
-. . .
-
-**The difference matters for percentages.** Filter to reels and the rates
-recompute among reels; highlight reels and the rates still include everything
-else.
-
-## Dashboard Actions {.smaller}
-
-The control that turns four charts into one dashboard. **Dashboard → Actions →
-Add Action**:
-
-| Action | What it does |
-|---|---|
-| **Filter** | Selecting a mark in one view filters every other view |
-| **Highlight** | Selecting a mark dims the non-matching marks everywhere |
-| **Go to URL** | A mark becomes a link out |
-| **Parameter / Set** | A selection changes a calculation |
-
-. . .
-
-Set the trigger (`Hover`, `Select`, `Menu`) deliberately. **Hover actions on a
-dense chart are unusable**; select is almost always the right answer.
-
-## Tooltips
-
-The Marks card's **Tooltip** button. What appears there is a design decision, not
-a default.
-
-- Remove the fields the reader does not need
-- Write it as a **sentence**: *"Reels in March reached 41,300 accounts across 18
-  posts"*
-- Include the **sample size**. A tooltip is where an honest `n` fits without
-  cluttering the chart
-- Advanced: embed another worksheet in the tooltip, so hovering shows a small
-  chart
-
-## Alias, Format, and the Small Things
-
-- **Aliases**: {{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click a dimension member to rename it for display.
-  `behind the scenes` becomes `Behind the scenes` without editing the data
-- **Number format**: set it once on the field, not per view
-- **Dates**: Tableau's date hierarchy (`Year > Quarter > Month > Day`) gives you
-  drilldown for free. Use `Week` for portfolio-scale data
-- **Device layouts**: build the desktop version, then check the phone layout.
-  Your marker may open it on a phone
-
-## Live Demo {background="#43464B"}
-
-<!-- Speaker notes: about twelve minutes. Build it badly first, on purpose, then
-     apply steps 3 and 4 in front of them. The contrast is the lesson. -->
-
-1. Four default worksheets dropped on a dashboard, ugly and unstyled
-2. Add the title, the three story paragraphs, a logo
-3. Back into each worksheet: colour, axis titles, number format, tooltip
-   sentences
-4. Back on the dashboard: containers, background, one filter action and one
-   highlight action
-5. Open the phone layout, and fix what breaks
-
-# 4. Publishing and Handover
-
-## Publishing to Tableau Public
-
-**File → Save to Tableau Public As...**, and the workbook uploads to your
-profile.
-
-. . .
-
-::: {.callout-note appearance="minimal"}
-**Everything you publish is public.** Do not upload anything confidential, and
-check what is in the data before you press it. This is a real habit, not a
-classroom rule.
-:::
-
-. . .
-
-Publishing is also saving. Publish at the end of every working session, and
-rename versions so you can go back.
-
-## Export Versus Share
-
-- **Share**: the link to your published viz. Interactive, and the one you submit
-- **Download → Image / PDF**: a snapshot for a slide deck. Interactivity is gone
-- **Download → Workbook**: the `.twbx`, for someone who will edit it
-- **Download → Data**: the underlying table. Check whether you meant to offer
-  this
-
-## The Handover Test
-
-The dashboard is finished when somebody can open it **without you in the room**
-and reach the conclusion you intended.
-
-. . .
-
-Test it properly: send the link to someone outside the module, say nothing, and
-ask them what they think it says.
-
-. . .
-
-**Most dashboards fail this test on the title and the missing story**, not on the
-charts.
-
-## Caveats Belong on the Page
-
-Anything you know about the data that would change how it is read goes on the
-dashboard, in small text, not in your head:
-
-- How many posts are behind the smallest bar
-- That `attributed_revenue_eur` is what the platform claims, not what was audited
-- That spend on days without a boosted post is not in the file, so the figures
-  are the content budget rather than the media budget
-
-. . .
-
-**A caveat you disclose is professional. The same caveat found by your reader is
-a credibility problem.** We come back to this in Lecture 20.
-
-## Assignment 1 Brief {.smaller}
-
-A Tableau Public **dashboard** built on `insta-data.csv`, answering Loomrow's two
-questions. Marked in four equal parts:
-
-| Criterion | 25% each |
-|---|---|
-| **Creativity** | Menus, filters and interactions that do something |
-| **Analytical depth** | Figures that answer a question worth asking |
-| **Design** | Layout, colour, typography, restraint |
-| **Overall story** | Title, narrative, and a conclusion with a recommendation |
-
-. . .
-
-**Submit the Tableau Public link.** Not a story, not a PDF, not a workbook file.
-Due mid-November.
-
-## Studio Time {background="#43464B"}
-
-Build. Checkpoints, in order:
-
-1. Decision sentence written and visible on the page
-2. Sketch reviewed by one peer
-3. Draft assembled with real data, unstyled
-4. Steps 3 and 4 of the build: figures, then dashboard
-5. One filter action and one highlight action working
-6. Peer review against the Lecture 6 critique checklist
-
-::: {#timer2 .timer seconds="1500"}
-:::
-
-# 5. AI as a Dashboard Critic
-
-## AI This Block: Chat With Context
-
-Where we are on the module's AI spine, set out in Lecture 1 and named properly in
-Lecture 12:
-
-> **Chat with context.** Attach the thing. A screenshot of your dashboard is
-> context.
-
-## Specification, Not Construction
-
-An assistant cannot build a Tableau workbook. It is good at the step before and
-the step after.
-
-. . .
-
-> "My dashboard supports this decision: *[your sentence]*. Propose a layout:
-> which views, in what order, above and below the fold. Say what to leave out."
-
-. . .
-
-And afterwards, on a screenshot:
-
-> "Here is the dashboard. Read it as a client who has ninety seconds. What do you
-> think it is telling me to do?"
-
-## The Removal Test
-
-Give it your list of built views and ask **which one does not change a
-decision**.
-
-. . .
-
-It is better at removing than you are, for one reason: it is not attached to the
-work. You spent two hours on that map.
-
-. . .
-
-Cut at least one view it names, even one you disagree about, and look at the
-dashboard again before you decide.
-
-## What It Cannot See
-
-- Whether your filter action actually fires
-- Whether the smallest bar rests on four posts
-- What your client will really ask, which is usually about money
-- Whether the colours survive on a projector
-
-. . .
-
-::: {.callout-note appearance="minimal"}
-Asked "is this dashboard good?", it will say yes. Ask it what the dashboard is
-telling you to do instead: that question has a wrong answer, so it is worth
-asking.
-:::
-
-## Exercise {background="#43464B"}
-
-1. Give an assistant your decision sentence and your list of built views
-2. Ask which to cut, and why
-3. Cut at least one you disagree about, and look at the result
-4. Screenshot the dashboard ({{< fa brands windows >}} <kbd>⊞ Win</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd>, {{< fa brands apple >}} <kbd>⌘ Cmd</kbd> + <kbd>⇧ Shift</kbd> + <kbd>4</kbd>) and ask what it thinks you are recommending
-
-If its answer is not your recommendation, the dashboard is wrong, not the
-assistant.
-
-::: {#timer3 .timer seconds="600"}
-:::
-
-## Going Further
-
-- [Dashboard Design Patterns](https://dashboarddesignpatterns.github.io/), and
-  its workshop slides
-- Stephen Few, *Information Dashboard Design*
-- [Tableau Public gallery](https://public.tableau.com/app/discover), and the
-  annual Viz Wrap posts
-- Tableau, *Actions* and *Dashboard Layout* documentation
-
-## Next Lecture
-
-Block 2 closes here. Next week Block 1 of Semester 2 opens: you stop analysing
-data somebody else generated and start generating your own.
-
-. . .
-
-**You will build a website.**

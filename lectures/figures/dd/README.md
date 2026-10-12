@@ -52,3 +52,29 @@ Re-fetch any of them with:
 
 Several are reproductions of third-party material. Fine for closed university
 teaching; review before publishing the decks openly.
+
+## Used by lecture 5
+
+The three GIFs are Damien's own Tableau Public recordings, on the Covid-19 sample
+(`lectures/data/covid_data_sample.csv`), compressed for the slides: 1050 px wide,
+12 frames a second, 128 colours. The stills are frames cut from the same
+recordings, or crops of images in the img repo.
+
+| File | Where | Made from |
+|---|---|---|
+| `tableau_dual_axis.gif` | "Two Measures, One Chart" | `tableau_dual_axis.gif` (26.7 MB), stopped at frame 885, before the screen-recording dock appears |
+| `tableau_map.gif` | "Mapping with Tableau" | `tableau_sheet_tooltip.gif` (54.2 MB), frames 420 to 961: Location, Show Me, filled map |
+| `tableau_sheet_tooltip.gif` | "A Figure in the Tooltip" | `tableau_sheet_tooltip.gif`, frame 950 to the end: Insert, Sheets, then hover |
+| `tableau_data_icons.png` | "Space and Time Variables" | frame 150 of `tableau_dual_axis.gif`, the Data pane |
+| `tableau_date_menu.png` | "Date Parts or Date Values?" | frame 280 of `tableau_sheet_tooltip.gif`, the date pill menu |
+| `tableau_show_filter_menu.png` | "Filter and Highlighter Menus" | the same frame, top of the menu |
+| `tableau_tooltip_editor.png` | "Tooltips" | frame 995 of `tableau_sheet_tooltip.gif`, the Edit Tooltip dialog |
+| `tableau_publish_as.png` | "Publish" | crop of `tableau_public.png` |
+| `tableau_alias_dialog.png` | "Aliases" | crop of `tableau_alias_2.png` |
+| `tableau_linecharts.png` | "Line and Area Charts" | `tableau_linecharts.png`, unchanged |
+| `tableau_published.png` | "Publish" | `tableau_published.png`, unchanged |
+| `tableau_public_actions.png` | "Dashboard Actions" | `tableau_public_actions.png`, unchanged |
+
+Compression, with the frame range of each GIF:
+
+    ffmpeg -i in.gif -vf "trim=start_frame=A:end_frame=B,setpts=PTS-STARTPTS,fps=12,scale=1050:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=128:stats_mode=diff[p];[s1][p]paletteuse=dither=none:diff_mode=rectangle" out.gif

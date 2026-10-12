@@ -1,372 +1,285 @@
 ---
-title: "Lecture 11: Getting Data Out of GA4"
+title: "Lecture 11: Cleaning and the Audit Trail"
 subtitle: STA1000 - Data Analytics and Metrics
 ---
 
 ## Previously ...
 
-- You have a live site
-- It emits events with parameters
-- You have a consent banner and a statement of success
-
-Now we look at what has actually arrived.
+Five lectures of Python. All of it assumed the data was real, and Lecture 9
+found bots, a payment page and a link in bio that were not what they seemed.
 
 ## Learning Outcomes
 
 By the end of this lecture you will be able to:
 
-- Export GA4 data in a form Tableau can consume
-- State the **grain** of a table before you build anything on it
-- Distinguish dimensions from measures, and say why the distinction is not cosmetic
-- Interrogate the **provenance** of a dataset you did not collect yourself
+- Identify bot traffic, self-referrals and spam in a GA4 property
+- Apply exclusions without destroying the record of what you excluded
+- Document the judgement calls behind a cleaned dataset
 
-# 1. Before the Tool: Provenance
+# 1. What Contaminates Marketing Data
 
-## Where Did This Table Come From?
+## Bots and Crawlers
 
-**Provenance** describes the people, systems and decisions involved in
-producing, transforming and sharing a dataset.
-
-. . .
-
-It determines quality, reliability and trustworthiness. It is also the part of
-an analysis nobody puts on a slide.
+GA4 filters traffic from the **IAB known-bot list** automatically, and you cannot
+turn it off or see what it removed.
 
 . . .
 
-**Treat every provenance claim as a hypothesis to be verified in the data**, not
-as documentation to be trusted. Sometimes the documentation is a marketing
-document.
+What it misses: anything not on the list. Scrapers, uptime monitors, link
+previewers, and the growing population of AI crawlers reading your pages.
+
+. . .
+
+**Signatures worth looking for:**
+
+- Engagement time of zero, on every session
+- Exactly one page per session, always the same one
+- Arrivals clustered at 03:00 local time
+- A single unusual `hostname`, or a browser version nobody uses
+
+## Self-Referrals
+
+Your own domain appearing in the acquisition report as a traffic source.
+
+. . .
+
+**Cause**: something starts a new session mid-visit. The usual culprits are a UTM
+parameter on an internal link (Lecture 13 will warn you), a payment or booking page on
+another domain, or a subdomain GA4 does not know is yours.
+
+. . .
+
+**Fix**: Admin → Data streams → Configure tag settings → **List unwanted
+referrals**, and add your own domains.
+
+. . .
+
+Until you do, your acquisition report says your best traffic source is yourself,
+and every channel comparison you make is wrong.
+
+## Internal Traffic
+
+You, reloading your own contact page forty times to check the tag fires: in
+Lecture 13 you will.
+
+. . .
+
+**This will be in every one of your properties**, and on a site with forty
+sessions a week it is not a rounding error. It is the majority of your data.
+
+. . .
+
+Admin → Data settings → Data filters → **Internal traffic**, defined by IP
+address. Set it to **Active**, not Testing, or it records the rule and filters
+nothing.
+
+. . .
 
 ::: {.callout-note appearance="minimal"}
-You wrote the measurement plan for your own site three weeks ago. Can you still
-say, without checking, what your `key_event` counts include?
+Your home IP is probably dynamic and campus is shared. This filter is imperfect
+by construction, which is exactly why it belongs in the cleaning log rather than
+in your assumptions.
 :::
 
-## GIGO
+## Referral Spam and Ghost Traffic
 
-Garbage In, Garbage Out. The oldest principle in analytics and still the one
-that costs the most.
+Some hits never touched your site at all. Spammers send events directly to
+measurement IDs they have guessed or scraped, to get their domain to appear in
+your reports.
 
 . . .
 
-Your advantage in this module is unusual: **you are your own data source.** You
-can answer provenance questions about your site that no analyst can answer about
-a client's.
+Blocking referrers is whack-a-mole. **The durable defence is a hostname filter**:
+your real traffic always carries your own hostname, and ghost traffic almost
+never does.
 
 . . .
 
-Use it. By Lecture 17 you will be documenting cleaning decisions, and the
-students who know their own tagging history will finish that lecture in twenty
-minutes.
+Keep only rows where `hostname` is your domain. One rule, and it holds against
+spam you have not seen yet.
 
-## When Is Zero Not Zero?
+## Development and Test Events
 
-<!-- Speaker notes: this is the single most useful habit to install early. Take
-     the crime-map example if they need something outside marketing: a map of
-     police reports shows almost nothing on the university campus, because
-     campus crime is reported to a different force. The blank area is not
-     safety, it is a reporting boundary. -->
-
-Three different things arrive in your export looking identical:
-
-:::: {layout="[1,1,1]"}
-::: {#first-column}
-
-**A true zero**
-
-Nobody converted on Tuesday.
-
-:::
-
-::: {#second-column}
-
-**A missing value**
-
-The tag did not fire on Tuesday.
-
-:::
-
-::: {#third-column}
-
-**A boundary**
-
-Tuesday's visitors declined consent.
-
-:::
-::::
+The `generate_lead` events you will fire in Lecture 13 to prove the tag works
+are indistinguishable, in the export, from real enquiries.
 
 . . .
 
-Tableau will happily plot all three as a point at zero.
+Two defences, in order of preference:
+
+1. **Prevent**: use GA4's DebugView and the `debug_mode` parameter while testing,
+   so test hits are separable at source
+2. **Exclude**: drop every event before your launch date, and every event
+   matching your own test parameters
+
+. . .
+
+**Exclusion by date is the one almost everybody needs**, because almost nobody
+does the first one.
+
+# 2. Cleaning Without Lying
+
+## The Cardinal Rule
+
+<!-- Speaker notes: the difference between cleaning and fabrication is the
+     audit trail, not the operation. -->
+
+**Never modify the raw export.**
+
+. . .
+
+The raw file is evidence. It is read-only, it keeps the date you pulled it in its
+filename, and nothing ever writes to it.
+
+. . .
+
+Every exclusion is a **step in a script** that reads raw and writes clean. If the
+clean file is lost, you rerun the script. If somebody questions a number, you show
+them the step.
+
+. . .
 
 ::: {.callout-note appearance="minimal"}
-Which of the three would you be most likely to miss on your own site? What check
-would catch it?
+The difference between cleaning and fabricating is not the operation. Deleting
+rows is both. The difference is whether the reader can see that you did it.
 :::
 
-# 2. Getting Data Out of GA4
+## The Cleaning Log {.smaller}
 
-## Three Routes Out {.smaller}
+One table, kept alongside the script, and shipped with the analysis.
 
-| Route | Live? | Effort | Ceiling |
-|---|---|---|---|
-| Report export to CSV | No, a snapshot | Minutes | Thresholding, sampling, aggregated fields only |
-| Looker Studio connector | Yes | Low | Not Tableau, and not our tool |
-| BigQuery export | Yes, event-level | An afternoon of setup | Effectively none, free tier is ample |
-
-. . .
-
-**Our default is the CSV export**, because it is the one you can repeat weekly
-without help. We name BigQuery so you know the ceiling you are working under,
-and so you can say the word in an interview.
-
-::: {.callout-note appearance="minimal"}
-The CSV route gives you rows GA4 has already aggregated. BigQuery gives you one
-row per event. Which questions can only be asked at the second grain?
-:::
-
-## Data Thresholding
-
-GA4 withholds rows when the numbers are small enough to identify someone,
-particularly when Google Signals is on.
+| Rule | Rationale | Rows | Applied | By |
+|---|---|---|---|---|
+| `hostname != mysite.ie` | Ghost spam | 412 | 2026-01-14 | Me |
+| Sessions before 2025-10-02 | Pre-launch tag testing | 87 | 2026-01-14 | Me |
+| IP 10.x.x.x | My own machine | 233 | 2026-01-14 | Me |
+| Zero duration, one page | Bot signature | 51 | 2026-01-16 | Me |
 
 . . .
 
-The rows do not appear with a warning. They simply are not there, and your
-totals will not reconcile.
+**Rows removed is not optional.** A rule with no count is a claim; a rule with a
+count is a fact somebody else can check.
+
+## Reproducible Cleaning
+
+```
+data/
+  raw/ga4_export_2026-01-14.csv        <- never edited
+  clean/sessions_clean.csv             <- output, regenerable
+notebooks/
+  01_clean.ipynb                       <- raw in, clean out, prose throughout
+  02_analyse.ipynb                     <- reads clean only
+```
 
 . . .
 
-**On a portfolio site with 40 sessions a week, this is not an edge case.** It is
-the normal case. Check the data-quality icon on every report you export.
-
-## The Export You Will Use {.smaller}
-
-Reports → Acquisition → Traffic acquisition, then Share → Download CSV.
-
-Set before exporting:
-
-1. **Date range**: from your site's first tagged day to yesterday. Not "last 28
-   days", which will silently change meaning every week you re-export.
-2. **Dimensions**: session source / medium, session campaign, device category,
-   country, landing page.
-3. **Metrics**: sessions, engaged sessions, average engagement time, key events,
-   session key event rate.
-4. **Rows**: raise the row limit. The default truncates and does not tell you.
+The cleaning notebook does one job and says why at every step, in the prose cells
+you have been writing since Lecture 6.
 
 . . .
 
-Save every export with the date you pulled it in the filename. You will re-pull,
-and you will need to know which is which.
+**The test: delete `clean/` and rerun. If you cannot get the same file back, you
+do not have a pipeline, you have a memory.**
 
-# 3. Grain, Dimensions and Measures
+## Judgement Calls Are Not Errors {.smaller}
 
-## Say the Grain Out Loud
+Two competent analysts, given the same export, will disagree about:
 
-**The grain is what one row is.** Before any chart, finish this sentence: "one
-row in this table is one ______".
-
-. . .
-
-GA4 gives you at least three grains, and mixes them freely in the interface:
-
-- **User level**: one row per person (as far as a cookie can tell)
-- **Session level**: one row per visit
-- **Event level**: one row per thing that happened
+- Whether a 3-second session is a bounce or a bot
+- Whether the viral outlier belongs in the average
+- Where the launch date really was
+- Whether to exclude a whole country or accept the noise
 
 . . .
 
-Nearly every wrong number in a marketing dashboard is a metric from one grain
-divided by a metric from another.
-
-::: {.callout-note appearance="minimal"}
-"Conversion rate" is a ratio. Name three different numbers that phrase could
-mean on your own site, depending on the grain of the numerator and denominator.
-:::
-
-## Dimensions and Measures, in GA4 Columns {.smaller}
-
-Lecture 2 split every column into **dimensions** (blue, categorical, they slice)
-and **measures** (green, continuous, they aggregate). Your export is the first
-time that split has real consequences.
-
-:::: {layout="[1,1]"}
-::: {#first-column}
-
-**Dimensions here**
-
-`sessionSource`, `deviceCategory`, `country`, `landingPage`
-
-:::
-
-::: {#second-column}
-
-**Measures here**
-
-`sessions`, `keyEvents`, `engagedSessions`
-
-:::
-::::
+**None of those disagreements is a mistake.** Analysis is full of defensible
+choices, and pretending otherwise is how people end up hiding them.
 
 . . .
 
-Tableau still guesses from the data type alone, so a postcode becomes a measure
-and it offers you the average postcode. **The GA4 export adds a worse case**,
-which is the next slide.
+What is not acceptable is that the reader cannot tell which choice you made.
+**Documented judgement beats undocumented certainty**, which is the sentence this
+module opened with in Lecture 1.
 
-## The Fields That Are Already Aggregated {.smaller}
-
-| GA4 field | Tableau's guess | What it actually is |
-|---|---|---|
-| `sessions` | Measure | A count. Safe to sum |
-| `keyEvents` | Measure | A count. Safe to sum |
-| `averageSessionDuration` | Measure | **Already a mean.** Never sum, never average |
-| `sessionKeyEventRate` | Measure | **Already a ratio.** Never average |
-| `deviceCategory` | Dimension | Correct |
-
-. . .
-
-**You cannot average an average.** Averaging the mean session duration of mobile
-and desktop gives every device equal weight regardless of how many sessions each
-had.
-
-## The Trap, With Numbers {.smaller}
-
-:::: {layout="[1,1]"}
-::: {#first-column}
-
-| Device | Sessions | Mean duration |
-|---|---|---|
-| Mobile | 900 | 30s |
-| Desktop | 100 | 300s |
-
-:::
-
-::: {#second-column}
-
-**Averaging the averages**
-
-(30 + 300) / 2 = **165s**
-
-**The true mean**
-
-(900×30 + 100×300) / 1000 = **57s**
-
-:::
-::::
-
-. . .
-
-A factor of three, from one plausible-looking drag and drop.
-
-::: {.callout-note appearance="minimal"}
-The fix is to export a numerator and a denominator and divide them in Tableau,
-never to export the ratio. What does that mean for the export you set up in
-part 2?
-:::
-
-<!-- Speaker notes: this slide is the whole point of the lecture. If they take
-     one thing away, it is "export counts, not rates". Lecture 3 then attacks
-     the mean itself. -->
-
-# 4. First Views
-
-## Live Demo {background="#43464B"}
-
-1. Connect to the CSV. Watch Tableau assign blue and green, and fix two of them
-2. Sessions over time, week not day, so the shape is visible at portfolio volume
-3. Break by channel. Note the long tail
-4. Break by device. Add the session count as a label next to every rate
-5. Break by landing page, and find a page nobody has ever landed on
+# 3. Practice
 
 ## Exercise {background="#43464B"}
 
-Connect Tableau to your own export and build:
+On Loomrow's GA4 export from Lecture 9:
 
-1. Sessions over time
-2. Sessions by device category, **with counts shown beside every rate**
-3. Sessions by source / medium
-4. State the grain of your table in one sentence, written down
-5. One view that surprised you, with a sentence saying why
+1. Find the bot traffic and the PayPal sessions, and write the rule for each
+2. Write the cleaning steps as pandas lines, from the raw export to a clean table
+3. Produce a cleaning log with at least three documented rules
+4. Report the conversion rate before and after cleaning, and explain the gap
 
-**25 minutes**
-
-# 5. AI for Getting Data Out
-
-## AI This Block: Chat with context
-
-Where we are on the module's AI spine, set out in Lecture 1 and named properly
-in Lecture 12:
-
-> **Chat with context**
-
-## Attach the Export, Not a Description of It
-
-This block's step on the AI spine: **stop describing your data and start
-attaching it.**
-
-. . .
-
-A description of your data is your model of your data. Attaching the file
-removes your model from the loop, which is the point, because your model is what
-you are trying to check.
-
-## A Prompt Worth Reusing
-
-> "Here are the first 20 rows of a GA4 export [attached]. Tell me the grain of
-> this table, which columns are dimensions and which are measures, and which
-> measures are already averages or rates that I must not aggregate again."
-
-. . .
-
-Then the follow-up that does the real work:
-
-> "Which of the columns you just called measures would give a wrong answer if I
-> summed it, and what should I export instead?"
-
-## Where It Will Be Wrong
-
-- It will not know your thresholding. It sees rows, not the rows that were
-  withheld
-- It will read `sessionKeyEventRate` correctly and `conversion_rate_v2`, which
-  you named yourself, however it likes
-- It will infer the grain from the columns. If your export mixes grains, it will
-  confidently pick one
-
-::: {.callout-note appearance="minimal"}
-Verification here is not reading its answer and nodding. It is checking one
-column against the GA4 reference, and one row against your own site. Which row
-would you check?
+::: {#timer1 .timer seconds="1800"}
 :::
+
+# 4. AI and the Audit Trail
+
+## AI This Block: Agentic coding
+
+Where we are on the module's AI spine, introduced in Lecture 10:
+
+> **Agentic coding.** It writes and runs the analysis. You decide what counts as
+> clean.
+
+## AI-Written Steps Are Still Your Steps
+
+An agent will happily write you fifteen cleaning rules in four seconds, and most
+of them will be reasonable.
+
+. . .
+
+**The log does not care who wrote the rule.** Every exclusion still needs a
+rationale in your own words, and a row count you have looked at.
+
+. . .
+
+The specific risk here: an agent's rules are plausible in general and wrong about
+**your** data. It does not know that Loomrow changed its link in bio on
+1 October 2025, or that paypal.com is a payment page and not a partner.
+
+## The Extra Column {.smaller}
+
+One more column on the template from section 2, and it is the one an examiner
+will look for.
+
+| Rule | Rationale | Rows | Applied | Source |
+|---|---|---|---|---|
+| Exclude `hostname != mysite.ie` | Ghost spam | 412 | 2026-01-14 | Written by me |
+| Exclude sessions under 1s | Bot signature | 88 | 2026-01-14 | Agent-suggested, verified |
+| Exclude `country = 'Vietnam'` | — | — | — | **Agent-suggested, rejected** |
+
+. . .
+
+The rejected row stays in the log. **A rule you declined is part of the trail**,
+and it is often the most interesting line on the page.
+
+## The Rule
+
+An agent may **propose** an exclusion. Only you may **accept** one.
+
+. . .
+
+Acceptance means you can finish this sentence without looking anything up:
+
+> *I removed these rows because ______, and I know it removed ______ rows.*
+
+. . .
+
+**If you cannot, the rule does not go in**, however sensible it looked.
 
 ## Exercise {background="#43464B"}
 
-1. Attach your export and run the prompt above
-2. Check its answer against the GA4 dimension and metric reference
-3. Note any column it misclassified, and whether the misclassification would
-   have changed a number
-4. Ask it what is missing from the export that you would need to compute
-   conversion rate correctly
+1. Ask an agent to propose cleaning rules for Loomrow's export
+2. Accept the ones you can justify, reject the rest
+3. Record the rejected ones and your reason, which is also part of the trail
 
-**10 minutes**
-
-## Going Further
-
-- Google, *GA4 Dimensions and metrics reference* — the authority on which fields
-  are already aggregated
-- Google, *Data thresholding in GA4* — read this before you reconcile totals
-- *Analytics Academy: Digital Analytics Fundamentals* — the in-class test is
-  based on this, and lectures 9 to 11 cover its ground
+::: {#timer2 .timer seconds="900"}
+:::
 
 ## Next Lecture
 
-You now have your own data, in a file, in a tool you already know.
-
-. . .
-
-Block 3 opens by naming the thing you have been using informally since Lecture 1,
-and setting out how to check it.
-
-**Prepare**: bring your export, and one number from it you are not sure you
-trust.
+Semester 2 opens by building your own site, so that the next export you clean
+is yours.

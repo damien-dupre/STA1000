@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="lecture_06_files/libs/clipboard/clipboard.min.js"></script>
+<script src="lecture_06_files/libs/quarto-html/tabby.min.js"></script>
+<script src="lecture_06_files/libs/quarto-html/popper.min.js"></script>
+<script src="lecture_06_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="lecture_06_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="lecture_06_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="lecture_06_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="lecture_06_files/libs/quarto-contrib/quarto-timer-1.0.0/timer.js"></script>
+<link href="lecture_06_files/libs/quarto-contrib/quarto-timer-1.0.0/timer.css" rel="stylesheet">
+<link href="lecture_06_files/libs/quarto-contrib/fontawesome6-1.2.0/all.min.css" rel="stylesheet">
+<link href="lecture_06_files/libs/quarto-contrib/fontawesome6-1.2.0/latex-fontsize.css" rel="stylesheet"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.8.25">
+
+  <meta name="author" content="Damien Dupré">
+  <title>Lecture 6: Visualisation for Stakeholders</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="lecture_06_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="lecture_06_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="lecture_06_files/libs/revealjs/dist/theme/quarto-8ff52f0e31ad5c532cba6b018e3cb49b.css">
+  <link href="lecture_06_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="lecture_06_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="lecture_06_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="lecture_06_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" data-background-iframe="colored-particles/index.html" class="quarto-title-block center">
+  <h1 class="title">Lecture 6: Visualisation for Stakeholders</h1>
+  <p class="subtitle">STA1000 - Data Analytics and Metrics</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Damien Dupré 
+</div>
+</div>
+</div>
+
+</section>
+<section id="previously" class="slide level2">
+<h2>Previously …</h2>
+<p>Lecture 4 gave you five principles: honest axes, easy reading, restraint, colour that means something, details that are right. Those keep a chart from being wrong.</p>
+<div class="fragment">
+<p>They do not make it <strong>land</strong>. You have views that answer your questions; a client has different questions, and about ninety seconds of attention.</p>
+</div>
+</section>
+<section id="learning-outcomes" class="slide level2">
+<h2>Learning Outcomes</h2>
+<p>By the end of this lecture you will be able to:</p>
+<ul>
+<li>Distinguish an analyst’s view from a client’s view, and build both</li>
+<li>Apply the ranking of visual channels to a marketing chart</li>
+<li>Identify the standard ways a chart misleads, deliberately or otherwise</li>
+<li>Critique a real marketing dashboard, and survive having yours critiqued</li>
+</ul>
+</section>
+<section>
+<section id="what-a-chart-is-for" class="title-slide slide level1 center">
+<h1>1. What a Chart Is For</h1>
+
+</section>
+<section id="why-we-bother" class="slide level2">
+<h2>Why We Bother</h2>
+<ul>
+<li>Humans are extremely good at reading visual patterns and poor at reading tables</li>
+<li>Charts reveal properties of the data nobody thought to test for</li>
+<li>They are understandable to non-specialists, which is most of the people who make decisions</li>
+<li>They are a <em>lingua franca</em> across functions: finance, product and marketing can argue over the same chart</li>
+</ul>
+<div class="fragment">
+<p><strong>A chart succeeds when it raises the next question.</strong> “I wonder why that is” is the sound of someone accepting the fact and moving to the explanation.</p>
+<div class="callout callout-note no-icon callout-style-simple">
+<div class="callout-body">
+<div class="callout-content">
+<p>Charts rarely settle an argument on their own. If a chart will not settle it, what is it for?</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="what-excellence-looks-like" class="slide level2 smaller">
+<h2>What Excellence Looks Like</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/external/smm635_graphical_excellence.png" height="255"></p>
+<figcaption>Source: <a href="https://github.com/simoneSantoni/data-viz-smm635">SMM635 Data Visualisation, Bayes Business School</a></figcaption>
+</figure>
+</div>
+<p><em>Ideas, ink, space, time. A good chart spends the least ink on the fewest ideas that carry the point.</em></p>
+</section>
+<section id="one-dataset-many-charts" class="slide level2">
+<h2>One Dataset, Many Charts</h2>
+<p>The same small dataset can be drawn a hundred different ways, each emphasising a different comparison.</p>
+<div class="fragment">
+<p>One shows change over time within a country. One shows the ranking at a single date. One shows regional grouping. One shows one country overtaking another.</p>
+</div>
+<div class="fragment">
+<p><strong>None of them is dishonest. They answer different questions.</strong> The choice of which comparison to foreground is the analyst’s, and it is rarely visible to the audience.</p>
+</div>
+</section>
+<section id="one-dataset-six-charts" class="slide level2 smaller">
+<h2>One Dataset, Six Charts</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/external/mgt100_one_dataset_six_charts.png" height="350"></p>
+<figcaption>Source: <a href="https://github.com/kennethcwilbur/mgt100">MGT 100 Customer Analytics, UC San Diego</a> (CC BY 4.0)</figcaption>
+</figure>
+</div>
+<p><em>World Heritage sites in three countries, 2004 and 2022. Each chart makes a different comparison easy and the others hard.</em></p>
+</section>
+<section id="each-chart-makes-one-point" class="slide level2">
+<h2>Each Chart Makes One Point</h2>
+<p>Graphics journalists work to a hard rule: <strong>one chart, one point, obvious how to read it.</strong></p>
+<p>In practice, most good charts say one of four things:</p>
+<ol type="1">
+<li>The number went up or down recently</li>
+<li>The number moved when something happened</li>
+<li>One line, or one group of lines, diverges from the rest</li>
+<li>The distribution has two lumps rather than one</li>
+</ol>
+<div class="fragment">
+<p>Scientific and analyst charts are often the opposite: four variables, six symbols, and the explanation two pages away.</p>
+<div class="callout callout-note no-icon callout-style-simple">
+<div class="callout-body">
+<div class="callout-content">
+<p>Take the chart you brought. Which of the four points does it make? If it makes two, which one loses?</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="the-four-points-a-chart-usually-makes" class="slide level2 smaller">
+<h2>The Four Points a Chart Usually Makes</h2>
+<div class="columns" style="gap:0px;">
+<div class="column" style="width:50%;line-height:0;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/external/mgt100_merrill_number_goes_up.png" class="quarto-figure quarto-figure-center" height="200"></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/external/mgt100_merrill_lines_diverge.png" class="quarto-figure quarto-figure-center" height="200"></p>
+</figure>
+</div>
+</div><div class="column" style="width:50%;line-height:0;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/external/mgt100_merrill_event.png" class="quarto-figure quarto-figure-center" height="200"></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/external/mgt100_merrill_bimodal.png" class="quarto-figure quarto-figure-center" height="200"></p>
+</figure>
+</div>
+</div></div>
+<div style="font-size:0.5em;">
+<p>Number goes up, lines diverge, something happened, the distribution is bimodal. Jeremy Merrill, Washington Post, via <a href="https://github.com/kennethcwilbur/mgt100">MGT 100 Customer Analytics, UC San Diego</a> (CC BY 4.0)</p>
+</div>
+</section></section>
+<section>
+<section id="two-audiences" class="title-slide slide level1 center">
+<h1>2. Two Audiences</h1>
+
+</section>
+<section id="what-an-analyst-needs" class="slide level2">
+<h2>What an Analyst Needs</h2>
+<ul>
+<li>Detail, at the grain the question lives at</li>
+<li>Uncertainty made visible</li>
+<li>The ability to drill down and check</li>
+<li>Access to the raw rows when something looks wrong</li>
+<li>Ugly is fine. Fast is better</li>
+</ul>
+</section>
+<section id="what-a-client-needs" class="slide level2">
+<h2>What a Client Needs</h2>
+<ul>
+<li>One number, its direction, and what to do about it</li>
+<li>The comparison that makes the number mean something</li>
+<li>The caveat, once, in words</li>
+<li>No vocabulary they have to learn to read the chart</li>
+</ul>
+<div class="fragment">
+<p><strong>These are not the same chart with different formatting.</strong> They are usually different charts, and the analyst’s chart is the one that produced the client’s.</p>
+</div>
+</section>
+<section id="the-title-does-the-work" class="slide level2 smaller">
+<h2>The Title Does the Work</h2>
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<p><strong>Analyst title</strong></p>
+<p>“Sessions by source / medium, weekly, 2026-01 to 2026-03”</p>
+<p>Describes the fields.</p>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<p><strong>Client title</strong></p>
+<p>“Referral traffic has replaced search as our main source since February”</p>
+<p>States the finding.</p>
+</div>
+</div>
+</div>
+<div class="fragment">
+<p>If you cannot write the second title, you have not finished the analysis. The chart is not the deliverable, the sentence is.</p>
+<!-- Speaker notes: make them do this live for one chart each. It is the single
+     highest-yield change in the whole lecture and it takes thirty seconds per
+     chart. It also exposes charts that do not have a finding, which is the more
+     valuable diagnosis. -->
+</div>
+</section>
+<section id="a-title-that-does-the-work" class="slide level2 smaller">
+<h2>A Title That Does the Work</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/external/mgt100_title_does_the_work.png" height="350"></p>
+<figcaption>Source: <a href="https://github.com/kennethcwilbur/mgt100">MGT 100 Customer Analytics, UC San Diego</a> (CC BY 4.0)</figcaption>
+</figure>
+</div>
+<p><em>You know the finding before you have read a single axis label.</em></p>
+</section></section>
+<section>
+<section id="encoding" class="title-slide slide level1 center">
+<h1>3. Encoding</h1>
+
+</section>
+<section id="the-ranking-of-visual-channels" class="slide level2 smaller">
+<h2>The Ranking of Visual Channels</h2>
+<p>Cleveland and McGill established, experimentally, how accurately people read quantities from different visual channels. Best to worst:</p>
+<ol type="1">
+<li><strong>Position</strong> along a common scale</li>
+<li><strong>Position</strong> along non-aligned scales</li>
+<li><strong>Length</strong></li>
+<li><strong>Angle</strong> and slope</li>
+<li><strong>Area</strong></li>
+<li><strong>Volume</strong>, curvature</li>
+<li><strong>Colour</strong> hue, saturation</li>
+</ol>
+<div class="fragment">
+<p>Everything above the line in a good chart is doing its work with the top three.</p>
+<div class="callout callout-note no-icon callout-style-simple">
+<div class="callout-body">
+<div class="callout-content">
+<p>A pie chart encodes quantity as angle and area, positions four and five. What does it buy in exchange for that cost, and when is the trade worth it?</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="chart-choice-by-question" class="slide level2">
+<h2>Chart Choice by Question</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Question</th>
+<th>Chart</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>How has it changed?</td>
+<td>Line</td>
+</tr>
+<tr class="even">
+<td>How do categories compare?</td>
+<td>Bar, sorted by value not alphabetically</td>
+</tr>
+<tr class="odd">
+<td>What is the distribution?</td>
+<td>Histogram, or box plot for comparisons</td>
+</tr>
+<tr class="even">
+<td>What is the composition?</td>
+<td>Stacked bar, rarely a pie</td>
+</tr>
+<tr class="odd">
+<td>Where does it drop off?</td>
+<td>Funnel, with counts at every step</td>
+</tr>
+<tr class="even">
+<td>Is there a relationship?</td>
+<td>Scatter, with the n stated</td>
+</tr>
+</tbody>
+</table>
+<div class="fragment">
+<p><strong>Start from the question, not from the chart menu.</strong> Tableau’s Show Me panel inverts that order, which is why it is so easy to produce a beautiful chart of nothing.</p>
+</div>
+</section>
+<section id="the-data-ink-ratio" class="slide level2">
+<h2>The Data-Ink Ratio</h2>
+<p>Tufte’s principle: <strong>maximise the share of ink that represents data.</strong></p>
+<div class="fragment">
+<p>Remove, in this order: 3D effects, background fills, heavy gridlines, borders, redundant legends, decorative images, drop shadows.</p>
+</div>
+<div class="fragment">
+<p>Add back only what a reader needs to decode the chart. The test is subtraction: delete an element and see whether the chart still works.</p>
+</div>
+</section>
+<section id="the-data-ink-ratio-concretely" class="slide level2 smaller">
+<h2>The Data-Ink Ratio, Concretely</h2>
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><strong>Default</strong></p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/external/smm635_scatter_traditional.png" class="quarto-figure quarto-figure-center"></p>
+</figure>
+</div>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><strong>Same data, less ink</strong></p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/external/smm635_scatter_tufte.png" class="quarto-figure quarto-figure-center"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div style="font-size:0.55em;text-align:center;">
+<p>Source: <a href="https://github.com/simoneSantoni/data-viz-smm635">SMM635 Data Visualisation, Bayes Business School</a></p>
+</div>
+<p><em>The right-hand version deletes the frame and spends the freed ink on the marginal distributions. Nothing was lost.</em></p>
+</section>
+<section id="chart-junk-and-its-modern-forms" class="slide level2">
+<h2>Chart Junk, and Its Modern Forms</h2>
+<p>The 1980s version was 3D bars and a picture of a duck. The current version is subtler:</p>
+<ul>
+<li>A rainbow palette on an ordered variable</li>
+<li>Colour used to encode a category <strong>and</strong> decorate the background</li>
+<li>Animated transitions between states nobody asked to compare</li>
+<li>An interactive filter for a dimension with two values</li>
+<li>A dashboard with eleven tiles, because there were eleven metrics</li>
+</ul>
+<div class="fragment">
+<p><strong>Every element on a dashboard competes for attention with every other.</strong> That is the cost, and it is paid by the reader.</p>
+</div>
+</section>
+<section id="the-duck" class="slide level2 smaller">
+<h2>The Duck</h2>
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><strong>A building shaped like a duck</strong></p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/external/smm635_big_duck.png" class="quarto-figure quarto-figure-center"></p>
+</figure>
+</div>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><strong>A chart shaped like a duck</strong></p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/external/smm635_duck_chart.png" class="quarto-figure quarto-figure-center"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div style="font-size:0.55em;text-align:center;">
+<p>Source: <a href="https://github.com/simoneSantoni/data-viz-smm635">SMM635 Data Visualisation, Bayes Business School</a></p>
+</div>
+<p><em>Tufte’s term. When the decoration becomes the structure, the chart is the duck.</em></p>
+</section>
+<section id="honest-charting-five-rules" class="slide level2">
+<h2>Honest Charting: Five Rules</h2>
+<ol type="1">
+<li>Start axes at zero, or say clearly that you have not</li>
+<li>Show all the relevant data and label it accurately</li>
+<li>Bin, smooth and aggregate judiciously, and say which you did</li>
+<li>Show uncertainty when it would change the reading</li>
+<li>Cite the source, including the date you pulled it</li>
+</ol>
+<div class="fragment">
+<p><strong>A misleading chart can indicate bad faith.</strong> Two goals here: not being misread, and spotting when someone else is misleading you.</p>
+<div class="callout callout-note no-icon callout-style-simple">
+<div class="callout-body">
+<div class="callout-content">
+<p>Rule 1 has a genuine exception: a series where the interesting variation is 2% of the level. How do you take the exception honestly?</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="the-standard-failures" class="slide level2">
+<h2>The Standard Failures</h2>
+<ul>
+<li><strong>Truncated axis</strong> on a bar chart, which turns a 3% difference into a landslide</li>
+<li><strong>Dual axes</strong>, which let you manufacture any crossing point you like by choosing the scales</li>
+<li><strong>Colour as the only encoding</strong>, which fails for about 8% of men</li>
+<li><strong>Pie with nine slices</strong>, which is a sorted bar chart wearing a disguise</li>
+<li><strong>A rate with no denominator</strong>, which is Lecture 5, again, forever</li>
+</ul>
+</section>
+<section id="a-famous-failure-and-its-repair" class="slide level2 smaller">
+<h2>A Famous Failure, and Its Repair</h2>
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><strong>As published</strong></p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/external/smm635_fuel_economy.png" class="quarto-figure quarto-figure-center"></p>
+</figure>
+</div>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><strong>As it should have been</strong></p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/external/smm635_fuel_economy_redo.png" class="quarto-figure quarto-figure-center"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div style="font-size:0.55em;text-align:center;">
+<p>Source: <a href="https://github.com/simoneSantoni/data-viz-smm635">SMM635 Data Visualisation, Bayes Business School</a></p>
+</div>
+<p><em>A 53% increase in fuel economy standards drawn as a 783% increase in line length. The redraw uses the same numbers.</em></p>
+</section></section>
+<section>
+<section id="critique" class="title-slide slide level1 center">
+<h1>4. Critique</h1>
+
+</section>
+<section id="live-critique" class="slide level2" data-background="#43464B">
+<h2>Live Critique</h2>
+<p>Two real dashboards on screen: the GA4 default home, and one agency or Looker Studio gallery template.</p>
+<p>For each, as a room:</p>
+<ol type="1">
+<li>Who is the audience, judging only by what is on it?</li>
+<li>What decision could it support?</li>
+<li>Which tile would you delete first, and what would you notice sooner?</li>
+<li>Which number on it has no denominator?</li>
+</ol>
+</section>
+<section id="exercise" class="slide level2" data-background="#43464B">
+<h2>Exercise</h2>
+<p>In pairs:</p>
+<ol type="1">
+<li>Take one chart from your own Tableau workbook</li>
+<li>Rewrite its title as a finding rather than a field name</li>
+<li>Redesign it for a client rather than for yourself</li>
+<li>Swap with your partner and critique theirs against the channel ranking and the five honesty rules</li>
+<li>List the three changes that most improved it</li>
+</ol>
+<p><strong>25 minutes</strong></p>
+</section></section>
+<section>
+<section id="ai-as-a-design-critic" class="title-slide slide level1 center">
+<h1>5. AI as a Design Critic</h1>
+
+</section>
+<section id="ai-this-block-chat-with-context" class="slide level2">
+<h2>AI This Block: Chat with context</h2>
+<p>Where we are on the module’s AI spine, set out in Lecture 1 and named properly in Lecture 12:</p>
+<blockquote>
+<p><strong>Chat with context</strong></p>
+</blockquote>
+</section>
+<section id="paste-the-chart-ask-what-is-wrong" class="slide level2">
+<h2>Paste the Chart, Ask What Is Wrong</h2>
+<p>Screenshot critique is one of the strongest uses of a multimodal assistant, because the encoding rules are explicit, well documented and heavily written about.</p>
+<blockquote>
+<p>“Here is a chart from my dashboard [screenshot]. Critique it against the Cleveland and McGill ranking of visual channels. Say specifically what a non-technical client would misread, and what they would conclude that the data does not support.”</p>
+</blockquote>
+<div class="fragment">
+<p>The last clause matters. “Critique this chart” gets you a list of tidying. “What would they wrongly conclude” gets you the failure.</p>
+</div>
+</section>
+<section id="two-more-prompts-worth-keeping" class="slide level2">
+<h2>Two More Prompts Worth Keeping</h2>
+<blockquote>
+<p>“Rewrite this chart title as a finding rather than a field name. Give me three versions at different levels of confidence.”</p>
+</blockquote>
+<div class="fragment">
+<blockquote>
+<p>“What would a CFO ask when they see this? What would a marketing manager ask? Which of those questions can this chart answer?”</p>
+</blockquote>
+</div>
+<div class="fragment">
+<p>The three-confidence-levels trick is useful because it forces you to choose how strong a claim your data supports, rather than defaulting to the strongest phrasing that sounds fine.</p>
+</div>
+</section>
+<section id="what-it-cannot-see" class="slide level2">
+<h2>What It Cannot See</h2>
+<ul>
+<li>Whether the finding is <strong>true</strong>. It is critiquing an image, not your data</li>
+<li>Whether the comparison is the one your client cares about</li>
+<li>Whether the number has a denominator, unless the denominator is on the chart</li>
+<li>Your audience, unless you describe them, and it will not ask</li>
+</ul>
+<div class="callout callout-note no-icon callout-style-simple">
+<div class="callout-body">
+<div class="callout-content">
+<p>It will make your chart prettier and more conventional. Under what circumstances is “more conventional” the wrong direction?</p>
+</div>
+</div>
+</div>
+</section>
+<section id="exercise-1" class="slide level2" data-background="#43464B">
+<h2>Exercise</h2>
+<ol type="1">
+<li>Screenshot one of your charts (<i class="fa-brands fa-windows" aria-label="windows"></i> <kbd>⊞ Win</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd>, <i class="fa-brands fa-apple" aria-label="apple"></i> <kbd>⌘ Cmd</kbd> + <kbd>⇧ Shift</kbd> + <kbd>4</kbd>) and ask for a critique</li>
+<li>Apply the two changes you agree with</li>
+<li>Note one piece of its advice you rejected, and why</li>
+<li>Ask it to rewrite the title at three confidence levels, and pick the one your data supports</li>
+</ol>
+<p><strong>15 minutes</strong></p>
+</section>
+<section id="going-further" class="slide level2">
+<h2>Going Further</h2>
+<ul>
+<li>Cleveland and McGill (1984), <em>Graphical Perception</em> — the source of the ranking, and it is readable</li>
+<li>Tufte, <em>The Visual Display of Quantitative Information</em> — ch.&nbsp;2 on graphical integrity, ch.&nbsp;4 on data-ink</li>
+<li>Cairo, <em>The Functional Art</em> — the design process framework, and the best bridge between journalism and analysis</li>
+<li>Wilke, <em>Fundamentals of Data Visualization</em> — free online, and the practical reference you will actually keep open</li>
+</ul>
+</section>
+<section id="next-lecture" class="slide level2">
+<h2>Next Lecture</h2>
+<p>Block 3 begins. We move to Python for the analyses Tableau makes awkward, and we stop and name what we are doing with AI.</p>
+<p><strong>Prepare</strong>: nothing to build. Come with the question about AI you have been not asking.</p>
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="lecture_06_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="lecture_06_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="lecture_06_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="lecture_06_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="lecture_06_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="lecture_06_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="lecture_06_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="lecture_06_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="lecture_06_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="lecture_06_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: true,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

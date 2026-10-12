@@ -5,9 +5,9 @@ project:
 
 author: "Damien Dupré"
 
-# Uncomment when a deck contains executable {python} chunks.
+# Lectures 6 to 9 run their Python when they render: each sets
+# `jupyter: python3` in its own header, so the other decks start no kernel.
 # Code shown for reading uses ```{.python}, which needs no kernel.
-# jupyter: python3
 
 filters:
   - timer

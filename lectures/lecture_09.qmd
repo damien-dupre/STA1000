@@ -1,438 +1,446 @@
 ---
-title: "Lecture 9: Measurement Plan and Implementation"
+title: "Lecture 9: Python IV - A GA4 Export"
 subtitle: STA1000 - Data Analytics and Metrics
+jupyter: python3
+filters:
+  - timer
 ---
+
+```{python}
+#| include: false
+# The slides read the repository copies of the data; students read the files they
+# uploaded to Colab, which is the code shown on the slides.
+import pandas as pd
+import matplotlib.pyplot as plt
+pd.set_option("display.max_columns", 8)
+pd.set_option("display.max_rows", 12)
+plt.rcParams["figure.figsize"] = (8, 2.9)
+plt.rcParams["figure.dpi"] = 110
+ga4 = pd.read_csv("../data/ga4/ga4-export.csv", comment="#")
+insta = pd.read_csv("../data/insta-data.csv")
+```
 
 ## Previously ...
 
-You have:
+- In Lecture 8 you drew the grouped tables of Lecture 7 as figures that state a finding, saved them, and asked an AI for a second opinion.
 
-- A site, or nearly one
-- A statement of what success would look like
+**Today, three questions:**
 
-. . .
+1. What does a **GA4 export** look like, and how do you read it?
+2. Which **channels, devices and countries** bring visits, and sales?
+3. What changed **over time**, and does GA4 agree with **Meta**?
 
-Today we turn that sentence into machinery: a measurement plan, a GA4 property,
-events, key events and UTM tags.
+## Loomrow's Website, in GA4
 
-. . .
+Loomrow sells online, and its shop is tracked with **Google Analytics 4** (GA4). Every visit is a **session**, recorded with where it came from, the device, the country, and what happened: an add to cart, a checkout, a purchase.
 
-**By the end of today your site will be recording data.**
-
-## Learning Outcomes
-
-By the end of this lecture you will be able to:
-
-- Write a measurement plan that connects an objective to a recorded event
-- Create and configure a GA4 property
-- Define custom events with parameters, and mark key events
-- Tag inbound links with UTM parameters consistently
-
-# 1. The Measurement Plan
-
-## Plan Before Tag
-
-The most common failure in marketing analytics is tagging first.
+`ga4-export.csv`: 1 January 2025 to 24 June 2026, the period of `insta-data.csv`.
 
 . . .
 
-You end up with 200 events, no idea which matter, and a report nobody reads.
+In Semester 2, your own site's GA4 data comes out as a file like this one, with your own visitors in it. Today you learn to read it on Loomrow's, which has eighteen months of them.
+
+## Today's Notebook
+
+A new notebook, `STA1000 Lecture 9`. From Loop, upload `ga4-export.csv` and `insta-data.csv`, then:
+
+```{.python}
+import pandas as pd
+ga4 = pd.read_csv("ga4-export.csv")
+```
 
 . . .
 
-**The measurement plan is one page. It is written before you touch GA4.**
+```
+ParserError: Error tokenizing data. C error: Expected 1 fields in line 3, saw 4
+```
 
-## The Structure
+Read the last line: pandas expected one column and found four. Something is wrong with the **top of the file**.
 
-Each row goes: objective, question, metric, event, parameter.
+# 1. Read a GA4 Export
 
-| Objective | Question | Metric | Event | Parameters |
-|---|---|---|---|---|
-| Get enquiries | Are people contacting me? | Enquiries / week | `generate_lead` | `form_location` |
-| Show work | Is anyone reading case studies? | Engaged reads | `read_case_study` | `case_id`, `scroll_pct` |
-| Reach | Where do visitors come from? | Sessions by channel | (automatic) | `source`, `medium` |
+## The First Lines Are Notes
 
-## Working Backwards
+Open the file in a text editor, or in the Files panel of Colab:
 
-The plan is written right to left in practice:
+```
+# ----------------------------------------
+# Loomrow - GA4
+# Sessions by date, source / medium, campaign, device and country
+# ----------------------------------------
+#
+# Start date: 20250101
+# End date: 20260624
+Date,Session default channel group,Session source / medium,Session campaign,...
+20250101,Organic Search,google / organic,(organic),mobile,Ireland,18,13,78.93,...
+```
 
-. . .
+GA4 writes a few lines of notes above the table, each starting with `#`. pandas took the first line for the header.
 
-1. Start with the **decision** you want to support
-2. State the **question** that decision turns on
-3. Choose the **metric** that answers it
-4. Identify the **event** that produces the metric
-5. List the **parameters** you need to slice it
+## Skip the Notes
 
-. . .
+```{.python}
+ga4 = pd.read_csv("ga4-export.csv", comment="#")
+```
 
-If you cannot get from a proposed event back to a decision, do not implement it.
+```{python}
+ga4.shape
+```
 
-## Objectives Are Not Metrics
+```{python}
+#| include: false
+pd.set_option("display.max_columns", 5)
+```
+
+```{python}
+ga4.head(3)
+```
+
+```{python}
+#| include: false
+pd.set_option("display.max_columns", 8)
+```
+
+`comment="#"` tells pandas to skip every line that starts with `#`. Lecture 2's lesson again: **look at the file before you read it**.
+
+## Rename the Columns
+
+GA4's names have spaces and capitals: `ga4["Session default channel group"]` is a lot to type, and easy to mistype. Rename once, at the top:
+
+```{python}
+ga4 = ga4.rename(columns={
+    "Date": "date", "Session default channel group": "channel",
+    "Session source / medium": "source_medium", "Session campaign": "campaign",
+    "Device category": "device", "Country": "country", "Sessions": "sessions",
+    "Engaged sessions": "engaged_sessions",
+    "Average engagement time per session": "avg_engagement_time",
+    "Add to carts": "add_to_carts", "Checkouts": "checkouts",
+    "Ecommerce purchases": "purchases", "Purchase revenue": "revenue"})
+```
+
+`{"old name": "new name", ...}` is a **dictionary**: each old name, a colon, its new name. Lecture 2's naming rules: lower case, no spaces, underscores.
+
+## Fix the Dates
+
+GA4 writes its dates as `20250101`, which pandas reads as a number:
+
+```{python}
+ga4["date"] = pd.to_datetime(ga4["date"], format="%Y%m%d")
+print(ga4["date"].min(), ga4["date"].max())
+```
+
+`format="%Y%m%d"` gives the order: a four-digit year, then the month, then the day. Without it, pandas reads `20250101` as a number of nanoseconds after 1 January 1970, **with no warning**:
+
+```{.python}
+pd.to_datetime(ga4["date"]).head(1)
+```
+
+```
+0   1970-01-01 00:00:00.020250101
+```
+
+## Say the Grain
+
+**One row = one day × one source / medium × one campaign × one device × one country.**
+
+```{python}
+ga4[["date", "source_medium", "device", "country", "sessions", "purchases"]].head(4)
+```
+
+Almost half the rows hold a single session. A row is not a visitor, nor a day: always **sum** the rows before you read a number.
+
+## Counts and Averages
 
 :::: {layout="[1,1]"}
 ::: {#first-column}
 
-**Not an objective**
+**Counts: sum them**
 
-- "Increase engagement"
-- "Improve the funnel"
-- "Grow the brand"
-
-These cannot be recorded, so they cannot be tested.
+`sessions`, `engaged_sessions`, `add_to_carts`, `checkouts`, `purchases`, `revenue`
 
 :::
 
 ::: {#second-column}
 
-**An objective**
+**Already an average: never sum it, never average it**
 
-- "Get 5 enquiries a month from the contact form"
-- "Have half of case study visitors reach the bottom of the page"
-
-These name an action, a count and a period.
-
-:::
-::::
-
-## Exercise {background="#43464B"}
-
-Write the first three rows of your own measurement plan.
-
-Use the four answers you brought from Lecture 1:
-
-- What the site is for
-- Who visits
-- What action counts as a win
-- What number tells you it works
-
-One row per objective. Do not write more than four rows.
-
-**10 minutes**
-
-# 2. Setting Up GA4
-
-## The Object Model
-
-GA4's hierarchy, which is not the same as Universal Analytics:
-
-```
-Account
-└── Property          <- your site lives here
-    └── Data stream   <- one per platform (web, iOS, Android)
-        └── Events    <- everything GA4 records is an event
-```
-
-. . .
-
-There are no "goals" and no "views". There are events, and some events are
-marked as key events.
-
-## Creating the Property
-
-Walk through, live:
-
-1. `analytics.google.com` → Admin → Create property
-2. Property name, **reporting time zone (Dublin)**, currency (EUR)
-3. Business details, objectives
-4. Create a **Web** data stream with your site URL
-5. Copy the measurement ID: `G-XXXXXXXXXX`
-
-. . .
-
-**Set the time zone correctly now.** Changing it later does not restate
-historical data, and your weekly cohorts in Lecture 15 will be wrong.
-
-## Installing the Tag
-
-The Google tag goes in `<head>`, on every page.
-
-```{.html}
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-XXXXXXXXXX');
-</script>
-```
-
-. . .
-
-In Quarto, this goes in `_quarto.yml` under `format: html: include-in-header`,
-so it is applied to every page from one place.
-
-## Verifying It
-
-Do not assume it worked.
-
-. . .
-
-- **Realtime report**: load your own site, see yourself appear
-- **DebugView**: install the GA Debugger extension, watch individual events
-- **Tag Assistant**: confirms the tag fires and reports its configuration
-
-. . .
-
-**A tag that fires on the homepage but not on the contact page is the single
-most common cause of a "broken funnel" in Lecture 19.** Check every page.
-
-# 3. Events and Parameters
-
-## Automatic Events
-
-GA4 collects some events without configuration:
-
-- `page_view`
-- `session_start`, `first_visit`
-- `scroll` (90% depth)
-- `click` (outbound links)
-- `file_download`
-- `video_start`, `video_progress`, `video_complete`
-
-. . .
-
-Enhanced measurement covers most of these. **Check which are on** in your data
-stream settings, because they are the ones you get for free.
-
-## Custom Events
-
-For anything specific to your site, you send your own:
-
-```{.html}
-<button onclick="gtag('event', 'generate_lead', {
-    'form_location': 'contact_page',
-    'enquiry_type': 'freelance'
-});">Send enquiry</button>
-```
-
-. . .
-
-The event name is a **verb**. The parameters are the **adjectives** that let you
-slice it later.
-
-## Naming Conventions {.smaller}
-
-Decide once, apply everywhere:
-
-:::: {layout="[1,1]"}
-::: {#first-column}
-
-**Do**
-
-- `snake_case` throughout
-- Verb-object: `read_case_study`
-- Use GA4's recommended names where one fits (`generate_lead`, `sign_up`,
-  `purchase`)
-- Parameter names shared across events
-
-:::
-
-::: {#second-column}
-
-**Do not**
-
-- `ContactFormSubmitted`
-- `contact-form-submit`
-- `button_click_1`
-- A different name for the same action on two pages
+`avg_engagement_time`, seconds per session, on each row
 
 :::
 ::::
 
 . . .
 
-**You cannot rename an event retroactively.** Historical data keeps the old name.
-
-## Parameters and Custom Dimensions
-
-A parameter sent with an event is **not** automatically reportable.
-
-. . .
-
-To use `form_location` as a dimension in a report, register it:
-
-Admin → Custom definitions → Create custom dimension → Event-scoped →
-Parameter name `form_location`
-
-. . .
-
-Registration is **not retroactive** either. Register before you need it.
-
-## Key Events
-
-What used to be called conversions.
-
-. . .
-
-Admin → Events → toggle **Mark as key event** on the event that represents your
-objective.
-
-. . .
-
-Keep it to **one or two**. If everything is a key event, the conversion rate in
-every report becomes meaningless, and the funnel in Lecture 19 has no top.
-
-## Limits Worth Knowing
-
-- 500 distinct event names per property
-- 25 parameters per event
-- 50 event-scoped custom dimensions
-- Event names are case-sensitive: `Sign_Up` and `sign_up` are two events
-
-. . .
-
-These are generous. You will not hit them. The case sensitivity will catch you.
-
-# 4. UTM Parameters
-
-## The Problem UTMs Solve
-
-GA4 can see the referring domain. It cannot see:
-
-- Which newsletter the click came from
-- Which of your three LinkedIn posts
-- Whether a link was in the bio or in a comment
-
-. . .
-
-Unless you tell it, in the URL.
-
-## The Five Parameters
-
-| Parameter | Answers | Example |
-|---|---|---|
-| `utm_source` | Which platform? | `linkedin` |
-| `utm_medium` | Which type? | `social` |
-| `utm_campaign` | Which effort? | `portfolio_launch` |
-| `utm_content` | Which variant? | `bio_link` |
-| `utm_term` | Which keyword? | `data_analyst_dublin` |
-
-. . .
-
-Source, medium and campaign are the ones you will actually use.
-
-## A Tagged URL
-
-```
-https://mysite.ie/work/?utm_source=linkedin&utm_medium=social&utm_campaign=portfolio_launch&utm_content=bio_link
+```{python}
+ga4["engagement_time"] = ga4["avg_engagement_time"] * ga4["sessions"]
+by_device = ga4.groupby("device")[["sessions", "engagement_time"]].sum()
+by_device["avg_engagement_time"] = by_device["engagement_time"] / by_device["sessions"]
+by_device.round(1)
 ```
 
-. . .
+## The Average of the Averages
 
-Build these with the Campaign URL Builder rather than by hand:
+The three device averages, averaged: (91.3 + 50.7 + 71.7) / 3 = **71.2 seconds**.
 
-<https://ga-dev-tools.google/campaign-url-builder/>
-
-## Consistency Is the Whole Point
-
-UTM values are **case-sensitive and free text**. GA4 will happily report:
-
-```
-LinkedIn / Social
-linkedin / social
-Linkedin / social
-linkedin / Social
+```{python}
+print(ga4["engagement_time"].sum() / ga4["sessions"].sum())
 ```
 
-. . .
-
-as four separate channels.
+The true average is **63.2 seconds**: averaging the averages gives tablets, 3% of the sessions, the same weight as phones, 68%.
 
 . . .
 
-**Write your conventions in a spreadsheet before your first campaign.** All
-lowercase, no spaces, a fixed vocabulary for medium. This spreadsheet is what
-you will join to in Lecture 14.
+Lecture 7's rule, once more: **turn the average back into a total** (× sessions), sum, then divide.
 
-## What Not to Tag
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
-<!-- Speaker notes: this is the classic self-referral mistake and it will
-     appear in student data if not pre-empted. -->
+### Read Loomrow's GA4
 
-**Never put UTM parameters on internal links.**
+1. Read `ga4-export.csv`, skipping the notes. How many rows and columns?
+2. Rename the columns, and convert `date`. What are the first and the last day?
+3. Total `sessions`, `purchases` and `revenue` over the period
+4. The **conversion rate** (purchases per session) and the **average order value** (revenue per purchase)
 
-. . .
+::: {#timer9_1 .timer seconds="480" starton="interaction"}
+:::
 
-Tagging a link from your own homepage to your own contact page starts a new
-session and attributes it to yourself. Your acquisition report then says your
-best traffic source is your own site.
+## Solution
 
-. . .
+```{python}
+print(ga4["date"].min(), ga4["date"].max())
+print(ga4[["sessions", "purchases", "revenue"]].sum())
+print(ga4["purchases"].sum() / ga4["sessions"].sum())
+print(ga4["revenue"].sum() / ga4["purchases"].sum())
+```
 
-We will find the damage in Lecture 17.
+25,242 rows and 13 columns, from 1 January 2025 to 24 June 2026. 177,124 sessions and 4,697 purchases: 2.7% of the sessions end in a purchase, of €94 on average.
 
-## Exercise {background="#43464B"}
+# 2. Channels, Devices, Countries
 
-Complete your implementation:
+## Sessions by Channel
 
-1. Install the tag and confirm it fires on **every** page in Realtime
-2. Implement at least two custom events with at least one parameter each
-3. Register those parameters as custom dimensions
-4. Mark one event as a key event
-5. Build three tagged URLs for wherever you will share the site, and write your
-   naming conventions into a spreadsheet
+GA4 sorts every session into a **channel**, from where the visitor came: Direct, Organic Search, Paid Social, Email ...
 
-**25 minutes, finish before next lecture**
+```{python}
+counts = ["sessions", "engaged_sessions", "purchases", "revenue"]
+by_channel = ga4.groupby("channel")[counts].sum()
+by_channel.sort_values("sessions", ascending=False)
+```
 
-# 5. AI for the Measurement Plan
+## A Rate per Channel
 
-## What to Delegate Here
+```{python}
+by_channel["engagement_rate"] = by_channel["engaged_sessions"] / by_channel["sessions"]
+by_channel["conversion_rate"] = by_channel["purchases"] / by_channel["sessions"]
+rates = by_channel[["sessions", "engagement_rate", "conversion_rate"]]
+rates.sort_values("conversion_rate", ascending=False).round(3)
+```
 
-<!-- Speaker notes: demonstrate live. Paste a half-written measurement plan and
-     let the room watch it produce a usable gtag snippet in seconds, then watch
-     it invent a plausible objective when you leave that row blank. Both halves
-     of the lesson are in the same demo. -->
+Email converts 5.4% of its sessions, Paid Social 1.4%. And **Referral 10.3%**: too good to be true?
 
-Safe and useful:
+## Too Good to Be True
 
-- Generating the `gtag` snippet for a custom event with parameters
-- Reviewing your event names against GA4's recommended names
-- Turning your objective into candidate questions and metrics
-- Explaining what a GA4 setting does
+```{python}
+referral = ga4[ga4["channel"] == "Referral"]
+referral.groupby("source_medium")[["sessions", "purchases", "revenue"]].sum()
+```
 
-## What Not to Delegate
-
-**The objective.** An assistant will invent a plausible one, and you will spend
-the semester measuring something you do not care about.
-
-. . .
-
-**The decision about what counts as a key event.** That is a commercial
-judgement about your own site.
+282 sessions from **paypal.com**, and 282 purchases. PayPal is not a channel: it is the payment page. A customer who pays there comes back to the shop in a new session, and GA4 credits PayPal with the sale.
 
 . . .
 
-**Verification.** It cannot see your Realtime report. Only you can confirm the
-tag fires on every page.
+The fix is in GA4's settings; in your report, say it. **A rate that looks too good is a question about the data first.** Lecture 11 cleans it.
 
-## A Prompt That Earns Its Place
+## Devices and Countries
 
-> "Here is my measurement plan [paste your table]. For each row, tell me whether
-> the event I have chosen can actually produce the metric I have named, and flag
-> any parameter I will need but have not listed."
+```{python}
+by_device = ga4.groupby("device")[["sessions", "purchases", "revenue"]].sum()
+by_device["conversion_rate"] = by_device["purchases"] / by_device["sessions"]
+by_device.round(3)
+```
+
+Two thirds of the sessions are on a phone, but a desktop session is **twice as likely** to end in a purchase: people browse on their phone and buy at their desk.
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### Where do the sales come from?
+
+1. By `country`: sessions, purchases and the conversion rate, for the 5 countries with most sessions. Which converts best?
+2. By `channel`: the **revenue per session**. Organic Search or Paid Social?
+3. Within `Organic Social`, which `source_medium` brings most sessions?
+4. Drop the PayPal sessions, and compute the conversion rate of Referral again
+
+::: {#timer9_2 .timer seconds="480" starton="interaction"}
+:::
+
+## Solution {.smaller}
+
+```{python}
+by_country = ga4.groupby("country")[["sessions", "purchases"]].sum()
+by_country["conversion_rate"] = by_country["purchases"] / by_country["sessions"]
+by_country.sort_values("sessions", ascending=False).head(5).round(3)
+```
+
+```{python}
+by_channel["revenue_per_session"] = by_channel["revenue"] / by_channel["sessions"]
+by_channel["revenue_per_session"].sort_values(ascending=False).round(2)
+```
+
+## Solution (continued)
+
+```{python}
+social = ga4[ga4["channel"] == "Organic Social"]
+print(social.groupby("source_medium")["sessions"].sum())
+not_paypal = referral[referral["source_medium"] != "paypal.com / referral"]
+print(not_paypal["purchases"].sum() / not_paypal["sessions"].sum())
+```
+
+Ireland converts best, 3.0%. A search visit is worth €2.35 and a paid social one €1.29. Without PayPal, Referral converts 0.9%, like the rest of Instagram: **linktr.ee is Loomrow's link in bio**.
+
+# 3. Over Time, and GA4 Against Meta
+
+## Sessions by Week
+
+```{python}
+weekly = ga4.groupby(ga4["date"].dt.to_period("W"))["sessions"].sum()
+ax = weekly.plot(title="Sessions by week: one week of April 2026 stands out",
+                 xlabel="", ylabel="Sessions")
+ax.spines[["top", "right"]].set_visible(False)
+```
+
+The highest week is in **April 2026**, above Black Friday. The last point is low because that week has only three days of data.
+
+## What Happened in April 2026?
+
+```{python}
+april = ga4[(ga4["date"] >= "2026-04-13") & (ga4["date"] <= "2026-04-19")]
+by_place = april.groupby(["country", "device"])[counts].sum()
+by_place.sort_values("sessions", ascending=False).head(3)
+```
+
+2,837 sessions from the **United States** on desktop, 2,813 of them from 14 to 16 April: 35 engaged, no purchase. Not customers: **bots**. Group by two columns to find them, and keep them out of your conversion rates. Lecture 11 again.
+
+## One Change That Was Not a Change {.smaller}
+
+```{python}
+ga4["month"] = ga4["date"].dt.to_period("M")
+channels = ga4.pivot_table(index="month", columns="channel",
+                           values="sessions", aggfunc="sum")
+ax = channels[["Organic Social", "Referral"]].plot(xlabel="", ylabel="Sessions",
+    title="October 2025: Referral falls as Organic Social rises")
+ax.spines[["top", "right"]].set_visible(False)
+```
+
+On 1 October 2025, Loomrow swapped its Linktree link in bio for a link tagged for GA4: the same visitors **changed channel overnight**.
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### What changed, and when?
+
+1. Sessions by week as a line, with a title that states the finding
+2. The week with the most sessions: drill down by `country` and `device`. What happened?
+3. A pivot table of sessions by month and channel: when does Organic Social jump?
+4. Purchases by month: which month sold most, and why?
+
+::: {#timer9_3 .timer seconds="480" starton="interaction"}
+:::
+
+## Solution
+
+```{python}
+print(weekly.sort_values(ascending=False).head(3))
+print(ga4.groupby("month")["purchases"].sum().sort_values(ascending=False).head(3))
+```
+
+The April bots top the weeks, ahead of two weeks of the deadstock drop in May 2026. The best month for sales is **November 2025**, with Black Friday. The bots added 2,813 sessions, and not one sale.
+
+## GA4 Against Meta
+
+In Lecture 7, Meta's file added up to **833 purchases** and €76,928.88 of revenue for Loomrow's ads. What does GA4 say?
+
+```{python}
+paid_social = ga4[ga4["channel"] == "Paid Social"]
+paid_ga4 = paid_social.groupby("campaign")[["sessions", "purchases", "revenue"]].sum()
+paid_ga4
+```
+
+The campaign names are Meta's, in lower case: `ss25_launch` in GA4 is `SS25_Launch` in `insta-data.csv`.
+
+## Merge on the Campaign
+
+```{.python}
+insta = pd.read_csv("insta-data.csv")
+```
+
+```{python}
+insta["campaign"] = insta["campaign"].str.lower()
+paid = insta[insta["is_paid"] == True]
+ad_columns = ["spend_eur", "attributed_purchases", "attributed_revenue_eur"]
+paid_meta = paid.groupby("campaign")[ad_columns].sum()
+both = pd.merge(paid_meta, paid_ga4, on="campaign")
+both[["spend_eur", "attributed_purchases", "purchases"]]
+```
+
+`.str.lower()` puts every name in lower case, so the keys match: without it, the merge finds **0 rows**. After `groupby`, `campaign` is the row names of both tables, not a column: `on=` accepts row names too.
+
+## Two Tools, Two Counts
+
+```{python}
+print(both["attributed_revenue_eur"].sum() / both["spend_eur"].sum())
+print(both["revenue"].sum() / both["spend_eur"].sum())
+```
+
+By Meta's count, a euro of ads returns **€3.16**; by GA4's, **€1.86**. Meta counts the people who clicked, or only saw, an ad in the days before buying; GA4 credits each purchase to the source of the visit it happened in.
 
 . . .
 
-This catches the most expensive error in the whole block: **an event that cannot
-answer the question it was created for**, discovered in Lecture 19 when your
-funnel has no middle.
+Neither number is the truth. Report both, with where each comes from: Lecture 18, attribution.
 
-## Exercise {background="#43464B"}
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
-1. Run the prompt above on your own measurement plan
-2. Ask it to generate the `gtag` call for your key event
-3. Implement it, then verify in DebugView that the parameters arrive
-4. Note one thing it got wrong about GA4
+### GA4 against Meta, campaign by campaign
 
-**15 minutes**
+1. Merge the Meta and GA4 tables on `campaign`, and check that you have 6 rows
+2. The return on ad spend of each campaign, by Meta's revenue and by GA4's
+3. Which campaign loses most when you move from Meta's count to GA4's?
+4. One figure that shows both, with a title that states the finding
 
-## Next Lecture
+::: {#timer9_4 .timer seconds="480" starton="interaction"}
+:::
 
-Your site is now recording data about people. We look at what that data actually
-is, who owns it, and what the law requires of you.
+## Solution
 
-. . .
+```{python}
+both["roas_meta"] = both["attributed_revenue_eur"] / both["spend_eur"]
+both["roas_ga4"] = both["revenue"] / both["spend_eur"]
+ax = both[["roas_meta", "roas_ga4"]].sort_values("roas_meta").plot(
+    kind="barh", xlabel="", ylabel="",
+    title="Black Friday returns €6.97 a euro by Meta's count, €2.41 by GA4's")
+ax.spines[["top", "right"]].set_visible(False)
+```
 
-**The cookie banner is now your problem.**
+Every campaign loses, Black Friday most: people buy that week anyway.
+
+## {background="#43464B"}
+
+```{=html}
+<style>img.circle {border-radius:50%;}</style>
+```
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+<img class="circle" src="https://github.com/damien-dupre.png" />
+
+:::
+::: {#second-column}
+**Thanks for your attention and don't hesitate to ask if you have any questions!**
+
+[{{< fa brands mastodon >}} @damien_dupre](https://datasci.social/@damien_dupre)
+
+[{{< fa brands github >}} @damien-dupre](https://github.com/damien-dupre)
+
+[{{< fa link >}} https://damien-dupre.github.io](https://damien-dupre.github.io)
+
+[{{< fa paper-plane >}} damien.dupre@dcu.ie](mailto:damien.dupre@dcu.ie)
+:::
+::::

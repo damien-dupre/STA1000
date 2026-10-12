@@ -1,373 +1,289 @@
 ---
-title: "Lecture 14: Python II - Grouping and Joining"
+title: "Lecture 14: What Tracking Data Actually Is"
 subtitle: STA1000 - Data Analytics and Metrics
 ---
 
 ## Previously ...
 
-You can load your GA4 export into a notebook and look at it. Today we combine it
-with everything else, which is where marketing metrics actually come from.
+Your site now sends events to GA4. That makes the next set of questions
+concrete rather than abstract:
+
+- What exactly is being recorded?
+- Who owns it?
+- What are you legally obliged to do about it?
 
 ## Learning Outcomes
 
 By the end of this lecture you will be able to:
 
-- Aggregate with `groupby()` and named `agg()`
-- State the grain of a table before and after every operation
-- Join traffic data to ad spend or content metadata
-- Diagnose a join that has gone wrong, and prove that one has not
+- Describe tracking data as events and parameters
+- Distinguish structured from unstructured sources
+- Distinguish first-party from third-party data
+- Apply consent and GDPR requirements to your own site
 
-# 1. Aggregation
+# 1. The Shape of Tracking Data
 
-## Split, Apply, Combine
+## Events and Parameters
 
-Every aggregation is three steps, and naming them prevents most errors:
+Everything GA4 records is an **event**. An event is a verb; its **parameters**
+are the adjectives.
 
-1. **Split** the rows into groups by one or more keys
-2. **Apply** a function to each group independently
-3. **Combine** the results into a new table
-
-. . .
-
-The new table has a **different grain**. That is the whole point, and it is the
-thing people forget one line later.
-
-```{.python}
-(ga4
-  .groupby("channel")
-  .agg(sessions=("sessions", "sum"),
-       conversions=("key_events", "sum"))
-  .assign(cvr=lambda d: d.conversions / d.sessions)
-)
-```
-
-## Named Aggregation, and Why
-
-```{.python}
-.agg(sessions=("sessions", "sum"),
-     conversions=("key_events", "sum"),
-     first_seen=("date", "min"),
-     users=("user_id", "nunique"))
+```{.json}
+{
+  "event_name": "generate_lead",
+  "event_timestamp": 1789192800123456,
+  "user_pseudo_id": "1842...e93",
+  "params": {
+    "page_location": "https://yoursite.ie/contact",
+    "form_location": "contact_page",
+    "enquiry_type": "freelance",
+    "engagement_time_msec": 14820
+  }
+}
 ```
 
 . . .
 
-One line per output column, each saying explicitly which input column and which
-function. No multi-level column index to unpack afterwards, and the code reads
-as a specification of the output table.
+**That is the whole data model.** No goals, no views, no sessions table: sessions
+are reconstructed from events that share a `user_pseudo_id` and a time window.
 
-. . .
-
-**Compute the rate after the aggregation, never before.** `conversions.sum() /
-sessions.sum()` is the rate of the totals. Averaging a per-row rate is Lecture 4
-returning in Python.
-
-::: {.callout-note appearance="minimal"}
-`nunique` on `user_id` and `sum` on `sessions` produce different numbers for the
-same group. Which one belongs in the denominator of a conversion rate, and does
-your answer depend on the question?
-:::
-
-## Multiple Grains From One Table
-
-```{.python}
-by_channel      = ga4.groupby("channel").agg(...)
-by_channel_week = ga4.groupby(["channel", "week"]).agg(...)
-by_channel_dev  = ga4.groupby(["channel", "device"]).agg(...)
-```
-
-. . .
-
-Three tables, three grains, all correct, and they will not reconcile against
-each other unless you are careful about which rows each one includes.
-
-. . .
-
-**Write the grain in a comment above every aggregation.** One row is one
-______. It costs three seconds and it is the single highest-yield habit in this
-block.
-
-<!-- Speaker notes: make them do this literally in the exercise. The habit is
-     what carries into lecture 17's cleaning log, where the grain of the log
-     itself becomes a question. -->
-
-# 2. Joining
-
-## Why Joining Is the Whole Point
-
-<!-- Speaker notes: GA4 alone cannot tell you cost. Spend lives in the ad
-     platform. Content attributes live in a spreadsheet the marketer keeps.
-     Every interesting marketing metric is a join. -->
-
-GA4 knows what happened on your site. It does not know what anything cost.
-
-. . .
-
-The marketer always has three tables, held in three different places by three
-different systems:
-
-| Table | Grain | Lives in |
-|---|---|---|
-| Traffic | Session or event | GA4 |
-| Spend | Campaign × day | The ad platform |
-| Content | One row per page or post | A spreadsheet somebody maintains |
-
-. . .
-
-**Cost per acquisition, ROAS, content performance: every one of them is a
-join.** There is no single system that hands you the number.
-
-## Join Types, With the Marketing Case {.smaller}
-
-| Type | Keeps | Right when |
-|---|---|---|
-| `inner` | Rows matching in both | You need both sides to compute anything, and unmatched rows are meaningless |
-| `left` | All traffic rows | Traffic is the truth and spend is optional: organic sessions have no cost |
-| `right` | All spend rows | You want to find campaigns that spent money and produced no traffic |
-| `outer` | Everything | Diagnosis. Rarely the final answer |
-
-. . .
-
-**The `left` join is the default for a reason**, and it is also the one that
-silently produces nulls that become zeros that become a ROAS of infinity.
-
-## Inner and Outer, Drawn {.smaller}
+## Structured Versus Unstructured
 
 :::: {layout="[1,1]"}
 ::: {#first-column}
 
-**Inner join: only the matches**
+**Structured**
 
-![](./figures/external/ubc_join_inner.png){fig-align="center" height="245px"}
+Rows and columns with fixed meaning: your GA4 export, `insta-data.csv`, an ad
+spend table.
+
+Countable without interpretation.
 
 :::
 
 ::: {#second-column}
 
-**Outer join: everything, with NaN**
+**Unstructured**
 
-![](./figures/external/ubc_join_outer.png){fig-align="center" height="245px"}
+Reviews, comments, captions, support tickets, images.
+
+There is no column to sum. Something has to turn it into a number first, and
+that step is a **modelling decision**.
 
 :::
 ::::
 
-::: {style="font-size:0.55em;text-align:center;"}
-Source: [UBC MDS, Programming in Python for Data Science](https://github.com/UBC-MDS/programming-in-python-for-data-science)
-:::
+. . .
 
-*The NaN block on the right is the whole reason to check a join. It is also
-where your row count went.*
+Most of the data an organisation holds is the second kind, and most of its
+dashboards use only the first. **This module stays with the first half.**
 
+## Three Grains, One Word for Each Metric {.smaller}
 
-## The Grain Contract {.smaller}
+Lecture 2 called it the **grain**: what one row is. GA4 mixes three, freely, in
+one interface.
 
-Before a merge, answer three questions in writing:
-
-1. What is the grain of the left table?
-2. What is the grain of the right table?
-3. What should the grain of the result be?
+| Grain | One row is | A metric at this grain |
+|---|---|---|
+| **Event** | One thing that happened | Event count |
+| **Session** | One visit | Sessions, engaged sessions |
+| **User** | One browser on one device | Users, new users |
 
 . . .
 
-If the right table has more than one row per key, a `left` join **multiplies**
-your rows. Sessions get counted twice. Spend gets attributed twice. Revenue
-doubles.
-
-. . .
-
-```{.python}
-merged = traffic.merge(spend, on="campaign", how="left",
-                       validate="many_to_one")
-```
-
-. . .
-
-`validate` makes pandas raise an error instead of quietly producing a bigger
-table. **Use it on every merge.** It is one keyword and it catches the most
-expensive class of error in this module.
+**"Conversion rate" means at least three different numbers** depending on which
+grain is on top and which is underneath. Conversions per session, per user, or
+per visit to the page where the conversion lives.
 
 ::: {.callout-note appearance="minimal"}
-A many-to-many join between traffic and spend, both at campaign × day, with one
-duplicate day in the spend table. How many rows do you get, and which number in
-the final report is wrong?
+Write down which one you mean, in your measurement plan, today. In Lecture 17
+your funnel will only reconcile if you did.
 :::
 
-## Join Keys That Do Not Match
+# 2. Who Owns the Data
 
-`google / cpc` versus `Google Ads`. `Newsletter` versus `newsletter`.
-`/pricing` versus `/pricing/`. A campaign named `spring26` in GA4 and
-`Spring 2026` in the spend sheet.
+## First, Second and Third Party {.smaller}
 
-. . .
-
-Case, whitespace, trailing slashes, and the human who typed the UTM by hand at
-11pm.
-
-. . .
-
-**This is where Lecture 9's tagging discipline pays off, or does not.** The
-students who wrote a UTM conventions sheet in week 3 spend five minutes here.
-The others spend the lecture.
-
-## Checking a Join
-
-```{.python}
-merged = traffic.merge(spend, on="campaign", how="left", indicator=True)
-merged["_merge"].value_counts()
-
-# the four numbers that matter
-len(traffic), len(spend), len(merged), merged["_merge"].eq("both").sum()
-```
+| | Whose data | Example | Availability |
+|---|---|---|---|
+| **First party** | Yours, from your own site | Your GA4 property, your mailing list | Yours to keep |
+| **Second party** | Someone else's first-party data, shared | A partner's audience in a co-marketing deal | By agreement |
+| **Third party** | Collected across sites by an intermediary | Broker audience segments, cross-site cookies | Shrinking fast |
 
 . . .
 
-**The four-number check**, run after every join:
-
-1. Rows in, left side
-2. Rows in, right side
-3. Rows out
-4. Rows matched
+Browser and regulatory pressure has been squeezing the third column for a decade:
+Safari and Firefox block third-party cookies by default, and Chrome's long retreat
+on the question has left the industry planning around their unreliability either
+way.
 
 . . .
 
-If (3) is greater than (1) on a left join, you have fanned out. If (4) is much
-less than (1), your keys do not match. Neither will announce itself.
+**The strategic consequence is the whole reason this module has you build a
+site.** First-party data is the part you can still rely on, and it only exists
+if someone measured it deliberately.
 
-## Diagnosing the Mismatch
+## "Users" Is an Estimate
 
-```{.python}
-unmatched = merged.loc[merged["_merge"] == "left_only", "campaign"].unique()
-sorted(unmatched)[:20]
-
-# then look at the other side
-sorted(spend["campaign"].unique())[:20]
-```
+GA4's `user_pseudo_id` identifies a **browser**, not a person.
 
 . . .
 
-**Look at the actual values, side by side.** Nine times in ten the answer is
-visible in ten seconds and invisible in any summary statistic.
+- You on your phone and you on your laptop are two users
+- You in a private window are a third
+- You after clearing cookies are a fourth
+- Your flatmate on your laptop is still you
 
 . . .
 
-Then fix the key with a normalisation you can write down, not a manual mapping
-you cannot reproduce:
+**So the user count is an upper bound on people and a lower bound on devices**,
+and it is neither of the things the word suggests. Report it as "users" only if
+you are prepared to explain that.
 
-```{.python}
-def norm(s):
-    return s.str.strip().str.lower().str.replace(r"\s+", " ", regex=True)
-```
+# 3. Consent and GDPR
+
+## The Cookie Banner Is Now Your Problem {.smaller}
+
+<!-- Speaker notes: this is the pedagogical pivot of the block. Students who
+     have to publish a banner on their own live site stop treating GDPR as an
+     exam topic. -->
+
+Under the GDPR and the ePrivacy Regulations, analytics cookies are **not
+strictly necessary**, so they need **consent before they are set**, not after.
+
+. . .
+
+That consent has to be:
+
+- **Freely given**: refusing must be as easy as accepting. One click each
+- **Specific and informed**: "cookies to improve your experience" is not informed
+- **Unambiguous**: a positive action. No pre-ticked boxes, no "by continuing you
+  agree"
+- **Withdrawable**: as easily as it was given
+
+. . .
 
 ::: {.callout-note appearance="minimal"}
-Normalising keys makes rows match. Under what circumstances does making rows
-match make the analysis worse?
+Ireland's Data Protection Commission has been explicit and repeatedly
+enforcing on cookie banners. Check <https://www.dataprotection.ie> for current
+guidance before you publish yours.
 :::
 
-# 3. Putting It Together
+## What It Requires of You, Specifically {.smaller}
 
-## Live Demo {background="#43464B"}
+1. **A privacy notice**: what you collect, why, on what lawful basis, how long
+   you keep it, who it goes to, and how to contact you
+2. **A consent banner** that blocks the tag until a choice is made
+3. **A data retention setting** in GA4: Admin → Data settings → Data retention.
+   The default is 2 months; 14 is the maximum. **Choose deliberately and say why**
+4. **IP anonymisation**, which GA4 does by default and Universal Analytics did
+   not
+5. **A route to erasure**: GA4's User Explorer can delete an individual's data if
+   you can identify their `user_pseudo_id`
 
-1. Traffic aggregated to campaign × week, grain written in a comment
-2. Spend read in at campaign × day, aggregated up to campaign × week first
-3. `merge` with `validate="one_to_one"`, which fails, because the spend sheet
-   has a duplicate row
-4. Find the duplicate, decide what to do about it, write the decision down
-5. Cost per session, and the campaigns with cost and no sessions
+. . .
+
+You are a **data controller** for your site. Google is your **processor**. The
+obligations in that list are yours, not Google's.
+
+## What They Do With It {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_ftc_surveillance_pricing.png){fig-align="center" height="350px"}
+
+*The FTC's 2025 study on surveillance pricing. This is the far end of the same
+pipeline your cookie banner sits at the front of.*
+
+
+## Consent Bias
+
+If 30% of your visitors decline, you do not have 70% of your data. **You have
+100% of the data about people who consent**, which is a different population.
+
+. . .
+
+And they differ systematically: consent rates vary by device, by browser, by
+country, by age, and by how privacy-conscious someone is.
+
+. . .
+
+**So every rate you compute is a rate among consenters**, and any segment that
+correlates with privacy behaviour is distorted before you touch it.
+
+. . .
+
+This is the first appearance of a theme that returns in Lecture 19 as sampling
+variability, and in Lecture 18 as an attribution blind spot. **It is a
+measurement limit, not a footnote.**
 
 ## Exercise {background="#43464B"}
 
-Using your own export plus a spend table, real or simulated:
+For your own site:
 
-1. Aggregate sessions and key events by channel and week, and write the grain in
-   a comment
-2. Join to spend on campaign, with `validate=` set
-3. Report the four-number check
-4. Report how many rows failed to match, and **why**, with the actual key values
-5. Compute cost per key event by channel, and say which channels it is undefined
-   for
+1. Publish a consent banner and a privacy notice
+2. List every cookie or identifier your site sets, and its purpose
+3. Set your GA4 data retention explicitly and justify the choice
+4. Estimate what proportion of your traffic you expect to lose to declined consent
 
-**25 minutes**
-
-# 4. Agentic Joins
-
-## AI This Block: Agentic coding
-
-Where we are on the module's AI spine, introduced in Lecture 12:
-
-> **Agentic coding**
-
-## A Failed Join Is the Ideal Agentic Task
-
-Because the diagnosis is a **loop**: count, inspect, hypothesise, test, count
-again.
-
-. . .
-
-Chat can list the usual causes of a key mismatch. An agent can find out which
-one is actually happening in your file, in one pass, without you pasting
-anything.
-
-> "This merge left 340 of 500 rows unmatched. Find out why, show me the
-> mismatched key values side by side, and propose a normalisation. Do not apply
-> it yet."
-
-. . .
-
-**"Do not apply it yet"** is the useful half of that prompt.
-
-## Why an Agent Beats Chat Here
-
-- It can run `value_counts()` on both sides rather than asking you to
-- It can test a normalisation and report the new match rate immediately
-- It can check whether the fix changed the row count, which is the check you
-  would forget
-
-. . .
-
-The loop is fast, mechanical, and has an unambiguous success criterion. That
-combination is exactly where delegation pays.
-
-## What You Still Verify
-
-- Row counts before and after: the four-number check is yours, not its
-- That the fix **normalised** keys rather than dropping the rows that did not
-  match
-- That no duplicate rows were created by a many-to-many join
-- That the campaigns which still do not match are genuinely absent from the
-  spend table, and not renamed
-
-::: {.callout-note appearance="minimal"}
-An agent that silently changes `how="left"` to `how="inner"` will report a 100%
-match rate. Which of the checks above catches that, and would you have run it?
+::: {#timer1 .timer seconds="1200"}
 :::
 
-<!-- Speaker notes: this is the concrete instance of lecture 12's "verification
-     is checking output, not reading code". Reading the diff would catch the
-     changed keyword; but so would the row count, and the row count also catches
-     the five other ways it could go wrong. -->
+# 4. AI and the Law
+
+## AI This Block: Chat
+
+Where we are on the module's AI spine, set out in Lecture 1 and named properly in Lecture 10:
+
+> **Chat.** A tutor for the concepts. Never an authority on the law.
+
+## Do Not Take Legal Advice From a Chatbot
+
+<!-- Speaker notes: the one place in the module where the honest answer is
+     "verify against the primary source, every time". -->
+
+Assistants are **confidently wrong about data protection law**, in a specific and
+predictable set of ways:
+
+- They mix jurisdictions, answering an Irish question with CCPA rules
+- They cite repealed provisions, because the training data outlived the law
+- They invent article numbers, which look exactly like real ones
+- They state a settled answer where the regulator's position is contested
+
+. . .
+
+**The failure mode is fluency.** A wrong GDPR answer reads exactly like a right
+one, which is not true of a wrong number.
+
+## What It Is Genuinely Good For
+
+- **Drafting** a privacy notice you then check, clause by clause, against the
+  DPC's guidance
+- **Explaining** a concept in plain words, so that you know what to go and
+  confirm
+- **Listing** what your cookie banner should cover, as a starting checklist
+- **Translating** the regulator's language into something you can act on
+
+. . .
+
+**Never**: telling you whether your specific setup is lawful. That is the one
+question it cannot answer and the one it will answer most confidently.
 
 ## Exercise {background="#43464B"}
 
-1. Deliberately break a join by changing case in one key
-2. Ask an agent to diagnose it
-3. Check whether its fix preserved the row count you expected
-4. Ask it to add a `validate=` argument and explain which value it chose and why
-5. Break it a second way, with a duplicate row rather than a bad key, and see
-   whether the same prompt finds it
+1. Ask an assistant to draft a privacy notice for your site
+2. Check three of its claims against the Data Protection Commission's own guidance
+   at <https://www.dataprotection.ie>
+3. Record what it got wrong
 
-**15 minutes**
-
-## Going Further
-
-- Wickham (2011), *The Split-Apply-Combine Strategy for Data Analysis* — the
-  paper that named the pattern
-- pandas user guide, *Merge, join, concatenate and compare* — read the
-  `validate` and `indicator` sections properly
-- McKinney, *Python for Data Analysis*, ch. 8 — the reference for this lecture
+::: {#timer2 .timer seconds="900"}
+:::
 
 ## Next Lecture
 
-The analyses Tableau makes awkward: cohorts, retention and RFM.
+Your site is live, tagged and lawful, and it has started to accumulate rows.
 
-**Prepare**: have a joined table ready. Lecture 15 builds on it rather than
-starting again.
+. . .
+
+Next week we get those rows **out** of GA4 and into a tool you already know, and
+discover what GA4 quietly withholds on the way.
+
+**Prepare**: bring your property, and the date your first real visitor arrived.

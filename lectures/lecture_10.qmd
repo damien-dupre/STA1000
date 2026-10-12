@@ -1,289 +1,411 @@
 ---
-title: "Lecture 10: What Tracking Data Actually Is"
+title: "Lecture 10: From Chat to Agent"
 subtitle: STA1000 - Data Analytics and Metrics
 ---
 
 ## Previously ...
 
-Your site now sends events to GA4. That makes the next set of questions
-concrete rather than abstract:
+Nine sessions. You have used an AI assistant in most of them:
 
-- What exactly is being recorded?
-- Who owns it?
-- What are you legally obliged to do about it?
+- To clean a messy file (Lecture 2)
+- To critique a chart, then your own figure (Lectures 4 and 8)
+- To explain an error, or a line of pandas you could not read (Lectures 6 to 9)
+
+. . .
+
+Today we stop using it incidentally and name what is actually happening.
+
+## Why Here
+
+Block 2 is called "Python as the marketer's power tool".
+
+. . .
+
+In 2026, the power tool is not Python. It is **Python plus something that writes
+Python**.
+
+. . .
+
+Pretending otherwise would teach you a version of the job that no longer exists.
+Teaching it without teaching verification would be worse.
 
 ## Learning Outcomes
 
 By the end of this lecture you will be able to:
 
-- Describe tracking data as events and parameters
-- Distinguish structured from unstructured sources
-- Distinguish first-party from third-party data
-- Apply consent and GDPR requirements to your own site
+- Distinguish chat, chat with context, and agentic use
+- Choose the right mode for a given analytics task
+- Verify AI-produced analysis rather than trusting it
+- State what an agent must not be given access to, and why
 
-# 1. The Shape of Tracking Data
+# 1. Three Modes
 
-## Events and Parameters
+## The Progression
 
-Everything GA4 records is an **event**. An event is a verb; its **parameters**
-are the adjectives.
-
-```{.json}
-{
-  "event_name": "generate_lead",
-  "event_timestamp": 1789192800123456,
-  "user_pseudo_id": "1842...e93",
-  "params": {
-    "page_location": "https://yoursite.ie/contact",
-    "form_location": "contact_page",
-    "enquiry_type": "freelance",
-    "engagement_time_msec": 14820
-  }
-}
-```
-
-. . .
-
-**That is the whole data model.** No goals, no views, no sessions table: sessions
-are reconstructed from events that share a `user_pseudo_id` and a time window.
-
-## Structured Versus Unstructured
-
-:::: {layout="[1,1]"}
+:::: {layout="[1,1,1]"}
 ::: {#first-column}
 
-**Structured**
+**Chat**
 
-Rows and columns with fixed meaning: your GA4 export, `insta-data.csv`, an ad
-spend table.
+You ask, it answers in words or code. It cannot see your data. You copy, paste
+and run.
 
-Countable without interpretation.
+*The assistant knows things.*
 
 :::
 
 ::: {#second-column}
 
-**Unstructured**
+**Chat with context**
 
-Reviews, comments, captions, support tickets, images.
+You attach a file, a screenshot, an export. It answers about **your** data.
 
-There is no column to sum. Something has to turn it into a number first, and
-that step is a **modelling decision**.
+*The assistant knows your situation.*
+
+:::
+
+::: {#third-column}
+
+**Agent**
+
+It runs code, reads the result, notices the error, fixes it, and repeats until
+done.
+
+*The assistant does the work.*
 
 :::
 ::::
 
 . . .
 
-Most of the data an organisation holds is the second kind, and most of its
-dashboards use only the first. **Lecture 16 is about the other half.**
+Each mode is more capable than the last, and each removes one more of your
+opportunities to notice that it is wrong.
 
-## Three Grains, One Word for Each Metric {.smaller}
+## Mode 1: Chat
 
-Lecture 2 called it the **grain**: what one row is. GA4 mixes three, freely, in
-one interface.
+What you have mostly been doing.
 
-| Grain | One row is | A metric at this grain |
-|---|---|---|
-| **Event** | One thing that happened | Event count |
-| **Session** | One visit | Sessions, engaged sessions |
-| **User** | One browser on one device | Users, new users |
+> "What is the difference between a session and a user in GA4?"
+
+> "What does `comment="#"` do in `pd.read_csv()`?"
 
 . . .
 
-**"Conversion rate" means at least three different numbers** depending on which
-grain is on top and which is underneath. Conversions per session, per user, or
-per visit to the page where the conversion lives.
+**Strengths**: fast, cheap, no setup, safe. It cannot damage anything because it
+cannot touch anything.
 
-::: {.callout-note appearance="minimal"}
-Write down which one you mean, in your measurement plan, today. In Lecture 19
-your funnel will only reconcile if you did.
-:::
+. . .
 
-# 2. Who Owns the Data
+**Limits**: it does not know your column names, your row counts, or that your
+date field is stored as text.
 
-## First, Second and Third Party {.smaller}
+## Mode 2: Chat With Context
 
-| | Whose data | Example | Availability |
+You give it the situation.
+
+> "Here is the first 20 rows of my GA4 export [attached]. The `date` column is
+> reading as text. Write the pandas to fix it and tell me what to check
+> afterwards."
+
+. . .
+
+**This is the single biggest upgrade available to you**, and most people never
+make it. They keep asking generic questions and getting generic answers.
+
+. . .
+
+**Limits**: it sees a sample, not the dataset. It cannot run anything, so it
+cannot know whether its answer worked.
+
+## Mode 3: Agent
+
+The assistant is given tools: a Python environment, a filesystem, sometimes a
+browser.
+
+. . .
+
+You state a goal. It writes code, runs it, reads the traceback, corrects itself,
+and continues.
+
+> "Load ga4_export.csv, clean the date and numeric columns, and report sessions
+> and conversion rate by channel and week. Tell me anything that looks wrong."
+
+. . .
+
+**This is genuinely different in kind.** The loop of run-observe-correct is the
+one you have been doing by hand since Lecture 6.
+
+## One Model, Many Inputs and Outputs {.smaller}
+
+![Source: [Masterclass: LLMs for Data Science](https://github.com/avvorstenbosch/Masterclass-LLMs-for-Data-Science) (CC BY-NC-SA 4.0)](./figures/external/mcllm_multimodal_llm.png){fig-align="center" height="255px"}
+
+*Text, image, audio in; text, image, audio out. The agent wraps a loop and a
+set of tools around this.*
+
+
+## What Makes an Agent an Agent
+
+Three ingredients:
+
+1. **Tools**: it can execute, not only emit text
+2. **A loop**: it observes the result and acts again
+3. **Some autonomy**: it decides the next step without asking you each time
+
+. . .
+
+Remove any one and you are back to chat.
+
+. . .
+
+The third ingredient is where the risk lives.
+
+## Where You Will Meet Them
+
+- **Notebook assistants**: Colab's Gemini, Copilot in Jupyter
+- **Coding agents**: Claude Code, Cursor, Codex
+- **Chat with code execution**: Claude and ChatGPT running Python on an uploaded file
+- **Inside the platforms**: GA4's and Meta's own automated insights
+
+. . .
+
+For this module, **Claude** is the default in worked examples. ChatGPT and
+GitHub Copilot do the same things with different names. The mode matters, the
+brand does not.
+
+## Why This Is a Marketing Question {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_zuckerberg_advertising.png){fig-align="center" height="350px"}
+
+
+# 2. The Spine of This Module
+
+## One Step Per Block {.smaller}
+
+<!-- Speaker notes: this slide is the reason the lecture exists here. Put it up
+     again at the start of each block so students can see where they are. -->
+
+| Block | Lectures | AI mode | Used as |
 |---|---|---|---|
-| **First party** | Yours, from your own site | Your GA4 property, your mailing list | Yours to keep |
-| **Second party** | Someone else's first-party data, shared | A partner's audience in a co-marketing deal | By agreement |
-| **Third party** | Collected across sites by an intermediary | Broker audience segments, cross-site cookies | Shrinking fast |
+| 1 See the data | 1-5 | Chat with context | Attach the file, not a description |
+| 2 Python | 6-11 | Agentic coding, from Lecture 10 | It writes and runs the analysis |
+| 3 Build the lab | 12-15 | Chat | A tutor. Explain, do not do |
+| 4 Metrics | 16-20 | An analyst you interrogate | Argue the other side |
+| 5 Communication | 21-22 | A producer | Drafts the spec, report, deck |
 
 . . .
 
-Browser and regulatory pressure has been squeezing the third column for a decade:
-Safari and Firefox block third-party cookies by default, and Chrome's long retreat
-on the question has left the industry planning around their unreliability either
-way.
+Block 3 steps **back**, deliberately: it is the one place where the decisions
+have to be yours. Everywhere else, **you own the judgement anyway.**
+
+## The Direction of Travel
+
+Each block hands more execution to the machine and keeps more verification with
+you.
 
 . . .
 
-**The strategic consequence is the whole reason this module has you build a
-site.** First-party data is the part you can still rely on, and it only exists
-if someone measured it deliberately.
+That is not a compromise. It is the actual job description of an analyst who
+uses these tools well.
 
-## "Users" Is an Estimate
+# 3. Verification
 
-GA4's `user_pseudo_id` identifies a **browser**, not a person.
+## The Only Skill That Matters
 
-. . .
-
-- You on your phone and you on your laptop are two users
-- You in a private window are a third
-- You after clearing cookies are a fourth
-- Your flatmate on your laptop is still you
+An AI assistant is a **confident** producer of plausible work.
 
 . . .
 
-**So the user count is an upper bound on people and a lower bound on devices**,
-and it is neither of the things the word suggests. Report it as "users" only if
-you are prepared to explain that.
-
-# 3. Consent and GDPR
-
-## The Cookie Banner Is Now Your Problem {.smaller}
-
-<!-- Speaker notes: this is the pedagogical pivot of the block. Students who
-     have to publish a banner on their own live site stop treating GDPR as an
-     exam topic. -->
-
-Under the GDPR and the ePrivacy Regulations, analytics cookies are **not
-strictly necessary**, so they need **consent before they are set**, not after.
+Plausible and correct are different, and the gap is invisible from the output
+alone.
 
 . . .
 
-That consent has to be:
+Everything in this section is about closing that gap cheaply.
 
-- **Freely given**: refusing must be as easy as accepting. One click each
-- **Specific and informed**: "cookies to improve your experience" is not informed
-- **Unambiguous**: a positive action. No pre-ticked boxes, no "by continuing you
-  agree"
-- **Withdrawable**: as easily as it was given
+## The Four Checks
 
-. . .
-
-::: {.callout-note appearance="minimal"}
-Ireland's Data Protection Commission has been explicit and repeatedly
-enforcing on cookie banners. Check <https://www.dataprotection.ie> for current
-guidance before you publish yours.
-:::
-
-## What It Requires of You, Specifically {.smaller}
-
-1. **A privacy notice**: what you collect, why, on what lawful basis, how long
-   you keep it, who it goes to, and how to contact you
-2. **A consent banner** that blocks the tag until a choice is made
-3. **A data retention setting** in GA4: Admin → Data settings → Data retention.
-   The default is 2 months; 14 is the maximum. **Choose deliberately and say why**
-4. **IP anonymisation**, which GA4 does by default and Universal Analytics did
-   not
-5. **A route to erasure**: GA4's User Explorer can delete an individual's data if
-   you can identify their `user_pseudo_id`
+**1. Shape.** Did the number of rows change when it should not have? Is the
+output the grain you asked for?
 
 . . .
 
-You are a **data controller** for your site. Google is your **processor**. The
-obligations in that list are yours, not Google's.
-
-## What They Do With It {.smaller}
-
-![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_ftc_surveillance_pricing.png){fig-align="center" height="350px"}
-
-*The FTC's 2025 study on surveillance pricing. This is the far end of the same
-pipeline your cookie banner sits at the front of.*
-
-
-## Consent Bias
-
-If 30% of your visitors decline, you do not have 70% of your data. **You have
-100% of the data about people who consent**, which is a different population.
+**2. Extremes.** Look at the largest and smallest values. Nonsense hides in the
+tails, not in the head of the table.
 
 . . .
 
-And they differ systematically: consent rates vary by device, by browser, by
-country, by age, and by how privacy-conscious someone is.
+**3. A known case.** Pick one channel or one week you can compute by hand or read
+off GA4. Does it match?
 
 . . .
 
-**So every rate you compute is a rate among consenters**, and any segment that
-correlates with privacy behaviour is distorted before you touch it.
+**4. Reproduce.** Restart and run all. Then run it on last month's data.
+
+## Verification Is Not Reading the Code
+
+Reading the code catches syntax and obvious logic errors.
 
 . . .
 
-This is the first appearance of a theme that returns in Lecture 21 as sampling
-variability, and in Lecture 20 as an attribution blind spot. **It is a
-measurement limit, not a footnote.**
+It does not catch:
+
+- The right operation on the wrong column
+- A join that silently dropped 40% of rows
+- A filter that excluded exactly the cases you cared about
+- A correct calculation of a metric that answers a different question
+
+. . .
+
+**Only checking the output against something you already know catches those.**
+
+## The Failure Mode You Will Actually Have
+
+<!-- Speaker notes: worth dwelling on. This is not hypothetical, it happens to
+     every student who submits agent-assisted work. -->
+
+You ask for conversion rate by channel. The agent produces a table. It looks
+right. It is formatted nicely. You put it in your report.
+
+. . .
+
+It computed key events divided by **users**, not by **sessions**.
+
+. . .
+
+Every number is wrong by a consistent factor, the ranking happens to be
+unchanged, and nothing about the output looks suspicious.
+
+. . .
+
+**The definition, not the code, was wrong.** No amount of reading the Python
+would have caught it. Checking one channel against GA4 would have.
+
+## Ask for the Assumptions
+
+A cheap habit that catches a lot:
+
+> "Before you write the code, list the assumptions you are making about the
+> data and the metric definitions."
+
+. . .
+
+The assumptions are where the errors are, and they are much faster to read than
+the code.
+
+## Exercise {background="#43464B" .smaller}
+
+Use an agent (Claude, ChatGPT with code execution, or Colab's assistant) on
+Loomrow's GA4 export from Lecture 9:
+
+> "Load this export, clean it, and report sessions and purchases by channel and
+> by week. List your assumptions before you start."
+
+Then, without looking at the code:
+
+1. Check the total sessions against Lecture 9's: 177,124
+2. Check one channel and one week by hand
+3. Find the largest and smallest values and ask whether they make sense
+4. Write down one assumption it made that you would have made differently
+
+**20 minutes**
+
+# 4. Limits, Cost and Safety
+
+## What Agents Are Bad At
+
+- **Small samples**: it will report a difference on n = 12 with no hesitation
+- **Your context**: it does not know that paypal.com is Loomrow's payment page,
+  or which week the bots came
+- **Domain definitions**: sessions, users, key events, engaged sessions. It will
+  pick a plausible one
+- **Saying "I do not know"**: it will produce an answer regardless
+
+. . .
+
+Every one of these is a thing you have learned to worry about: medians and small
+groups in Lectures 3 and 5, GA4's definitions in Lecture 9.
+That is why this lecture is here and not in week one: you can now tell when the
+answer is wrong.
+
+## How Far They Can Actually Go {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_metr_three_fits.png){fig-align="center" height="320px"}
+
+*Task length completed at 50% reliability, with three fits to the same data.
+The disagreement after 2026 is the honest part of the picture.*
+
+
+## What Not to Give an Agent
+
+**Write access to your live GA4 property.** Configuration changes are not
+reversible and historical data does not restate. Lectures 13 and 14 explain why.
+
+. . .
+
+**Your live site, unsupervised.** A broken tag costs you weeks of data.
+
+. . .
+
+**Personal data.** Your GA4 export is pseudonymous, but a comments dataset with
+names in it is not. Lecture 14 applies to what you paste into a chat window.
+
+. . .
+
+**Client credentials.** Ever.
+
+## Who Gains, Who Loses {.smaller}
+
+![Source: [MGT 100 Customer Analytics, UC San Diego](https://github.com/kennethcwilbur/mgt100) (CC BY 4.0)](./figures/external/mgt100_genai_effects_table.png){fig-align="center" height="350px"}
+
+*Most studies find generative AI narrows the gap between high and low
+performers. A few find the opposite. Note which tasks are which.*
+
+
+## Cost
+
+Agents are not free, in money or in time.
+
+. . .
+
+A long agentic session on a small dataset can cost more than doing it yourself,
+and a wrong answer you then have to debug costs far more.
+
+. . .
+
+**Rule of thumb**: chat for questions, context for one-off analysis, agents for
+work you will repeat or work large enough that the loop pays for itself.
+
+## Disclosure
+
+For this module:
+
+- **You may use AI for anything.** There is no penalty and no need to hide it.
+- **You must say what you used it for.** One short section in your notebook or
+  report: which tasks, which tool, what you changed.
+- **You are responsible for every number you submit.** "The AI produced it" is
+  not a defence, in this module or in a job.
+
+. . .
+
+This is the principle the cleaning log formalises next week, in Lecture 11, and
+the measurement plan in Lecture 13. The reader must be able to tell what you
+did.
 
 ## Exercise {background="#43464B"}
 
-For your own site:
+In pairs, one of you plays the client.
 
-1. Publish a consent banner and a privacy notice
-2. List every cookie or identifier your site sets, and its purpose
-3. Set your GA4 data retention explicitly and justify the choice
-4. Estimate what proportion of your traffic you expect to lose to declined consent
+1. The analyst presents a finding produced with an agent
+2. The client asks: "how do you know that is right?"
+3. The analyst answers without saying "the AI did it"
+4. Swap
 
-::: {#timer1 .timer seconds="1200"}
-:::
+Then write, for your own portfolio work, the three sentences of your AI use
+disclosure.
 
-# 4. AI and the Law
-
-## AI This Block: Chat
-
-Where we are on the module's AI spine, set out in Lecture 1 and named properly in Lecture 12:
-
-> **Chat.** A tutor for the concepts. Never an authority on the law.
-
-## Do Not Take Legal Advice From a Chatbot
-
-<!-- Speaker notes: the one place in the module where the honest answer is
-     "verify against the primary source, every time". -->
-
-Assistants are **confidently wrong about data protection law**, in a specific and
-predictable set of ways:
-
-- They mix jurisdictions, answering an Irish question with CCPA rules
-- They cite repealed provisions, because the training data outlived the law
-- They invent article numbers, which look exactly like real ones
-- They state a settled answer where the regulator's position is contested
-
-. . .
-
-**The failure mode is fluency.** A wrong GDPR answer reads exactly like a right
-one, which is not true of a wrong number.
-
-## What It Is Genuinely Good For
-
-- **Drafting** a privacy notice you then check, clause by clause, against the
-  DPC's guidance
-- **Explaining** a concept in plain words, so that you know what to go and
-  confirm
-- **Listing** what your cookie banner should cover, as a starting checklist
-- **Translating** the regulator's language into something you can act on
-
-. . .
-
-**Never**: telling you whether your specific setup is lawful. That is the one
-question it cannot answer and the one it will answer most confidently.
-
-## Exercise {background="#43464B"}
-
-1. Ask an assistant to draft a privacy notice for your site
-2. Check three of its claims against the Data Protection Commission's own guidance
-   at <https://www.dataprotection.ie>
-3. Record what it got wrong
-
-::: {#timer2 .timer seconds="900"}
-:::
+**15 minutes**
 
 ## Next Lecture
 
-Your site is live, tagged and lawful, and it has started to accumulate rows.
-
-. . .
-
-Next week we get those rows **out** of GA4 and into a tool you already know, and
-discover what GA4 quietly withholds on the way.
-
-**Prepare**: bring your property, and the date your first real visitor arrived.
+Cleaning and the audit trail. You now know what you are doing when you let
+something else write the code; next, what to do when the data itself is wrong.

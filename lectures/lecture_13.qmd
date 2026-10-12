@@ -1,464 +1,439 @@
 ---
-title: "Lecture 13: Python I - Notebooks and pandas"
+title: "Lecture 13: Measurement Plan and Implementation"
 subtitle: STA1000 - Data Analytics and Metrics
 ---
 
 ## Previously ...
 
-Six sessions in Tableau, and your own GA4 export on top. You can now:
+You have:
 
-- Connect to a file or a live source
-- Distinguish dimensions from measures
-- Write calculated fields and level-of-detail expressions
-- Build segments, cohorts and stakeholder-ready views
+- A site, or nearly one
+- A statement of what success would look like
 
 . . .
 
-Today we start doing the things Tableau makes awkward.
-
-## Why Move to Python {.smaller}
-
-:::: {layout="[1,1]"}
-::: {#first-column}
-
-**Tableau is better at**
-
-- Exploring visually
-- Sharing with non-analysts
-- Interactive dashboards
-- Speed of first look
-
-:::
-
-::: {#second-column}
-
-**Python is better at**
-
-- Reproducibility: the script is the record
-- Joins across many tables
-- Cohort, retention and RFM logic
-- Text and unstructured data
-- Anything you will do more than twice
-
-:::
-::::
+Today we turn that sentence into machinery: a measurement plan, a GA4 property,
+events, key events and UTM tags.
 
 . . .
 
-You need both. Tableau built the dashboard in Lectures 6 and 7; Python is for
-the analyses that dashboard cannot do.
+**By the end of today your site will be recording data.**
 
 ## Learning Outcomes
 
 By the end of this lecture you will be able to:
 
-- Work in a Colab notebook
-- Load your own GA4 export into a pandas DataFrame
-- Inspect, select and filter a DataFrame
-- Produce a first summary of your own traffic in code
+- Write a measurement plan that connects an objective to a recorded event
+- Create and configure a GA4 property
+- Define custom events with parameters, and mark key events
+- Tag inbound links with UTM parameters consistently
 
-# 1. Notebooks
+# 1. The Measurement Plan
 
-## Google Colab
+## Plan Before Tag
 
-In your browser:
-
-1. Keep these slides open in one tab to copy from
-2. In another tab, go to <https://colab.research.google.com>
-   - Sign in with your DCU or personal Google account
-   - File → New notebook
+The most common failure in marketing analytics is tagging first.
 
 . . .
 
-Nothing to install. It runs on Google's machines and saves to your Drive.
-
-## How a Notebook Works
-
-A notebook is a sequence of **cells**.
-
-- **Code cells** run Python and show the output beneath
-- **Text cells** hold markdown: your commentary, which is not optional
+You end up with 200 events, no idea which matter, and a report nobody reads.
 
 . . .
 
-{{< fa brands windows >}} <kbd>Shift</kbd> + <kbd>Enter</kbd> or {{< fa brands apple >}} <kbd>⇧ Shift</kbd> + <kbd>↩ Return</kbd> runs the current cell and moves to the next.
+**The measurement plan is one page. It is written before you touch GA4.**
 
-## The One Thing That Will Bite You
+## The Structure
 
-Cells run **in the order you run them**, not in the order they appear.
+Each row goes: objective, question, metric, event, parameter.
 
-. . .
+| Objective | Question | Metric | Event | Parameters |
+|---|---|---|---|---|
+| Get enquiries | Are people contacting me? | Enquiries / week | `generate_lead` | `form_location` |
+| Show work | Is anyone reading case studies? | Engaged reads | `read_case_study` | `case_id`, `scroll_pct` |
+| Reach | Where do visitors come from? | Sessions by channel | (automatic) | `source`, `medium` |
 
-A notebook that works for you may not work for the person you send it to,
-because you ran cell 8 before cell 5.
+## Working Backwards
 
-. . .
-
-**Before you submit anything: Runtime → Restart and run all.** If it fails, it
-was never working.
-
-## Documenting as You Go
-
-The notebook is the audit trail we formalise in Lecture 17.
+The plan is written right to left in practice:
 
 . . .
 
-Every analysis cell gets a text cell above it saying **what question it answers**,
-and a text cell below saying **what you concluded**.
+1. Start with the **decision** you want to support
+2. State the **question** that decision turns on
+3. Choose the **metric** that answers it
+4. Identify the **event** that produces the metric
+5. List the **parameters** you need to slice it
 
 . . .
 
-A notebook of 40 code cells and no prose is not an analysis, it is a transcript.
+If you cannot get from a proposed event back to a decision, do not implement it.
 
-# 2. pandas
-
-## Importing
-
-```{.python}
-import pandas as pd
-```
-
-. . .
-
-`pd` is the universal alias. Every example you find online assumes it.
-
-## The DataFrame
-
-A DataFrame is a table: named columns, indexed rows, each column one type.
-
-. . .
-
-Think of a well-behaved spreadsheet with the following rules enforced:
-
-- Every column has one name
-- Every column holds one kind of thing
-- Every row is one observation
-
-. . .
-
-That last point is the definition of tidy data, and your GA4 export mostly obeys it.
-
-## Loading Your Export
-
-From a file you uploaded to Colab:
-
-```{.python}
-ga4 = pd.read_csv("ga4_export.csv")
-```
-
-. . .
-
-From a URL, which is more reproducible:
-
-```{.python}
-ga4 = pd.read_csv("https://raw.githubusercontent.com/user/repo/main/ga4_export.csv")
-```
-
-. . .
-
-GA4 CSV exports carry several header lines before the table. Skip them:
-
-```{.python}
-ga4 = pd.read_csv("ga4_export.csv", skiprows=9)
-```
-
-## Looking at It First
-
-Always, in this order:
-
-```{.python}
-ga4.shape       # (rows, columns)
-ga4.head()      # first five rows
-ga4.dtypes      # what type is each column
-ga4.info()      # types plus non-null counts
-ga4.describe()  # numeric summaries
-```
-
-. . .
-
-`ga4.dtypes` is the one people skip and regret. A date read as text, or sessions
-read as text because of a thousands separator, will silently break everything
-downstream.
-
-## Fixing Types
-
-```{.python}
-ga4["date"] = pd.to_datetime(ga4["date"], format="%Y%m%d")
-ga4["sessions"] = pd.to_numeric(ga4["sessions"], errors="coerce")
-```
-
-. . .
-
-`errors="coerce"` turns unparseable values into `NaN` rather than raising.
-Then count them, because a silent `NaN` is a lie:
-
-```{.python}
-ga4["sessions"].isna().sum()
-```
-
-# 3. Selecting and Filtering
-
-## Columns
-
-```{.python}
-ga4["sessions"]                          # one column, a Series
-ga4[["date", "sessions", "channel"]]     # several columns, a DataFrame
-```
-
-. . .
-
-Single brackets give you a Series, double brackets give you a DataFrame. This
-distinction causes more confusion than it should.
-
-## Rows
-
-Filtering uses a boolean condition:
-
-```{.python}
-ga4[ga4["channel"] == "Organic Search"]
-ga4[ga4["sessions"] > 10]
-```
-
-. . .
-
-Combine with `&` (and) and `|` (or), **with brackets around each condition**:
-
-```{.python}
-ga4[(ga4["channel"] == "Organic Search") & (ga4["sessions"] > 10)]
-```
-
-. . .
-
-Python's `and` / `or` do not work here. This is not negotiable and it is not
-your fault.
-
-## Chaining
-
-The readable pattern, which is the one we will keep using:
-
-```{.python}
-(ga4
-  .query("channel == 'Organic Search'")
-  .sort_values("sessions", ascending=False)
-  .head(10)
-)
-```
-
-. . .
-
-Wrap the chain in brackets, one operation per line. Read it top to bottom as a
-sentence.
-
-## New Columns
-
-```{.python}
-ga4 = ga4.assign(
-    conversion_rate = lambda d: d["key_events"] / d["sessions"],
-    is_mobile = lambda d: d["device"] == "mobile"
-)
-```
-
-. . .
-
-`assign` with a `lambda` keeps the chain intact and avoids modifying the
-original object in place, which is what makes a notebook reproducible.
-
-## A First Summary
-
-```{.python}
-(ga4
-  .groupby("channel")
-  .agg(sessions=("sessions", "sum"),
-       key_events=("key_events", "sum"))
-  .assign(cvr=lambda d: d["key_events"] / d["sessions"])
-  .sort_values("sessions", ascending=False)
-)
-```
-
-. . .
-
-We take `groupby` properly next lecture. For now, notice it is the same
-split-apply-combine idea as a Tableau breakdown, written down.
-
-# Live Demo
-
-## Exercise {background="#43464B"}
-
-Open a notebook and, with your own GA4 export:
-
-```{.python}
-import pandas as pd
-ga4 = pd.read_csv("____", skiprows=__)
-
-ga4.shape
-ga4.dtypes
-ga4.head()
-```
-
-1. Load your export and report its shape
-2. Fix any column whose type is wrong, and count the values that failed to parse
-3. Filter to a single channel and report total lectures 10. Add a conversion rate column
-
-**15 minutes**
-
-## Exercise {background="#43464B"}
-
-Now write the prose:
-
-1. Above each code cell, a sentence saying what question it answers
-2. Below each, a sentence saying what you found
-3. Restart and run all
-4. Note one thing that is easier here than in Tableau, and one that is harder
-
-**10 minutes**
-
-# 4. A Note on Libraries
-
-## pandas, polars, and what you will meet
-
-This module uses **pandas**, because it is what marketing teams, tutorials and
-AI assistants all assume.
-
-. . .
-
-You will meet **polars** elsewhere (including in BAA1030). It is faster and its
-syntax is arguably cleaner. The concepts transfer directly: filter, select,
-with_columns, group_by, agg.
-
-. . .
-
-Learning the ideas matters more than learning the library. The library will
-change.
-
-# 5. Vibe Coding with pandas
-
-## AI This Block: Agentic Coding
-
-Where we are on the module's AI spine, introduced in Lecture 12:
-
-> **The assistant writes and runs the code with you.**
-
-Lecture 12 covered the modes and the verification discipline. This section is
-the pandas-specific version.
-
-## What Vibe Coding Is
-
-Describing the transformation you want in words and letting an assistant write
-the pandas.
-
-. . .
-
-It works well here because:
-
-- The chained syntax reads top to bottom, so it is easy to verify
-- pandas is heavily represented in training data, so the code is usually idiomatic
-- You can check the output shape immediately
-
-. . .
-
-It does **not** mean running code you have not checked.
-
-## In Practice
-
-**Step 1:** Describe the goal, naming your data
-
-> "From a pandas DataFrame called `ga4` with columns `date`, `channel`,
-> `sessions` and `key_events`, compute sessions and conversion rate per channel
-> for the last 8 weeks, sorted by sessions."
-
-. . .
-
-**Step 2:** The assistant produces code
-
-```{.python}
-(ga4
-  .query("date >= @cutoff")
-  .groupby("channel")
-  .agg(sessions=("sessions", "sum"),
-       key_events=("key_events", "sum"))
-  .assign(cvr=lambda d: d.key_events / d.sessions)
-  .sort_values("sessions", ascending=False)
-)
-```
-
-**Step 3:** Read it, run it, check the total against GA4
-
-## Tips: Write a Specific Prompt {.smaller}
-
-- Name the DataFrame and the **exact** column names
-- Say **pandas**, or you may get polars, SQL or base Python
-- State the grain you want out
-- Say what to do with missing values
-
-. . .
-
-**A prompt that works:**
-
-> "Using pandas, on `ga4` with columns `date`, `channel`, `sessions`, add a
-> column `week` from `date` and return sessions per channel per week as a wide
-> table. Leave rows with a missing channel in, labelled `unknown`."
-
-## Tips: Pitfalls, and What to Check {.smaller}
+## Objectives Are Not Metrics
 
 :::: {layout="[1,1]"}
 ::: {#first-column}
 
-**Common pitfalls**
+**Not an objective**
 
-- Not naming the library, so you get a different one
-- Column names that do not match your export
-- Accepting a `SettingWithCopyWarning` without reading it
-- Chained operations that silently drop rows
+- "Increase engagement"
+- "Improve the funnel"
+- "Grow the brand"
+
+These cannot be recorded, so they cannot be tested.
 
 :::
 
 ::: {#second-column}
 
-**Always check**
+**An objective**
 
-- Did the row count change when it should not have?
-- Are the totals the same as before the transformation?
-- Does one known channel match GA4?
+- "Get 5 enquiries a month from the contact form"
+- "Have half of case study visitors reach the bottom of the page"
+
+These name an action, a count and a period.
 
 :::
 ::::
 
-## The pandas-Specific Trap
+## Exercise {background="#43464B"}
 
-<!-- Speaker notes: this is the one that costs students marks, because the
-     output looks fine. -->
+Write the first three rows of your own measurement plan.
 
-An assistant will happily write a `groupby` that drops your `NaN` groups without
-mentioning it.
+Use the four answers you brought from Lecture 1:
+
+- What the site is for
+- Who visits
+- What action counts as a win
+- What number tells you it works
+
+One row per objective. Do not write more than four rows.
+
+**10 minutes**
+
+# 2. Setting Up GA4
+
+## The Object Model
+
+GA4's hierarchy, which is not the same as Universal Analytics:
+
+```
+Account
+└── Property          <- your site lives here
+    └── Data stream   <- one per platform (web, iOS, Android)
+        └── Events    <- everything GA4 records is an event
+```
 
 . . .
 
-`groupby` excludes missing keys by default. If 15% of your sessions have no
-channel recorded, they vanish from the table and the totals no longer reconcile.
+There are no "goals" and no "views". There are events, and some events are
+marked as key events.
+
+## Creating the Property
+
+Walk through, live:
+
+1. `analytics.google.com` → Admin → Create property
+2. Property name, **reporting time zone (Dublin)**, currency (EUR)
+3. Business details, objectives
+4. Create a **Web** data stream with your site URL
+5. Copy the measurement ID: `G-XXXXXXXXXX`
 
 . . .
 
-**Check your total against the ungrouped total. Every time.**
+**Set the time zone correctly now.** Changing it later does not restate
+historical data, and every weekly figure you compute will be wrong.
+
+## Installing the Tag
+
+The Google tag goes in `<head>`, on every page.
+
+```{.html}
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
+```
+
+. . .
+
+In Quarto, this goes in `_quarto.yml` under `format: html: include-in-header`,
+so it is applied to every page from one place.
+
+## Verifying It
+
+Do not assume it worked.
+
+. . .
+
+- **Realtime report**: load your own site, see yourself appear
+- **DebugView**: install the GA Debugger extension, watch individual events
+- **Tag Assistant**: confirms the tag fires and reports its configuration
+
+. . .
+
+**A tag that fires on the homepage but not on the contact page is the single
+most common cause of a "broken funnel" in Lecture 17.** Check every page.
+
+# 3. Events and Parameters
+
+## Automatic Events
+
+GA4 collects some events without configuration:
+
+- `page_view`
+- `session_start`, `first_visit`
+- `scroll` (90% depth)
+- `click` (outbound links)
+- `file_download`
+- `video_start`, `video_progress`, `video_complete`
+
+. . .
+
+Enhanced measurement covers most of these. **Check which are on** in your data
+stream settings, because they are the ones you get for free.
+
+## Custom Events
+
+For anything specific to your site, you send your own:
+
+```{.html}
+<button onclick="gtag('event', 'generate_lead', {
+    'form_location': 'contact_page',
+    'enquiry_type': 'freelance'
+});">Send enquiry</button>
+```
+
+. . .
+
+The event name is a **verb**. The parameters are the **adjectives** that let you
+slice it later.
+
+## Naming Conventions {.smaller}
+
+Decide once, apply everywhere:
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+**Do**
+
+- `snake_case` throughout
+- Verb-object: `read_case_study`
+- Use GA4's recommended names where one fits (`generate_lead`, `sign_up`,
+  `purchase`)
+- Parameter names shared across events
+
+:::
+
+::: {#second-column}
+
+**Do not**
+
+- `ContactFormSubmitted`
+- `contact-form-submit`
+- `button_click_1`
+- A different name for the same action on two pages
+
+:::
+::::
+
+. . .
+
+**You cannot rename an event retroactively.** Historical data keeps the old name.
+
+## Parameters and Custom Dimensions
+
+A parameter sent with an event is **not** automatically reportable.
+
+. . .
+
+To use `form_location` as a dimension in a report, register it:
+
+Admin → Custom definitions → Create custom dimension → Event-scoped →
+Parameter name `form_location`
+
+. . .
+
+Registration is **not retroactive** either. Register before you need it.
+
+## Key Events
+
+What used to be called conversions.
+
+. . .
+
+Admin → Events → toggle **Mark as key event** on the event that represents your
+objective.
+
+. . .
+
+Keep it to **one or two**. If everything is a key event, the conversion rate in
+every report becomes meaningless, and the funnel in Lecture 17 has no top.
+
+## Limits Worth Knowing
+
+- 500 distinct event names per property
+- 25 parameters per event
+- 50 event-scoped custom dimensions
+- Event names are case-sensitive: `Sign_Up` and `sign_up` are two events
+
+. . .
+
+These are generous. You will not hit them. The case sensitivity will catch you.
+
+# 4. UTM Parameters
+
+## The Problem UTMs Solve
+
+GA4 can see the referring domain. It cannot see:
+
+- Which newsletter the click came from
+- Which of your three LinkedIn posts
+- Whether a link was in the bio or in a comment
+
+. . .
+
+Unless you tell it, in the URL.
+
+## The Five Parameters
+
+| Parameter | Answers | Example |
+|---|---|---|
+| `utm_source` | Which platform? | `linkedin` |
+| `utm_medium` | Which type? | `social` |
+| `utm_campaign` | Which effort? | `portfolio_launch` |
+| `utm_content` | Which variant? | `bio_link` |
+| `utm_term` | Which keyword? | `data_analyst_dublin` |
+
+. . .
+
+Source, medium and campaign are the ones you will actually use.
+
+## A Tagged URL
+
+```
+https://mysite.ie/work/?utm_source=linkedin&utm_medium=social&utm_campaign=portfolio_launch&utm_content=bio_link
+```
+
+. . .
+
+Build these with the Campaign URL Builder rather than by hand:
+
+<https://ga-dev-tools.google/campaign-url-builder/>
+
+## Consistency Is the Whole Point
+
+UTM values are **case-sensitive and free text**. GA4 will happily report:
+
+```
+LinkedIn / Social
+linkedin / social
+Linkedin / social
+linkedin / Social
+```
+
+. . .
+
+as four separate channels.
+
+. . .
+
+**Write your conventions in a spreadsheet before your first campaign.** All
+lowercase, no spaces, a fixed vocabulary for medium. This spreadsheet is the
+join key: Lecture 9's merge only worked once both campaign names were in lower
+case.
+
+## What Not to Tag
+
+<!-- Speaker notes: this is the classic self-referral mistake and it will
+     appear in student data if not pre-empted. -->
+
+**Never put UTM parameters on internal links.**
+
+. . .
+
+Tagging a link from your own homepage to your own contact page starts a new
+session and attributes it to yourself. Your acquisition report then says your
+best traffic source is your own site.
+
+. . .
+
+Lecture 11 showed what that damage looks like in an export.
 
 ## Exercise {background="#43464B"}
 
-Use an assistant to generate pandas for these, on your own export. **Read the
-code before running it.**
+Complete your implementation:
 
-1. *"Using pandas, on a DataFrame `ga4`, add a `week` column from `date` and
-   return total sessions per week."*
-2. *"Using pandas, return the top 5 channels by conversion rate, but only
-   channels with at least 30 sessions."*
-3. Run both, then check that the weekly totals sum to your overall total
-4. Note whether either dropped rows without telling you
+1. Install the tag and confirm it fires on **every** page in Realtime
+2. Implement at least two custom events with at least one parameter each
+3. Register those parameters as custom dimensions
+4. Mark one event as a key event
+5. Build three tagged URLs for wherever you will share the site, and write your
+   naming conventions into a spreadsheet
+
+**25 minutes, finish before next lecture**
+
+# 5. AI for the Measurement Plan
+
+## What to Delegate Here
+
+<!-- Speaker notes: demonstrate live. Paste a half-written measurement plan and
+     let the room watch it produce a usable gtag snippet in seconds, then watch
+     it invent a plausible objective when you leave that row blank. Both halves
+     of the lesson are in the same demo. -->
+
+Safe and useful:
+
+- Generating the `gtag` snippet for a custom event with parameters
+- Reviewing your event names against GA4's recommended names
+- Turning your objective into candidate questions and metrics
+- Explaining what a GA4 setting does
+
+## What Not to Delegate
+
+**The objective.** An assistant will invent a plausible one, and you will spend
+the semester measuring something you do not care about.
+
+. . .
+
+**The decision about what counts as a key event.** That is a commercial
+judgement about your own site.
+
+. . .
+
+**Verification.** It cannot see your Realtime report. Only you can confirm the
+tag fires on every page.
+
+## A Prompt That Earns Its Place
+
+> "Here is my measurement plan [paste your table]. For each row, tell me whether
+> the event I have chosen can actually produce the metric I have named, and flag
+> any parameter I will need but have not listed."
+
+. . .
+
+This catches the most expensive error in the whole block: **an event that cannot
+answer the question it was created for**, discovered in Lecture 17 when your
+funnel has no middle.
+
+## Exercise {background="#43464B"}
+
+1. Run the prompt above on your own measurement plan
+2. Ask it to generate the `gtag` call for your key event
+3. Implement it, then verify in DebugView that the parameters arrive
+4. Note one thing it got wrong about GA4
 
 **15 minutes**
 
 ## Next Lecture
 
-Grouping properly, and joining your traffic to ad spend and content metadata.
+Your site is now recording data about people. We look at what that data actually
+is, who owns it, and what the law requires of you.
 
 . . .
 
-That is where the interesting metrics start, because GA4 alone cannot tell you
-what anything cost.
+**The cookie banner is now your problem.**

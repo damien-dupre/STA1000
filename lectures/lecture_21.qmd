@@ -1,427 +1,493 @@
 ---
-title: "Lecture 21: Experimentation"
+title: "Lecture 21: Frameworks and Sustainable Performance"
 subtitle: STA1000 - Data Analytics and Metrics
 ---
 
 ## Previously ...
 
-Attribution models disagree because they are all assumptions. An experiment
-replaces the assumption with evidence, and then charges you for it in sample
-size.
+Twenty-two lectures of individual metrics: reach, conversion rate, CAC, LTV,
+ROAS, contribution, attribution, lift.
+
+. . .
+
+A board does not want a list of metrics. It wants a **structure**, and it
+increasingly wants one that does not stop at money.
+
+<!-- Speaker notes: this lecture carries LO6 and LO8 and is the merge of two
+     earlier sessions. If time is short, cut section 3 (successors) rather than
+     section 4, which is LO6's only home. -->
 
 ## Learning Outcomes
 
 By the end of this lecture you will be able to:
 
-- Design an A/B test on your own site, and pre-register it
-- Explain sampling variability using your own traffic volumes
-- Compute the sample size a decision would require, and react honestly
-- Read a test result, including a null result, without over-claiming
+- Describe the Balanced Scorecard and its marketing application
+- Compare it to later frameworks and select one for a given organisation
+- Explain why marketing performance measurement now includes non-financial metrics
+- Evaluate a sustainability claim against its evidence
 
-# 1. Why Experiments
+# 1. Why a Framework
 
-## Selection Effects Are Large. Treatment Effects Are Small.
+## The Metric Sprawl Problem
 
-The most useful rule of thumb in applied marketing:
-
-. . .
-
-**Differences between groups of people are usually large. Differences caused by
-what you did to them are usually small.**
+A GA4 property exposes several hundred metrics. Your dashboard could show any of
+them.
 
 . . .
 
-So any comparison of two groups you did not randomise is measuring mostly
-selection. The people who clicked the email differ from the people who did not,
-in ways that dwarf whatever the email did.
+Without a structure, three things happen, reliably:
+
+- The report becomes a **data dump**, and nobody reads past the first screen
+- The client picks the **flattering number**, because you offered it
+- Nobody can say whether the quarter was good, because there is no agreed answer
+  to what good means
 
 . . .
 
-Randomisation is the only tool that removes selection by construction rather
-than by assumption.
+**A framework is a commitment made in advance about which numbers count.** It is
+the pre-registration habit from Lecture 12, at organisational scale.
 
-::: {.callout-note appearance="minimal"}
-Name the exceptions: where are treatment effects genuinely large? Price changes
-and giving things away for free are two. What do they have in common?
-:::
+## What a Framework Actually Does
 
-## What Randomisation Buys You
-
-It makes the two groups **exchangeable in expectation** on everything, including
-the things you did not measure and did not think of.
+1. **Selects.** A small set of metrics, chosen before the results are in
+2. **Structures.** A hierarchy, so a number has a parent it explains
+3. **Connects.** Every metric attaches to a stated objective
+4. **Forces trade-offs into the open.** Two metrics that pull against each other
+   are visible on the same page rather than argued about separately
 
 . . .
 
-That is the entire trick, and nothing else in analytics does it. Every control
-variable in Lecture 22's regression can only adjust for confounders you named.
+The fourth is the one that makes frameworks uncomfortable, and the reason they
+are worth having.
+
+# 2. The Balanced Scorecard
+
+## Kaplan and Norton, 1992
+
+Robert Kaplan and David Norton's argument was simple and, at the time, radical:
+
+> Financial measures are **lagging** indicators. They tell you the result of
+> decisions taken quarters ago, and they tell you nothing about whether the next
+> quarter will be any good.
 
 . . .
 
-**What it does not buy you**: precision. Randomisation removes bias. Sample size
-removes noise. They are separate problems and a small randomised test is
-unbiased and useless.
-
-## Exogenous Variation, and Why Firms Pay For It
-
-The reason a price experiment is worth running rather than just analysing
-historical prices: **historical prices moved for reasons**.
+Managing on financial measures alone therefore encourages exactly the behaviour
+that produces good numbers now and a weaker business later: cutting training,
+deferring maintenance, under-investing in the customer relationship.
 
 . . .
 
-Prices rose when demand was strong, or when costs rose, or when a competitor
-exited. Regress quantity on those prices and you measure the reasons, not the
-price effect. Sometimes you find that raising prices increases sales.
+**Their fix was to make three other kinds of measure equally visible.**
+
+## The Four Perspectives {.smaller}
+
+| Perspective | The question | A marketing metric |
+|---|---|---|
+| **Financial** | How do we look to shareholders? | Contribution, ROAS, CAC payback |
+| **Customer** | How do customers see us? | NPS, retention, share of wallet |
+| **Internal process** | What must we excel at? | Campaign cycle time, lead response time |
+| **Learning and growth** | Can we keep improving? | Test velocity, skills, data quality |
 
 . . .
 
-An experiment creates price variation that is unrelated to everything else. That
-is what "exogenous" means and it is the scarce commodity.
+Note where this module's own subject sits. **Data quality is a learning and
+growth metric**, which is why the cleaning log in Lecture 11 is a management
+artefact and not just good manners.
 
-<!-- Speaker notes: this is the cleanest available motivation for randomisation
-     and it lands better than the medical framing, because they can see the
-     mechanism. Keep it to five minutes; the full endogeneity treatment belongs
-     in a different module. -->
+## Strategy Maps
 
-## Experiments and Models Are Complements
+The perspectives are not a list. They are a **causal chain**, read from the
+bottom up:
 
-Firms that only run experiments learn what happened at the two prices they
-tested.
-
-. . .
-
-Firms that only model learn a lot, conditional on assumptions nobody can check.
-
-. . .
-
-**Together**: the experiment identifies the effect, the model extends it to
-prices you did not test and to segments you could not power separately.
-
-. . .
-
-And the practical warning: price experiments are **visible**. Competitors,
-customers, suppliers and distributors can all see them, and can all react. An
-experiment is not a private act.
-
-# 2. Design
-
-## The One-Thing Rule
-
-Change one thing, or you learn nothing about which thing worked.
-
-. . .
-
-The counter-argument is real: changing one button colour is cheap and almost
-always produces a null result, because the effect is tiny relative to the noise.
-
-. . .
-
-**So change one thing, and make it a big one.** At portfolio volume, the only
-tests worth running are tests of changes you would be nervous about.
-
-## Hypothesis Before Data
-
-A testable statement, with a direction, a metric, and a number, written **before
-the test runs**:
-
-> "Moving the enquiry form above the fold will increase the session-to-enquiry
-> rate by at least 20% relative. Primary metric: session key event rate.
-> Guardrail: bounce rate must not rise by more than 5 points."
-
-. . .
-
-This is the same pre-registration habit as the success statement in Lecture 8,
-and it is what stops the analysis in Lecture 5 where you picked two segments
-before looking.
-
-## Choosing the Metric
-
-**Primary metric**: one. Chosen in advance. The test succeeds or fails on it.
-
-. . .
-
-**Guardrail metrics**: two or three things that must not get worse. You do not
-test them, you watch them.
-
-. . .
-
-**Everything else**: exploratory, and reported as exploratory.
-
-. . .
-
-Test twenty metrics and report the winner and you have not run an experiment,
-you have run a search. At the conventional 5% threshold, twenty independent
-metrics produce a "significant" result by chance about two thirds of the time.
-
-::: {.callout-note appearance="minimal"}
-This is Lecture 5's segment-hypothesis trap in a more formal costume. Why is it
-worse here than it was there?
-:::
-
-# 3. Sampling Variability
-
-## Why Two Identical Pages Give Different Numbers
-
-<!-- Speaker notes: this is the heart of the module's statistics content, and
-     the only place students can feel it, because the n is their own. Run the
-     simulation live with their real weekly traffic. Ask for predictions first,
-     out loud, before running it. -->
-
-Run the same page against itself. Split the traffic randomly. The two halves
-will not report the same conversion rate.
-
-. . .
-
-Not because anything differs. Because 40 coin flips do not come out 20-20.
-
-```{.python}
-import numpy as np
-rng = np.random.default_rng(0)
-n, p = 40, 0.05
-sim = [rng.binomial(n, p)/n - rng.binomial(n, p)/n for _ in range(10000)]
-np.percentile(sim, [2.5, 97.5])
+```{mermaid}
+%%| echo: false
+%%| fig-align: center
+%%| fig-height: 2.2
+flowchart LR
+  L["<b>Learning &amp; growth</b><br>analyst skills,<br>data quality"] --> P["<b>Internal process</b><br>faster tests,<br>quicker response"]
+  P --> C["<b>Customer</b><br>better experience,<br>higher retention"]
+  C --> F["<b>Financial</b><br>contribution,<br>growth"]
 ```
 
 . . .
 
-With $n = 40$ per arm and a true 5% rate in both, the observed difference lands
-anywhere within roughly ±10 percentage points. **A "doubling" is entirely
-ordinary when nothing whatsoever has happened.**
+**Drawing the map is the exercise that exposes the assumptions.** Every arrow is
+a claim that one thing causes another, and most organisations have never tested
+any of them.
 
-## Where the Variation Comes From {.smaller}
+## Criticisms Worth Taking Seriously
 
-![Source: [DS701 Tools for Data Science, Boston University](https://github.com/tools4ds/DS701-Course-Notes)](./figures/external/ds701_galton_bean_machine.png){fig-align="center" height="340px"}
-
-*Galton's bean machine. Every bead follows the same rules and no two columns
-end up the same height. That is your A/A test.*
-
-
-## Confidence Intervals First
-
-> "Between −3 and +9 percentage points."
-
-says considerably more than
-
-> "p = 0.31."
+- **Static.** Built annually, in a world that moves quarterly
+- **Top-down.** Cascaded from the board, so the people measured did not choose
+  the measures
+- **Slow.** Some measures cannot be updated more often than they can be collected
+- **Causality is assumed, not demonstrated.** The arrows on the strategy map are
+  hypotheses, and they are rarely tested even when the data exists
 
 . . .
-
-The interval reports **what the data can rule out**. It shows that a large
-positive effect is still consistent with your result, and so is a small negative
-one, which is the honest state of knowledge.
-
-. . .
-
-**Report the interval. Then, if you must, the p-value.**
-
-## What a p-value Is Not
-
-- **Not** the probability that your hypothesis is true
-- **Not** the probability the result is due to chance
-- **Not** a measure of effect size: a tiny effect on huge traffic gives a tiny p
-- **Not** a licence to stop the test
-
-. . .
-
-It is the probability of seeing data at least this extreme **if nothing were
-happening**. That is a narrow, conditional statement, and every over-claim in
-marketing analytics comes from widening it.
-
-## Peeking
-
-Checking the test every day and stopping when it looks good **inflates the false
-positive rate**, badly. The nominal 5% becomes 20% or worse depending on how
-often you look.
-
-. . .
-
-The intuition: the difference wanders. Given enough looks, it will wander across
-the significance threshold at some point, and you have arranged to stop
-precisely then.
-
-. . .
-
-**Fix the duration in advance**, from the power calculation, and look at the end.
-Or use a sequential testing method built for peeking, and say that you did.
-
-## Regression to the Mean
-
-The variant "won" in a week when the baseline was unusually bad.
-
-. . .
-
-Extremes are followed by less extreme values, for no reason other than that
-extremes are partly luck. This is why firing the coach after a bad season
-appears to work, and why the herbal remedy started after a terrible winter
-appears to work.
-
-. . .
-
-**In marketing**: any decision triggered by an unusually bad period will look
-successful. Any test started because "conversion collapsed last week" is
-measuring the recovery that was coming anyway.
 
 ::: {.callout-note appearance="minimal"}
-Does randomisation protect you from this? Both arms run in the same weeks, so
-what exactly is protected, and what is not?
+The last one is the interesting criticism for this module. You spent Lecture 19
+learning how to test a causal claim. Almost nobody applies it to their own
+strategy map.
 :::
 
-# 4. Reality on a Small Site
+# 3. Successors
 
-## Power
+## OKRs {.smaller}
 
-To detect a 20% relative lift on a 3% base rate (3.0% versus 3.6%), at 80% power
-and 5% significance, you need roughly **14,000 sessions per arm**.
+**Objectives and Key Results**: one qualitative objective, three to five
+quantitative key results, reviewed quarterly.
 
-. . .
-
-Your portfolio produces perhaps 40 sessions a week.
-
-. . .
-
-$$\frac{2 \times 14{,}000}{40} \approx 700 \text{ weeks}$$
+> **Objective**: Become the obvious choice for Dublin deadstock buyers
+>
+> **KR1**: Repeat purchase rate from 18% to 26%
+> **KR2**: Non-follower reach share from 41% to 55%
+> **KR3**: Email list from 2,100 to 5,000
 
 . . .
-
-**Thirteen years.** Compute it live with the room's actual traffic. The answer is
-uncomfortable and the discomfort is the lesson.
-
-## What to Do Instead
-
-1. **Test bigger changes.** Effect size is in the numerator. A whole new landing
-   page can move a rate by 50%; a button colour cannot
-2. **Move up the funnel.** Click-through on a link happens 30 times more often
-   than an enquiry. Test on the frequent event, and be explicit that it is a
-   proxy
-3. **Run longer, and accept the seasonality** you have bought
-4. **Change the question.** Five user interviews will tell you more about your
-   enquiry form than an underpowered A/B test, and you can say why
-
-. . .
-
-**Or run it and report the interval.** An honest wide interval is a legitimate
-deliverable in this module.
-
-## Reporting a Null Result
-
-"No detectable difference, 95% CI −4 to +6 points, n = 380 per arm" is a
-**finding**. It says the effect, if any, is not large.
-
-. . .
-
-"The variant won, 8% versus 5%" on n = 30 is not a finding. It is a coin flip
-with a conclusion attached.
-
-. . .
-
-**Documented judgement beats undocumented certainty.** The marking here rewards
-the student who computed the power, found it impossible, ran the test anyway and
-reported honestly, over the one who declared a winner.
-
-## Exercise {background="#43464B"}
-
-On your own portfolio:
-
-1. Write a hypothesis with a direction, a primary metric and a guardrail
-2. Compute the sample size needed for a 20% relative lift on your base rate
-3. Compare it to your actual weekly traffic and state how long the test would
-   take
-4. Decide what you will do about that, and write the decision down
-5. Run the test anyway, and report the confidence interval rather than a winner
-
-**30 minutes**
-
-# 5. AI and the Temptation to Over-Claim
-
-## AI This Block: An analyst you interrogate
-
-Where we are on the module's AI spine, introduced in Lecture 12:
-
-> **An analyst you interrogate**
-
-## It Will Not Stop You
-
-<!-- Speaker notes: run this live. Give an assistant a fake result on n=30 and
-     watch it write a confident, well-structured recommendation with next steps.
-     It is the most persuasive demonstration in the whole module. Then run the
-     fixed prompt on the same numbers. -->
-
-> "Variant B converted at 8% versus 5% for A, 30 sessions each. What should I
-> do?"
-
-. . .
-
-You will get a recommendation. Probably a well-organised one, with next steps and
-a note about continuing to monitor.
-
-. . .
-
-It will rarely volunteer, unprompted, that 30 sessions cannot support any
-conclusion at all.
-
-## The Prompt That Fixes It
-
-> "Before recommending anything, compute the confidence interval for the
-> difference in proportions, state the minimum detectable effect at this sample
-> size, and tell me whether this sample can support a conclusion."
-
-. . .
-
-Same numbers, entirely different answer.
-
-. . .
-
-**The obligation to ask is yours.** That is the single sentence to take out of
-this lecture, and it generalises well past A/B tests.
-
-## Using It Properly {.smaller}
 
 :::: {layout="[1,1]"}
 ::: {#first-column}
 
-**Reliable**
+**Stronger than the scorecard at**
 
-- Power and sample-size calculations
-- Simulation code for the peeking demonstration
-- Explaining what a confidence interval means, in client language
-- Listing the guardrail metrics you forgot
+Cadence, focus, and getting the team to care
 
 :::
 
 ::: {#second-column}
 
-**Never**
+**Weaker at**
 
-- Deciding whether to stop the test
-- Judging whether the effect is practically important
-- Telling you whether the randomisation actually worked
-- Choosing the primary metric after seeing the data
+Trade-offs. Nothing in the format says what you are willing to lose
 
 :::
 ::::
 
+## The North Star Metric
+
+One number the whole organisation is steered by, with a handful of input metrics
+beneath it.
+
+. . .
+
+Attractive because it is simple, and **dangerous for exactly the same reason**.
+Everything not in the number becomes invisible, and any single metric can be
+moved in ways nobody intended.
+
+. . .
+
+::: {.callout-note appearance="minimal"}
+If Loomrow's north star were "reach", the reel in Lecture 3 that reached 535,086
+accounts and engaged almost none of them would be the best thing the company ever
+did.
+:::
+
+## Marketing-Specific Scorecards
+
+- **Funnel-stage scorecards**: a small set of metrics per stage, so awareness and
+  conversion are not judged by the same number
+- **Brand plus performance**: the long-term and short-term split, because the
+  measurable half is the short-term half and budgets follow measurement
+- **The Marketing Accountability Standards Board** line of work, on connecting
+  marketing activity to financial outcomes in terms a CFO accepts
+
+## Choosing One {.smaller}
+
+| If the organisation is... | Consider |
+|---|---|
+| Small, fast, one marketing hire | OKRs. Quarterly, few metrics, low overhead |
+| Large, board-governed, regulated | Balanced Scorecard, with a reporting calendar |
+| Product-led with one clear behaviour | A north star, plus explicit guardrail metrics |
+| Data-immature | Fewer metrics than you want, measured properly |
+
+. . .
+
+**The last row is the common case and the hardest advice to give**, because it
+sounds like doing less. A framework the organisation cannot feed is worse than no
+framework: it produces numbers nobody trusts and everybody quotes.
+
 ## Exercise {background="#43464B"}
 
-1. Give an assistant your real test result and ask for a recommendation
-2. Then ask for the confidence interval and the minimum detectable effect
-3. Compare the two answers and write what changed
-4. Ask it to compute your required sample size, and check its arithmetic against
-   an online calculator
+For Loomrow, or a company you know:
 
-**15 minutes**
+1. Build a four-perspective scorecard with two metrics per perspective
+2. Draw the strategy map linking them
+3. Mark every arrow that is **assumed** rather than measured
+4. Say which framework you would actually recommend, and why
+
+::: {#timer1 .timer seconds="1500"}
+:::
+
+# 4. The Perspective Every Framework Now Needs
+
+## Why This Is a Marketing Metrics Question {.smaller}
+
+<!-- Speaker notes: regulation here moves fast and has been repeatedly amended,
+     delayed and simplified. Check the current position of CSRD, the omnibus
+     package and the Green Claims proposal before delivering this slide, and say
+     plainly when something is in flux. -->
+
+**Regulation.** EU corporate sustainability reporting obligations have been
+extending non-financial disclosure well beyond the largest listed companies, and
+separate work on substantiating environmental claims has been moving in parallel.
+Both have been amended and delayed repeatedly, so **check the current position
+before you rely on any of it**.
+
+. . .
+
+**Ireland specifically.** The Advertising Standards Authority for Ireland's code
+covers environmental claims in advertising now, whatever happens at EU level.
+
+. . .
+
+**Stakeholders beyond shareholders.** Employees, customers, and above all
+**procurement teams**: B2B buyers ask for this data in tenders, and an answer of
+"we do not measure that" loses the tender.
+
+## Reputational Risk Has a Price
+
+Greenwashing is no longer a reputational abstraction. It is an advertising risk
+with a measurable cost: campaigns withdrawn, rulings published, and the original
+claim reprinted in every article about the ruling.
+
+. . .
+
+**The asymmetry is what matters for a marketer.** An unsupported green claim buys
+a small lift in sentiment and risks a headline naming the brand. Most marketing
+decisions do not have that shape.
+
+## What Gets Measured: Environmental {.smaller}
+
+The emissions of the marketing function itself, which are almost entirely
+**Scope 3**:
+
+- **Media delivery.** Every ad impression is computation plus transmission plus a
+  device. Per-impression it is tiny; at campaign scale it is not
+- **The ad tech supply chain.** A programmatic impression may pass through a
+  dozen intermediaries, each with its own footprint
+- **Production.** Shoots, travel, sets, samples
+- **Events.** Usually the largest single line, and the easiest to count
+
+. . .
+
+Per-thousand-impression carbon estimates now exist and are increasingly requested
+in media plans. **Treat the published figures as estimates with wide error bars**,
+because that is what they are.
+
+## Social and Governance {.smaller}
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+**Social**
+
+- Representation in creative
+- **Accessibility** of digital assets: alt text, captions, contrast, keyboard
+  navigation
+- Ad placement standards, and what your programmatic buying funds
+- Supplier diversity
+
+:::
+
+::: {#second-column}
+
+**Governance**
+
+- Data protection compliance, as a reportable metric
+- Consent rates and how consent is obtained
+- Retention periods actually applied
+
+:::
+::::
+
+. . .
+
+**That governance column is Lecture 14, returning as a board metric.** The cookie
+banner you wrote is now a number somebody reports.
+
+## Measured, Estimated, or Asserted {.smaller}
+
+The single most useful distinction in this whole area:
+
+| | Example | What it supports |
+|---|---|---|
+| **Measured** | Event travel, from receipts | A claim, with a boundary |
+| **Estimated** | Media delivery emissions, from a published model | A direction, with error bars |
+| **Asserted** | "We are committed to sustainability" | Nothing |
+
+. . .
+
+Most published sustainability communication mixes all three **in the same
+sentence**, and presents the whole thing at the confidence of the first.
+
+## The Evidence Ladder {.smaller}
+
+From the bottom:
+
+1. **Sentiment.** "We care about the planet"
+2. **Activity.** "We switched to recycled packaging"
+3. **A number.** "We cut packaging emissions by 30%"
+4. **A number with a boundary and a baseline.** "...across our own packaging,
+   against 2023, excluding inbound freight"
+5. **Audited**, by someone whose opinion is published
+6. **Audited, and comparable**, against a standard others report to
+
+. . .
+
+**Marketing claims usually live on rungs 1 to 3. Procurement questions start at
+rung 4.**
+
+## Greenwashing Patterns {.smaller}
+
+The recurring five. Once you can name them you will see them daily:
+
+1. **Unbounded claims.** "Sustainable" with no scope. Sustainable compared to
+   what, measured how?
+2. **Shifted baselines.** Choosing the worst year as the starting point
+3. **Offsets presented as reductions.** "Carbon neutral" where nothing was reduced
+4. **Selective scope.** Reporting the 8% you control and omitting the 92% you buy
+5. **Irrelevant precision.** "We saved 1,247,391 litres of water." Out of how
+   much? Compared to what?
+
+. . .
+
+::: {.callout-note appearance="minimal"}
+The fifth is the one this module has already taught you to spot. Lecture 4's
+rule on sensible precision named the same fault on a chart.
+:::
+
+## Putting Them on the Dashboard
+
+Non-financial metrics get ignored when they are put somewhere ignorable: a second
+tab, a footer, an appendix.
+
+. . .
+
+**Same page, same visual weight, or they will not be read.** That is a design
+decision, and you learned how to make it in Lectures 4 and 5.
+
+. . .
+
+And apply the honesty rule from Lecture 11 here too: mark which figures are
+measured, which are estimated, and which are somebody's assertion. A dashboard
+that shows all three at the same weight is making the claim on rung 1 look like
+rung 5.
+
+## Exercise {background="#43464B"}
+
+Take a real brand's sustainability communication, on their own site:
+
+1. List every quantitative claim it makes
+2. For each, identify the **boundary**, the **baseline**, and whether it is
+   audited
+3. Rank the claims on the evidence ladder
+4. Design two non-financial metrics you would add to that brand's marketing
+   dashboard, and say where on the page they go
+
+::: {#timer2 .timer seconds="1500"}
+:::
+
+# 5. AI, Frameworks and Claims
+
+## AI This Block: A Producer
+
+Where we are on the module's AI spine, set out in Lecture 1 and named properly in
+Lecture 10:
+
+> **A producer.** It drafts the spec, the report and the deck. You are still the
+> one who signs it.
+
+## Comparing Frameworks Is a Reading Task
+
+This is well-documented territory, widely written about, and assistants handle it
+well.
+
+> "Compare the Balanced Scorecard and OKRs for a 12-person Irish e-commerce
+> business with one marketing hire. Which fits, and why?"
+
+. . .
+
+Then the prompt that stops you accepting the first fluent answer:
+
+> "Now argue for the one you rejected."
+
+. . .
+
+**It will argue that side just as fluently**, which tells you how much weight the
+first answer deserved.
+
+## The Greenwashing Machine
+
+<!-- Speaker notes: strong exercise. Let them generate the fluent unfalsifiable
+     claim themselves, then have to fix it. It lands far harder than an example
+     from a slide. -->
+
+Ask an assistant to write sustainability copy for a brand, and it will produce
+exactly what section 4 warns about: unbounded, baseline-free, rung-one claims, in
+confident marketing prose.
+
+. . .
+
+It is not being careless. **It is reproducing the genre**, and the genre is mostly
+greenwashing.
+
+## Using It the Other Way
+
+Pointed at claims rather than producing them, it is a genuinely good auditor:
+
+> "For each quantitative claim in this text, identify the boundary, the baseline,
+> and whether it is verifiable. Flag anything unfalsifiable."
+
+. . .
+
+The same tool, the same afternoon, on both sides of the problem. **Which is the
+clearest demonstration in this module that the tool is not the thing that has
+judgement.**
+
+## An AI-Drafted Claim Is Still Your Claim
+
+There is no exemption for generated copy. Not in the ASAI code, not in
+consumer-protection law, not in a tender response.
+
+. . .
+
+If a claim in your campaign turns out to be unsupported, "the assistant wrote it"
+is the same defence as "the AI produced it" in Lecture 1, and it fails for the
+same reason.
+
+. . .
+
+**Disclosure protects you. Delegation does not.**
+
+## Exercise {background="#43464B"}
+
+1. Ask an assistant to write sustainability copy for a brand
+2. Audit its own output with the prompt from two slides ago
+3. Rewrite one claim so it would survive procurement scrutiny
+4. Note what the rewrite cost you in punchiness, because that cost is the reason
+   the original genre exists
+
+::: {#timer3 .timer seconds="900"}
+:::
 
 ## Going Further
 
-- Kohavi, Tang and Xu, *Trustworthy Online Controlled Experiments* — the
-  practitioner's book; the chapters on peeking and on metric choice especially
-- Johari, Koomen, Pekelis and Walsh (2017), *Peeking at A/B Tests* — what
-  sequential testing actually fixes
-- Gelman and Loken (2013), *The Garden of Forking Paths* — why you do not need
-  to cheat to get a false positive
+- Kaplan and Norton, *The Balanced Scorecard*, Harvard Business Review, 1992
+- Doerr, *Measure What Matters*, for OKRs in practice
+- Advertising Standards Authority for Ireland, on environmental claims:
+  <https://www.asai.ie>
+- Ad Net Zero, and the current industry work on advertised emissions
+- The GHG Protocol on Scope 3, for where the boundaries actually come from
 
 ## Next Lecture
 
-Regression, as a way of asking which levers move the number when you cannot run
-the experiment.
+The last one. You present your own analysis, defend your method, and we close the
+loop on what any of this was for.
 
-**Prepare**: bring your joined traffic-and-spend table from Lecture 14. We
-model it.
+. . .
+
+**Prepare**: ten minutes of slides, and rehearsed answers to the three questions
+you least want to be asked.
