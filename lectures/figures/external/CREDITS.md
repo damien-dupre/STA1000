@@ -34,6 +34,14 @@ with attribution.
 Screenshots of example dashboards. Used for non-commercial university teaching
 with attribution.
 
+## `tidyexplain_*`: Garrick Aden-Buie, *tidyexplain*
+<https://www.garrickadenbuie.com/project/tidyexplain/>
+Animated joins, copied unchanged from the `images/` folder of
+<https://github.com/gadenbuie/tidyexplain>. The images are released under
+**CC0 1.0** (the code under MIT); the author adds: "Please feel free to use these
+images for teaching or learning about action verbs from the tidyverse." Used in
+Lecture 4, with the source on each slide.
+
 ## `economist_mistakes.png`: The Economist, *Mistakes, we've drawn a few*
 <https://medium.economist.com/mistakes-weve-drawn-a-few-8cdd8a42d368>
 The Economist's own before-and-after redraw of one of its charts, published on

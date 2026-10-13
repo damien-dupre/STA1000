@@ -33,7 +33,7 @@
       vertical-align: middle;
     }
   </style>
-  <link rel="stylesheet" href="lecture_04_files/libs/revealjs/dist/theme/quarto-8ff52f0e31ad5c532cba6b018e3cb49b.css">
+  <link rel="stylesheet" href="lecture_04_files/libs/revealjs/dist/theme/quarto-158af071109d29c7035ba1450a51c90c.css">
   <link href="lecture_04_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="lecture_04_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="lecture_04_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -757,7 +757,6 @@ Damien Dupré
 <p>In a new workbook with <code>insta-data.csv</code>:</p>
 <ol type="1">
 <li>Pivot <code>reach_followers</code> and <code>reach_non_followers</code> into <code>audience</code> and <code>audience_reach</code></li>
-<li>Stacked bars of <code>audience_reach</code> by <code>format</code>, with <code>audience</code> on <strong>Colour</strong>: which format reaches people who do not follow Loomrow yet?</li>
 <li>Create <code>Engagements</code> (<code>[Likes] + [Comments] + [Saves] + [Shares]</code>), then the engagement rate by <code>format</code></li>
 </ol>
                     <div id="timer4_2"></div>
@@ -823,6 +822,42 @@ Damien Dupré
 </div>
 </div>
 </section>
+<section id="inner-and-left-joins" class="slide level2">
+<h2>Inner and Left Joins</h2>
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img data-src="./figures/external/tidyexplain_inner_join.gif"></p>
+<p><strong>Inner</strong>: only the keys found in both tables, here 1 and 2</p>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img data-src="./figures/external/tidyexplain_left_join.gif"></p>
+<p><strong>Left</strong>: every row of the left table; 3 has no match, so its <code>y</code> stays empty</p>
+</div>
+</div>
+</div>
+<div style="font-size:0.7em;text-align:center;">
+<p><code>x</code> is the left table and <code>y</code> the right one. The animations write the joins in R; Tableau’s join dialog offers the same four. Source: Garrick Aden-Buie, tidyexplain <a href="https://www.garrickadenbuie.com/project/tidyexplain/"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
+</section>
+<section id="right-and-full-outer-joins" class="slide level2">
+<h2>Right and Full Outer Joins</h2>
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img data-src="./figures/external/tidyexplain_right_join.gif"></p>
+<p><strong>Right</strong>: every row of the right table; 4 has no match, so its <code>x</code> stays empty</p>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img data-src="./figures/external/tidyexplain_full_join.gif"></p>
+<p><strong>Full outer</strong>: every row of both tables, empty wherever a key has no match</p>
+</div>
+</div>
+</div>
+<div style="font-size:0.7em;text-align:center;">
+<p>Source: Garrick Aden-Buie, tidyexplain <a href="https://www.garrickadenbuie.com/project/tidyexplain/"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
+</section>
 <section id="which-rows-survive" class="slide level2 smaller">
 <h2>Which Rows Survive?</h2>
 <p><code>insta-posts.csv</code> has one row per post (431), <code>meta-ads.csv</code> one row per boosted post (127). Combined on <code>post_id</code>:</p>
@@ -868,6 +903,25 @@ Damien Dupré
 </tbody>
 </table>
 <p><strong>Check the number of rows after every join</strong>: it is shown above the data grid of the Data Source page. If it is not the number you expected, the join has changed your data.</p>
+</section>
+<section id="when-a-key-appears-twice" class="slide level2">
+<h2>When a Key Appears Twice</h2>
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img data-src="./figures/external/tidyexplain_left_join_extra.gif"></p>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<p>Key 2 appears <strong>twice</strong> in <code>y</code>, so the join copies <code>x2</code>: 4 rows instead of 3.</p>
+<p>Every value of <code>x2</code> now counts twice, and no error message warns you.</p>
+<p>A <strong>relationship</strong> does not copy rows: one more reason it is Tableau’s default.</p>
+</div>
+</div>
+</div>
+<p>In Lecture 5, a join with Loomrow’s ads by country turns €24,345.78 of spend into €106,899.36.</p>
+<div style="font-size:0.7em;text-align:center;">
+<p>Source: Garrick Aden-Buie, tidyexplain <a href="https://www.garrickadenbuie.com/project/tidyexplain/"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
 </section>
 <section id="your-turn-3" class="slide level2" data-background="#43464B">
 <h2><i class="fa-solid fa-screwdriver-wrench" aria-label="screwdriver-wrench"></i> Your Turn!</h2>

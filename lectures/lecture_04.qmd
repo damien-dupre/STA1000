@@ -599,8 +599,7 @@ gives you the **rate of the totals**: **5.7%**, which is almost always what you 
 In a new workbook with `insta-data.csv`:
 
 1. Pivot `reach_followers` and `reach_non_followers` into `audience` and `audience_reach`
-2. Stacked bars of `audience_reach` by `format`, with `audience` on **Colour**: which format reaches people who do not follow Loomrow yet?
-3. Create `Engagements` (`[Likes] + [Comments] + [Saves] + [Shares]`), then the engagement rate by `format`
+2. Create `Engagements` (`[Likes] + [Comments] + [Saves] + [Shares]`), then the engagement rate by `format`
 
 ::: {#timer4_2 .timer seconds="360" starton="interaction"}
 :::
@@ -664,6 +663,54 @@ The default method in Tableau is to use **relationships**: they preserve each ta
 :::
 ::::
 
+## Inner and Left Joins
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/external/tidyexplain_inner_join.gif)
+
+**Inner**: only the keys found in both tables, here 1 and 2
+
+:::
+
+::: {#second-column}
+
+![](./figures/external/tidyexplain_left_join.gif)
+
+**Left**: every row of the left table; 3 has no match, so its `y` stays empty
+
+:::
+::::
+
+::: {style="font-size:0.7em;text-align:center;"}
+`x` is the left table and `y` the right one. The animations write the joins in R; Tableau's join dialog offers the same four. Source: Garrick Aden-Buie, tidyexplain [{{< fa link >}}](https://www.garrickadenbuie.com/project/tidyexplain/)
+:::
+
+## Right and Full Outer Joins
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/external/tidyexplain_right_join.gif)
+
+**Right**: every row of the right table; 4 has no match, so its `x` stays empty
+
+:::
+
+::: {#second-column}
+
+![](./figures/external/tidyexplain_full_join.gif)
+
+**Full outer**: every row of both tables, empty wherever a key has no match
+
+:::
+::::
+
+::: {style="font-size:0.7em;text-align:center;"}
+Source: Garrick Aden-Buie, tidyexplain [{{< fa link >}}](https://www.garrickadenbuie.com/project/tidyexplain/)
+:::
+
 ## Which Rows Survive? {.smaller}
 
 `insta-posts.csv` has one row per post (431), `meta-ads.csv` one row per boosted post (127). Combined on `post_id`:
@@ -677,6 +724,32 @@ The default method in Tableau is to use **relationships**: they preserve each ta
 | **Relationship** | both tables as they are, combined view by view | 431 and 127 |
 
 **Check the number of rows after every join**: it is shown above the data grid of the Data Source page. If it is not the number you expected, the join has changed your data.
+
+## When a Key Appears Twice
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/external/tidyexplain_left_join_extra.gif)
+
+:::
+
+::: {#second-column}
+
+Key 2 appears **twice** in `y`, so the join copies `x2`: 4 rows instead of 3.
+
+Every value of `x2` now counts twice, and no error message warns you.
+
+A **relationship** does not copy rows: one more reason it is Tableau's default.
+
+:::
+::::
+
+In Lecture 5, a join with Loomrow's ads by country turns €24,345.78 of spend into €106,899.36.
+
+::: {style="font-size:0.7em;text-align:center;"}
+Source: Garrick Aden-Buie, tidyexplain [{{< fa link >}}](https://www.garrickadenbuie.com/project/tidyexplain/)
+:::
 
 ## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
