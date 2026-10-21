@@ -55,24 +55,39 @@ teaching; review before publishing the decks openly.
 
 ## Used by lecture 5
 
-The three GIFs are Damien's own Tableau Public recordings, on the Covid-19 sample
-(`lectures/data/covid_data_sample.csv`), compressed for the slides: 1050 px wide,
-12 frames a second, 128 colours. The stills are frames cut from the same
-recordings, or crops of images in the img repo.
+Since 13 October 2026 the lecture follows Damien's BAA1030 Lecture 5 (extended on
+19 October for a two-hour class): his own
+GIFs and pictures are cached here, and the external images it borrows (Tableau
+Help, InterWorks, datadent, the Tableau blog, Medium, ...) stay remote, as in
+BAA1030. The two GIFs are his Tableau Public recordings on the Covid-19 sample
+(`lectures/data/covid_data_sample.csv`), compressed for the slides: 1050 px
+wide, 12 frames a second, 128 colours.
 
 | File | Where | Made from |
 |---|---|---|
-| `tableau_dual_axis.gif` | "Two Measures, One Chart" | `tableau_dual_axis.gif` (26.7 MB), stopped at frame 885, before the screen-recording dock appears |
+| `tableau_dual_axis.gif` | "Line and Area Charts" (Dual Axis) | `tableau_dual_axis.gif` (26.7 MB), stopped at frame 885, before the screen-recording dock appears |
+| `tableau_sheet_tooltip.gif` | "Tooltip Advanced" | `tableau_sheet_tooltip.gif` (54.2 MB), frame 950 to the end: Insert, Sheets, then hover |
+| `tableau_linecharts.png` | "Line and Area Charts" (resources) | `tableau_linecharts.png`, unchanged |
+| `tableau_alias_1.png`, `tableau_alias_2.png` | "Variable Alias" | unchanged |
+| `dashboard_types.png` | "Dashboard Types" | unchanged; from Dashboard Design Patterns |
+| `dashboard_key.png`, `dashboard_key_title.png`, `dashboard_key_story.png` | "Key Elements", "Key Elements: Title", "Key Elements: Story" | unchanged |
+| `tableau_published.png` | "Publish" | `tableau_published.png`, unchanged |
+| `car_dashboard.jpeg` | "What Is a Dashboard?" | `car_dashboard.jpeg`, resized from 4912 to 1600 px wide (3.8 MB to about 0.3 MB) |
+| `dashboard_key_viz.png` | "Key Elements: Visualisations" | unchanged |
+| `tableau_story.png` | "Dashboard or Story?" | unchanged (already in this folder since 14 September 2026) |
+| `dashboard_story_ex.png` | "Keep Practising" | unchanged: the Iron Viz: Student Edition page |
+
+No longer used by lecture 5 since 13 October 2026, kept for now:
+
+| File | Was on | Made from |
+|---|---|---|
 | `tableau_map.gif` | "Mapping with Tableau" | `tableau_sheet_tooltip.gif` (54.2 MB), frames 420 to 961: Location, Show Me, filled map |
-| `tableau_sheet_tooltip.gif` | "A Figure in the Tooltip" | `tableau_sheet_tooltip.gif`, frame 950 to the end: Insert, Sheets, then hover |
 | `tableau_data_icons.png` | "Space and Time Variables" | frame 150 of `tableau_dual_axis.gif`, the Data pane |
 | `tableau_date_menu.png` | "Date Parts or Date Values?" | frame 280 of `tableau_sheet_tooltip.gif`, the date pill menu |
 | `tableau_show_filter_menu.png` | "Filter and Highlighter Menus" | the same frame, top of the menu |
 | `tableau_tooltip_editor.png` | "Tooltips" | frame 995 of `tableau_sheet_tooltip.gif`, the Edit Tooltip dialog |
 | `tableau_publish_as.png` | "Publish" | crop of `tableau_public.png` |
 | `tableau_alias_dialog.png` | "Aliases" | crop of `tableau_alias_2.png` |
-| `tableau_linecharts.png` | "Line and Area Charts" | `tableau_linecharts.png`, unchanged |
-| `tableau_published.png` | "Publish" | `tableau_published.png`, unchanged |
 | `tableau_public_actions.png` | "Dashboard Actions" | `tableau_public_actions.png`, unchanged |
 
 Compression, with the frame range of each GIF:

@@ -592,14 +592,35 @@ gives you the **rate of the totals**: **5.7%**, which is almost always what you 
 :::
 ::::
 
-## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B" .smaller}
 
 ### Pivot and calculate
 
-In a new workbook with `insta-data.csv`:
+Open `insta-data.csv` in a new Tableau workbook.
 
-1. Pivot `reach_followers` and `reach_non_followers` into `audience` and `audience_reach`
-2. Create `Engagements` (`[Likes] + [Comments] + [Saves] + [Shares]`), then the engagement rate by `format`
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+**On the Data Source page**
+
+1. Select `reach_followers` and `reach_non_followers`: {{< fa brands windows >}} <kbd>Ctrl</kbd> + click or {{< fa brands apple >}} <kbd>⌘ Cmd</kbd> + click
+2. Click the drop-down arrow of one of them → **Pivot**
+3. Rename **Pivot Field Names** as `audience` and **Pivot Field Values** as `audience_reach`
+
+Check: the table now has 862 rows, two per post.
+
+:::
+
+::: {#second-column}
+
+**On Sheet 1**
+
+4. **Analysis** → **Create Calculated Field**: `Engagements`, with `[Likes] + [Comments] + [Saves] + [Shares]`
+5. A second one: `Engagement Rate`, with `SUM([Engagements]) / SUM([Reach])`
+6. `format` on **Columns**, `Engagement Rate` on **Rows**: **which format has the highest rate, and which the lowest?**
+
+:::
+::::
 
 ::: {#timer4_2 .timer seconds="360" starton="interaction"}
 :::
@@ -751,16 +772,34 @@ In Lecture 5, a join with Loomrow's ads by country turns €24,345.78 of spend i
 Source: Garrick Aden-Buie, tidyexplain [{{< fa link >}}](https://www.garrickadenbuie.com/project/tidyexplain/)
 :::
 
-## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B" .smaller}
 
 ### Merge Instagram and Meta Ads
 
-From Loop, download `insta-posts.csv` and `meta-ads.csv`:
+Download `insta-posts.csv` and `meta-ads.csv` from Loop.
 
-1. Connect `insta-posts.csv`, then drag `meta-ads.csv` next to it: a relationship on `post_id`
-2. How many posts? How much was spent?
-3. Return on ad spend by `format`, as a rate of the totals
-4. Replace the relationship with a join: how many posts now? What can you no longer answer?
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+**A relationship**, in a new workbook
+
+1. Open `insta-posts.csv`, then the plus sign beside **Connections** → **Text file** → `meta-ads.csv`
+2. Drag `meta-ads.csv` next to the `insta-posts.csv` box: check `Post Id` = `Post Id`
+3. Sheet 1: `insta-posts.csv (Count)` and `spend_eur` on **Text**: **how many posts, and how much was spent?**
+4. Calculated field `ROAS`: `SUM([Attributed Revenue Eur]) / SUM([Spend Eur])`, then `format` on **Columns** and `ROAS` on **Rows**: **which format returns the most per euro?**
+
+:::
+
+::: {#second-column}
+
+**A join**, after **File** → **New**
+
+5. Open `insta-posts.csv`, **double-click** its box, and drag `meta-ads.csv` into the window that opens
+6. Click the two circles between the tables: the join is **Inner**, on `Post Id`
+7. Count the posts as in step 3: **how many now? Which posts have gone, and why?**
+
+:::
+::::
 
 ::: {#timer4_3 .timer seconds="300" starton="interaction"}
 :::

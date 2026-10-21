@@ -3,113 +3,161 @@ title: "Lecture 5: Advanced Features in Tableau"
 subtitle: STA1000 - Data Analytics and Metrics
 filters:
   - timer
+format:
+  revealjs:
+    include-in-header:
+      - text: |
+          <style>
+          .reveal .slides section.concept h2 {background: none; color: #23373b; font-size: 1.6em; font-weight: 400; border-radius: 0; padding: 0 0 15px 0; border-bottom: 1px solid #eb811b;}
+          .reveal .slides div.quarto-figure {margin-bottom: 0;}
+          </style>
 ---
 
 ## Previously ...
 
 - In Lecture 4 we made figures clear and honest, then prepared the table behind them in Tableau: a pivot, calculated fields, and two files merged into one data source.
 
-**Today, three questions:**
+## Going Forward
 
-1. How does Tableau handle **dates** and **locations**?
-2. How do you make a figure **interactive**?
-3. How do you turn your figures into a **dashboard** where they work together?
+In general, through the lectures we have seen variables:
+
+- Made of character strings (usually interpreted as categorical, but not always)
+- Made of numbers (usually interpreted as continuous, but not always)
+
+But variables can be made of many more values. In business analytics, **dates** and **locations** are particularly important: **how to handle date and location variables in Tableau?**
+
+. . .
+
+Tableau is particularly interesting because it creates interactive figures: **how to make them smart by customising their interactivity?**
+
+. . .
+
+Finally, the figures are assembled in a dashboard: **how to make them react together, and how to share the dashboard?**
 
 # 1. Date and Location Types in Tableau
 
-## Space and Time Variables
+## Space and Time Variables {.smaller}
 
-:::: {layout="[1.5,1]"}
+So far, we were only interested in two variable types:
+
+- **Categorical** (made of characters), also called **Dimensions** in Tableau
+- **Continuous** (made of numbers), also called **Measures** in Tableau
+
+However, we have seen that sometimes...
+
+- A categorical variable needs to be converted to continuous (e.g., an opinion scale)
+- A continuous variable needs to be converted to categorical (e.g., `Survived`, coded 0/1, in the Titanic data)
+
+> In Tableau, change the type of a variable by drag-and-drop between **Dimensions** and **Measures** in the Data pane
+
+. . .
+
+:::: {layout="[1,1]"}
 ::: {#first-column}
 
-So far, two types of variables:
-
-- **Categorical**, made of characters: the **Dimensions** in Tableau
-- **Continuous**, made of numbers: the **Measures** in Tableau
-
-Tableau has special features for two more types: **Date** variables, with a calendar icon, and **Location** variables, with a globe icon.
+In addition to categorical and continuous variables, Tableau has special features to handle **Location** and **Date** type variables.
 
 :::
 
 ::: {#second-column}
 
-![](./figures/dd/tableau_data_icons.png){fig-align="center" style="width:100%; max-height:440px;"}
+![](https://i2tutorials.com/wp-content/media/2023/03/d.png){fig-align="center" style="max-height:150px;"}
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: i2tutorials [{{< fa link >}}](https://i2tutorials.com/wp-content/media/2023/03/d.png)
+:::
 
 :::
 ::::
 
 ## Date Type Variables
 
-A **date** refers to a specific time: any combination of year, month, day, hour, minute and second.
+A date refers to a specific time: it can be any combination and format of year, month, day, hour, minute, second ...
 
-"March 23, 1984", "03/23/84", "23/03/1984" and "1984-03-23" have **different formats but refer to the same date**. Lecture 2: insist on **YYYY-MM-DD** (ISO 8601), which sorts correctly.
+For example, "March 23, 1984", "03/23/84", "23/03/1984" and "1984-03-23" have **different formats but refer to the same date**.
 
-In `insta-data.csv`, `posted_at` (`2025-01-08 20:00:00`) should come in as a **Date & Time**, with a calendar icon. If it shows Abc or #, click the icon and choose **Date & Time**.
+In data science, we use the ISO 8601 international standard format (YYYY-MM-DD), "1984-03-23", which sorts dates easily.
+
+By default, a date variable should be properly encoded: a **calendar icon** appears before it. If it is encoded as categorical (Abc) or continuous (#), convert it to **Date** or **Date & Time**. In `insta-data.csv`, `posted_at` (`2025-01-08 20:00:00`) is a Date & Time.
 
 ## Line and Area Charts
 
-:::: {layout="[1.2,1]"}
-::: {#first-column}
+Date variables are usually used as the **X axis** (**Columns** in Tableau) to display the evolution of another variable over time.
 
-A date usually goes on **Columns**, the X axis, to show how another variable changes over time.
+The resolution of the chart can be adjusted by clicking on the **+** symbol of the date variable: from the year to the quarter, the month, the day ...
 
-The other variable goes on **Rows**, with a **statistical aggregation**: SUM by default, but COUNT, AVERAGE or MEDIAN are in the menu of the pill.
+![](https://help.tableau.com/current/pro/desktop/en-us/Img/datefunctions3.png){fig-align="center" style="max-height:330px;"}
 
-Tableau starts with the **YEAR**: click the **+** on the date pill to go down to the quarter, the month, the day.
-
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/Img/datefunctions3.png)
 :::
 
-::: {#second-column}
+## Line and Area Charts {.smaller}
 
-![](./figures/dd/tableau_linecharts.png){fig-align="center" style="max-height:450px;"}
+While the date variable is in one field, drag and drop the other variable in the other field. It uses a **statistical aggregation**: by default the sum (SUM), but it can be changed to count, median, average ...
 
-:::
-::::
+To add a **second line in the same figure**:
 
-## One Date, Three Levels {.smaller}
+1. Drag and drop the second variable in **Rows**, next to the first one
+2. Open the menu of its pill ({{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click) and select **Dual Axis** to merge them
+3. If both variables have the same unit (e.g., euros), open the menu of the right axis and select **Synchronise Axis**
 
-![](./figures/loomrow/viz_date_levels.png){fig-align="center" style="max-height:330px;"}
-
-The same `SUM(reach)` tells three stories. By **year**, 2026 looks like a decline, but it has only six months. By **quarter**, one quarter stands out. By **month**, it is one month, and mostly one post: Lecture 3's reel. **Check the level before you read the line.**
-
-## Date Parts or Date Values?
-
-:::: {layout="[1,1.4]"}
-::: {#first-column}
-
-![](./figures/dd/tableau_date_menu.png){fig-align="center" style="max-height:450px;"}
-
-:::
-
-::: {#second-column}
-
-The menu of a date pill ({{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click) has two lists:
-
-**Date parts**, at the top: "May" means every May, whatever the year. The pill is **blue**, discrete.
-
-**Date values**, below: "May 2015" means that month only. The pill is **green**, continuous: a timeline.
-
-**Exact Date** keeps the full date and time of every row.
-
-:::
-::::
-
-## Two Measures, One Chart {.smaller}
-
-![](./figures/dd/tableau_dual_axis.gif){fig-align="center" style="max-height:340px;"}
-
-1. Drag a second measure onto **Rows**, next to the first: two charts, one above the other
-2. Open the menu of the second pill → **Dual Axis**: one chart, with a second axis on the right
+![](./figures/dd/tableau_dual_axis.gif){fig-align="center" style="max-height:300px;"}
 
 ::: {style="font-size:0.7em;text-align:center;"}
 The recordings in this lecture use a Covid-19 sample: the clicks are the same with your own data.
 :::
 
-## Synchronise the Axes
+## Time as a Dimension or as a Measure {.smaller}
 
-![](./figures/loomrow/viz_dual_axis.png){fig-align="center" style="max-height:290px;"}
+A date can be used as a **Dimension** (discrete, blue pill) or as a **Measure** (continuous, green pill). Switch from one to the other in the menu of the date pill: **Discrete** or **Continuous**.
 
-With **Dual Axis**, each measure keeps its own scale: €4,170 of spend and €15,425 of revenue are drawn at the same height, the trick of Lecture 4's Nicolas Cage chart. When both measures share a unit, open the menu of the right axis → **Synchronise Axis**.
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+**As a Dimension**: each unit of time (year, quarter, month ...) is a category with its own header. The line stops at the end of each year: **gaps between the units**.
+
+![](https://help.tableau.com/current/pro/desktop/en-us/Img/dates_3.png){fig-align="center" style="max-height:290px;"}
+
+:::
+
+::: {#second-column}
+
+**As a Measure**: time is a continuous axis, a timeline. The line runs from the first date to the last: **no gaps between the units**.
+
+![](https://help.tableau.com/current/pro/desktop/en-us/Img/dates_5.png){fig-align="center" style="max-height:290px;"}
+
+:::
+::::
+
+A Dimension compares the same units year by year; a Measure follows the trend over the whole period.
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Change Date Levels, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/dates_levels.htm)
+:::
+
+## Line and Area Charts
+
+More details about Tableau and time series figures, among other resources found online:
+
+:::: {layout="[1.3,1]"}
+::: {#first-column}
+
+- [Building Line Charts](https://help.tableau.com/current/pro/desktop/en-us/buildexamples_line.htm) by Tableau
+- [Change Date Levels](https://help.tableau.com/current/pro/desktop/en-us/dates_levels.htm) by Tableau
+- [Date Functions](https://help.tableau.com/current/pro/desktop/en-us/functions_functions_date.htm) by Tableau
+- [Tableau Playbook: Line Chart](https://www.pluralsight.com/guides/tableau-playbook-line-chart) by Pluralsight
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/tableau_linecharts.png){fig-align="center" style="max-height:430px;"}
+
+:::
+::::
+
+## Live Example: Loomrow Over Time {.center .concept}
 
 ## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
@@ -124,35 +172,64 @@ With `insta-data.csv`:
 ::: {#timer5_1 .timer seconds="300" starton="interaction"}
 :::
 
-## Location Type Variables
+## Location Type Variables {.smaller}
 
-A list of geographical places: continents, countries, regions, counties, cities, postcodes ...
+A list of geographical locations by:
 
-A location variable should come in with a **globe icon**. If it shows Abc (text) or # (numbers, e.g., postcodes), click its icon → **Geographic Role** → **Country/Region**, **City**, ...
+- Continents (Europe, Asia, Africa, Oceania, North America, South America)
+- Countries (Ireland, France, Spain, Germany ...)
+- States, regions, counties, cities ...
 
-![](https://help.tableau.com/current/pro/desktop/en-us/Img/maps_getstarted6.gif){fig-align="center" style="max-height:260px;"}
+By default, a location variable should be properly encoded: a **globe icon** appears before it. If it is encoded as categorical (made of characters) or continuous (made of numbers), give it a **Geographic Role**.
+
+![](https://help.tableau.com/current/pro/desktop/en-us/Img/maps_getstarted6.gif){fig-align="center" style="max-height:250px;"}
 
 ::: {style="font-size:0.5em;text-align:center;"}
-Source: Get Started Mapping with Tableau [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/buildexamples_maps.htm)
+Source: Get Started Mapping with Tableau, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/buildexamples_maps.htm)
 :::
 
 ## Mapping with Tableau {.smaller}
 
-![](./figures/dd/tableau_map.gif){fig-align="center" style="max-height:330px;"}
+To create a map:
 
-1. Put the location variable on **Columns** or **Rows**, then open **Show Me**: Tableau generates the **Latitude** and **Longitude**
-2. Choose a **symbol map**, where each place is a point (good for cities), or a **filled map**, where each place is filled with colour (not for cities)
-3. Put another variable on **Colour** or **Size**
+1. Drag and drop the **location variable in Rows or Columns** of the worksheet
+2. Use **Show Me** and select one of the map figures (the Longitude and Latitude variables are generated automatically):
+    - **Symbol map**: the data are reduced to a point (good for cities)
+    - **Map**: the data fill the full shape of the location
+3. Drag and drop another variable in the **Colour** box of the Marks card, to display how its values change by location
 
-## Filled or Symbol Map?
+![](https://i0.wp.com/datadent.org/wp-content/uploads/2020/03/Map-change-colors.gif){fig-align="center" style="max-height:260px;"}
 
-Lecture 4: **land doesn't vote, people do**. A filled map gives the most ink to the largest area, whatever its value.
+::: {style="font-size:0.5em;text-align:center;"}
+Source: datadent.org [{{< fa link >}}](https://i0.wp.com/datadent.org/wp-content/uploads/2020/03/Map-change-colors.gif)
+:::
 
-- A **count** (purchases, spend, followers): a **symbol map**, with the count on **Size**
-- A **rate** (return on ad spend, conversion rate): a **filled map**, with the rate on **Colour**
+## Mapping with Tableau {.smaller}
 
-::: {.fragment}
-Maps are easy in Tableau: make one only when geography changes a decision.
+More details about Tableau and maps, among other resources found online:
+
+- [Get Started Mapping with Tableau](https://help.tableau.com/current/pro/desktop/en-us/buildexamples_maps.htm) by Tableau
+- [Build a Simple Map](https://help.tableau.com/current/pro/desktop/en-us/maps_howto_simple.htm) by Tableau
+- [Tableau Maps: How to Create Stunning Maps in Tableau](https://www.youtube.com/watch?v=MT-HlqUHLFU) by Vizual Intelligence (video)
+- [Create a Map in Tableau](https://www.tutorialgateway.org/maps-in-tableau/) by Tutorial Gateway
+- [Create a Map with Multiple Layers in Tableau](https://www.youtube.com/watch?v=bwUj2NZHTC4) by Anthony Smoak (video)
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](https://www.edureka.co/community/?qa=blob&qa_blobid=15134316276860426432){fig-align="center" style="max-height:200px;"}
+
+:::
+
+::: {#second-column}
+
+![](https://static.packt-cdn.com/products/9781786465634/graphics/B05527_05_01.jpg){fig-align="center" style="max-height:200px;"}
+
+:::
+::::
+
+::: {style="font-size:0.7em;text-align:center;"}
+A symbol map (left) and a filled map (right)
 :::
 
 ## A Second File, With Countries {.smaller}
@@ -170,6 +247,8 @@ Maps are easy in Tableau: make one only when geography changes a decision.
 - Check the totals: `SUM(amount_spent_eur)` is €24,345.78, the `spend_eur` of `insta-data.csv`
 - With a **join**, each paid post appears once per country: `SUM(spend_eur)` jumps to €106,899.36
 
+## Live Example: Mapping Loomrow's Ads {.center .concept}
+
 ## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
 ### Map Loomrow's ads
@@ -186,83 +265,256 @@ From Loop, download `ads-by-country.csv`, then with `insta-data.csv`:
 
 # 2. Interactive Customisations in Tableau
 
-## Aliases
+## Where We Stopped
 
-An **alias** renames the categories a variable displays. Only the labels change: the original values are kept for the calculations.
+Last week, in Tableau:
 
-![](./figures/dd/tableau_alias_dialog.png){fig-align="center"}
+- **Dates**: a Dimension (blue pill, gaps between the units) or a Measure (green pill, one timeline), and two measures on a **Dual Axis**
+- **Locations**: a **Geographic Role**, then a symbol map or a filled map
+- **A second file**: `ads-by-country.csv`, related to `insta-data.csv` on `post_id`
 
-In the Data pane, open the menu of a Dimension ({{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click) → **Aliases...**. Here, in a Titanic dataset, the 0 and 1 of `Survived` now read *Did not survive* and *Survived*.
+**Today**:
 
-## Tooltips {.smaller}
+1. Make the figures smart with interactive customisations
+2. Assemble the figures in a dashboard, with actions
+3. The brief of Assignment 1
 
-:::: {layout="[1,1.4]"}
+## Aliases and Groups {.center .concept}
+
+## Variable Alias {.smaller}
+
+Not an interactive feature, but a simple and useful tip: an **alias** renames the categories displayed by a variable, while the calculations keep the original values.
+
+**How**: in the Data pane, open the menu of the variable ({{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click) → **Aliases...**, then type the new names.
+
+::: {style="font-size:0.8em;text-align:center;"}
+**Without aliases**: `Survived` (Titanic data) shows its codes, 0 and 1
+:::
+
+![](./figures/dd/tableau_alias_1.png){fig-align="center" style="max-height:135px;"}
+
+::: {style="font-size:0.8em;text-align:center;"}
+**With aliases**: 0 is displayed as Did not survive, 1 as Survived
+:::
+
+![](./figures/dd/tableau_alias_2.png){fig-align="center" style="max-height:135px;"}
+
+## Groups {.smaller}
+
+An alias renames one category; a **group** merges several categories into one: to correct spellings, or to compare families of categories.
+
+:::: {layout="[1.2,1]"}
 ::: {#first-column}
 
-The **tooltip** is the box that appears when the cursor hovers over, or clicks on, a mark.
+**How**: in the Data pane, open the menu of the variable ({{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click) → **Create** → **Group...**, then:
 
-It gives the actual numbers behind the figure, and tells a short story about what is currently seen.
+1. Select the categories to merge and click **Group**
+2. Rename the group
+3. Tick **Include 'Other'** to merge all the remaining categories
 
-Edit it from **Tooltip** on the **Marks** card. Fields between `< >` change with the mark under the cursor.
+**Shortcut**: select marks in the figure, then click the paperclip icon of their tooltip.
 
 :::
 
 ::: {#second-column}
 
-![](./figures/dd/tableau_tooltip_editor.png){fig-align="center"}
+![](https://help.tableau.com/current/pro/desktop/en-us/Img/ad-hoc6.png){fig-align="center" style="max-height:110px;"}
+
+![](https://help.tableau.com/current/pro/desktop/en-us/Img/ad-hoc24.png){fig-align="center" style="max-height:180px;"}
 
 :::
 ::::
 
-## Write the Tooltip as a Sentence
+**Loomrow**: `campaign` mixes three launches (SS25_Launch, AW25_Preorder, SS26_Launch) and three sales (Summer_Sale_25, Black_Friday_25, Deadstock_Drop_26), two groups to compare.
 
-:::: {layout="[1,1]"}
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Group Your Data, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/sortgroup_groups_creating.htm)
+:::
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### Rename and group
+
+With `insta-data.csv`:
+
+1. Alias `is_paid`: **False** as Organic, **True** as Paid
+2. Group the campaigns into **Launches** and **Sales**
+3. `SUM([Attributed Revenue Eur]) / SUM([Spend Eur])` by campaign group: which group returns more per euro spent?
+
+::: {#timer5_3 .timer seconds="300" starton="interaction"}
+:::
+
+## Marks, Labels and Tooltips {.center .concept}
+
+## Marks Card {.smaller}
+
+Tableau designs the default figure automatically, according to what it considers the most relevant. The **Marks card** changes this design:
+
+:::: {layout="[1.7,1]"}
 ::: {#first-column}
 
-**Default**, on `reach` by month:
+1. **The type of mark**: the drop-down at the top (Automatic, Bar, Line, Circle ...)
+2. **The design of the marks**: Colour, Size, Label, Detail and Tooltip
 
-::: {style="font-size:1.25em;"}
+Each property of the design can be set:
+
+- **For all the marks**: click it, e.g., one colour for all the bars
+- **By the values of a variable**, already used or additional: drag the variable onto it, e.g., `format` on **Colour** gives one colour per format, `reach` on **Size** bigger marks for a bigger reach
+
+:::
+
+::: {#second-column}
+
+![](https://help.tableau.com/current/pro/desktop/en-us/Img/build_manual_shelves_marks1.png){fig-align="center" style="max-height:340px;"}
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Shelves and Cards Reference, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/buildmanual_shelves.htm)
+:::
+
+:::
+::::
+
+## Labels and Annotations {.smaller}
+
+:::: {layout="[1,1.25]"}
+::: {#first-column}
+
+**Labels** write the values on the marks. Click **Label** in the Marks card, then choose the marks to label: all of them, the minimum and maximum, the line ends, or only the selected or highlighted ones.
+
+**Annotations** point at an insight. Open the menu of a mark ({{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click) → **Annotate**, then choose:
+
+- **Mark**: attached to a mark, it follows it when the view changes
+- **Point**: attached to a position in the figure
+- **Area**: a box around a group of marks
+
+:::
+
+::: {#second-column}
+
+![](https://help.tableau.com/current/pro/desktop/en-us/Img/annotate1.gif){fig-align="center" style="max-height:340px;"}
+
+:::
+::::
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Add Annotations, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/annotations_annotations_add.htm)
+:::
+
+## Tooltip Principle
+
+The **tooltip** is a series of information (numeric or graphic) displayed in a temporary box when the cursor goes over, or clicks on, an element of a figure. It gives the actual numbers behind the figure, and tells a short story about what is currently seen.
+
+:::: {layout="[1,1,1]"}
+::: {#first-column}
+
+![](https://interworks.com/wp-content/uploads/sites/default/files/wp-content/uploads/2010/08/TTDefault.png){fig-align="center" style="max-height:150px;height:150px;object-fit:contain;"}
+
+::: {style="font-size:0.7em;text-align:center;"}
+The default tooltip
+:::
+
+:::
+
+::: {#second-column}
+
+![](https://interworks.com/wp-content/uploads/sites/default/files/wp-content/uploads/2010/08/CondFormatMore.png){fig-align="center" style="max-height:150px;height:150px;object-fit:contain;"}
+
+::: {style="font-size:0.7em;text-align:center;"}
+A tooltip with conditional formatting
+:::
+
+:::
+
+::: {#third-column}
+
+![](https://cdns.tblsft.com/sites/default/files/blog/vit-gif-for-blog_leave-for-work.gif){fig-align="center" style="max-height:150px;height:150px;object-fit:contain;"}
+
+::: {style="font-size:0.7em;text-align:center;"}
+A figure in the tooltip
+:::
+
+:::
+::::
+
+::: {style="font-size:0.5em;text-align:center;"}
+Sources: InterWorks [{{< fa link >}}](https://interworks.com/wp-content/uploads/sites/default/files/wp-content/uploads/2010/08/TTDefault.png) [{{< fa link >}}](https://interworks.com/blog/interworks/2010/09/03/tableau-tooltips-conditional-formatting/) and Tableau [{{< fa link >}}](https://cdns.tblsft.com/sites/default/files/blog/vit-gif-for-blog_leave-for-work.gif)
+:::
+
+## Tooltip Editing
+
+By default, the tooltip lists the variables of the figure, one per line. Click **Tooltip** in the Marks card to edit it: the text is free, and each **variable between `< >`** shows its value under the cursor (in annotations too).
+
+:::: {layout="[1.2,1]"}
+::: {#first-column}
+
+For example, on `reach` by month:
+
+::: {style="font-size:1.1em;"}
+```
+Month of Posted At:  <MONTH(Posted At)>
+Reach:               <SUM(Reach)>
+```
+:::
+
+:::
+
+::: {#second-column}
+
+Will show:
+
+::: {style="font-size:1.1em;"}
 ```
 Month of Posted At:  August 2025
 Reach:               685,460
 ```
 :::
 
-**Rewritten**:
-
-::: {style="font-size:1.25em;"}
-```
-In <MONTH(Posted At)>,
-<CNTD(Post Id)> posts reached
-<SUM(Reach)> accounts. The best
-one alone: <MAX(Reach)>.
-```
-:::
-
-:::
-
-::: {#second-column}
-
-**Shows**:
-
-*In August 2025, 26 posts reached 685,460 accounts. The best one alone: 535,086.*
-
-<br>
-
-To use a field that is not in the view, drag it onto **Tooltip** on the Marks card, then set its aggregation from the menu of its pill: **Count (Distinct)** for `post_id`, **Maximum** for `reach`.
-
 :::
 ::::
 
-## A Figure in the Tooltip {.smaller}
+Rewritten as a sentence, the same tooltip tells a story:
 
-![](./figures/dd/tableau_sheet_tooltip.gif){fig-align="center" style="max-height:360px;"}
+::: {style="font-size:1.1em;"}
+```
+In <MONTH(Posted At)>, <CNTD(Post Id)> posts reached <SUM(Reach)> accounts!
+```
+:::
 
-Instead of a value, a tooltip can show a whole figure: in the tooltip editor, **Insert** → **Sheets** → the sheet to show. Hover a country, and its own time series appears. With Loomrow: hover a month, and see its reach by `format`.
+Will show:
 
-## Filters
+::: {style="font-size:1.1em;"}
+```
+In August 2025, 26 posts reached 685,460 accounts!
+```
+:::
 
-Show **only specific data** with the **Filters** shelf: drag a variable onto it, then choose which categories to keep (Dimension) or which range of values (Measure).
+## Tooltip Advanced {.smaller}
+
+Two ways to put more in a tooltip:
+
+- **Another variable**: drag it onto **Tooltip** in the Marks card, e.g., `post_id`, counted with **Count (Distinct)**
+- **A full figure**: when editing the tooltip, click **Insert** → **Sheets** → the name of the figure to add (*Viz in Tooltip* in Tableau Help)
+
+![](./figures/dd/tableau_sheet_tooltip.gif){fig-align="center" style="max-height:380px;"}
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### Labels and tooltips
+
+On your sheet of `reach` by month:
+
+1. Label the highest month, and annotate it with the post that explains it
+2. Rewrite the tooltip as a sentence, with the number of posts
+3. Insert a sheet in the tooltip: `reach` by `format` for the month under the cursor
+
+::: {#timer5_5 .timer seconds="360" starton="interaction"}
+:::
+
+## Filters and Highlighters {.center .concept}
+
+## Local Filters
+
+A **filter** displays only specific data. Drag a variable onto the **Filters** shelf, then select what to keep: categories for a categorical variable, values for a continuous one.
 
 ![](https://help.tableau.com/current/pro/desktop/en-us/Img/filtering-drag.gif){fig-align="center" style="max-height:320px;"}
 
@@ -270,66 +522,174 @@ Show **only specific data** with the **Filters** shelf: drag a variable onto it,
 Source: Filter Data from Your Views, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/filtering.htm)
 :::
 
-## Filter and Highlighter Menus {.smaller}
+## Types of Filters {.smaller}
 
-:::: {layout="[1,1.5]"}
+:::: {layout="[1.35,1]"}
 ::: {#first-column}
 
-![](./figures/dd/tableau_show_filter_menu.png){fig-align="center"}
+The filter dialog depends on the variable:
+
+- A **Dimension** (categories) has four tabs:
+    - **General**: tick the categories to keep
+    - **Wildcard**: the names that contain, start or end with a text
+    - **Condition**: the categories whose measure meets a rule, e.g., a `SUM([Reach])` of at least 10,000
+    - **Top**: the top or bottom *N*, e.g., the 10 posts with the highest `SUM([Reach])`
+- A **Measure** keeps a range of values: at least, at most, or between two values
+- A **Date** keeps a range of dates, **relative dates** (e.g., the last 3 months), or date parts (e.g., the years 2025 and 2026)
 
 :::
 
 ::: {#second-column}
 
-A **menu** lets the reader make their own selection. Open the menu of a pill in the view:
-
-- **Show Filter**: keeps the selected values and removes the others
-- **Show Highlighter**: keeps every value and dims the ones not selected
-
-Customise each card from its own drop-down arrow: list, drop-down, slider, ...
+![](https://help.tableau.com/current/pro/desktop/en-us/Img/filtering-drag1.png){fig-align="center" style="max-height:360px;"}
 
 :::
 ::::
 
-## Filter or Highlight? {.smaller}
-
-![](./figures/loomrow/viz_filter_highlight.png){fig-align="center" style="max-height:370px;"}
-
-The **filter** leaves sustainability alone: 507,491 accounts, but is that a lot? The **highlighter** keeps the other themes, dimmed: sustainability is the lowest of the six.
-
-**Filter** when the rest of the data does not matter, **highlight** when the comparison with the rest does.
-
 ::: {style="font-size:0.5em;text-align:center;"}
-Source: Highlight Data Points in Context, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/actions_highlight_highlighter.htm). To go further: Highlight vs Filter Actions in Tableau: When Should You Use Each?, Andy Kriebel (video) [{{< fa link >}}](https://www.youtube.com/watch?v=Ezq644Th3SM)
+Source: Filter Data from Your Views, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/filtering.htm)
 :::
 
-## Time Animation Player {.smaller}
+## Local Filter Menu {.smaller}
 
-Put a date on the **Pages** shelf: the view becomes a series of pages, one per month (or year, or day), with **playback controls** to play them in a row.
+A **filter menu** (a *filter card* in Tableau Help) lets the readers make their own selection.
 
-![](https://help.tableau.com/current/pro/desktop/en-us/Img/pages6.gif){fig-align="center" style="max-height:300px;"}
+:::: {layout="[1.5,1]"}
+::: {#first-column}
 
-Tick **Show History** to keep the marks of the previous pages on screen. With Loomrow: `impressions` against `likes`, and `posted_at` as a month on **Pages**.
+**Add it**:
+
+1. Click **Analysis** in the top toolbar → **Filters** → the variable the readers choose from
+2. Customise the menu from its drop-down arrow
+
+[{{< fa circle-arrow-right >}}]{style="color:#2a78d6;"} Note: the same result comes from the **Filters** shelf: open the menu of the variable → **Show Filter**.
+
+**Choose its style**:
+
+- **Single value**: a list, a drop-down or a slider
+- **Multiple values**: a list or a drop-down
+- **Range**: a slider, for measures and dates
+
+Tick **Only Relevant Values** to hide the values that the other filters exclude.
+
+:::
+
+::: {#second-column}
+
+![](https://help.tableau.com/current/pro/desktop/en-us/Img/show_filter2.gif){fig-align="center" style="max-height:400px;"}
+
+:::
+::::
 
 ::: {style="font-size:0.5em;text-align:center;"}
-Source: Shelves and Cards Reference, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/buildmanual_shelves.htm)
+Source: Filter Data from Your Views, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/filtering.htm)
+:::
+
+## One Filter, Several Sheets {.smaller}
+
+By default, a filter only changes its own sheet. On a dashboard, the readers expect one filter menu to change all the figures.
+
+:::: {layout="[1.1,1]"}
+::: {#first-column}
+
+On the **Filters** shelf, open the menu of the variable → **Apply to Worksheets**:
+
+- **All Using Related Data Sources**: every sheet using `insta-data.csv` or `ads-by-country.csv`, related on `post_id`
+- **All Using This Data Source**: every sheet using the same data source
+- **Selected Worksheets...**: the sheets you tick
+- **Only This Worksheet**: the default
+
+A filter shared by several sheets gets an icon on the Filters shelf.
+
+:::
+
+::: {#second-column}
+
+![](https://help.tableau.com/current/pro/desktop/en-us/Img/shared_filters4.png){fig-align="center" style="max-height:320px;"}
+
+:::
+::::
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Apply Filters to Multiple Worksheets, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/filtering_global.htm)
+:::
+
+## Local Highlighter Menu {.smaller}
+
+A **highlighter menu** lets the readers focus the figures on some categories. Unlike a filter, it keeps all the data in the figure: the categories not selected are only dimmed.
+
+:::: {layout="[1,1.2]"}
+::: {#first-column}
+
+**Add it**:
+
+1. Click **Analysis** in the top toolbar → **Highlighters** → the variable the readers highlight from
+2. Customise the menu from its drop-down arrow (fewer options than a filter menu)
+
+On a dashboard, the highlighter menu applies to all the figures that use the highlighted variable.
+
+:::
+
+::: {#second-column}
+
+![](https://cdnl.tblsft.com/sites/default/files/blog/third_highlighter.gif){fig-align="center" style="max-height:300px;"}
+
+:::
+::::
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Quickly Find Marks in Context with Tableau 10's New Highlighter, Tableau [{{< fa link >}}](https://www.tableau.com/blog/check-out-new-highlighter-tableau-10-54969)
 :::
 
 ## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
-### Make your figures smart
+### Filter and highlight
 
-On your Loomrow sheets:
-
-1. Alias `is_paid`: **False** as Organic, **True** as Paid
-2. Rewrite the tooltip of `reach` by month as a sentence
+1. A filter menu on `format` (multiple values, drop-down) on your monthly sheet, applied to all the sheets using `insta-data.csv`
+2. A bar chart of the 10 posts with the highest `reach` (a Top filter on `post_id`): which formats and themes?
 3. `reach` by `theme`: a filter on `theme`, then a highlighter. Select customer in each: where does it rank?
-4. Your scatterplot, by month on **Pages**: press play
 
-::: {#timer5_3 .timer seconds="360" starton="interaction"}
+::: {#timer5_6 .timer seconds="420" starton="interaction"}
+:::
+
+## Time Animation Player {.center .concept}
+
+## Time Animation Player
+
+Drag a date variable onto the **Pages** shelf to play the figure over time:
+
+1. A player appears: play forwards or backwards, page by page, at the speed you choose
+2. Tick **Show History** to keep the marks of the previous pages as trails
+
+![](https://miro.medium.com/max/1400/1*9wAYT7RHcaZOCNs0suDcmg.gif){fig-align="center" style="max-height:260px;"}
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Medium [{{< fa link >}}](https://miro.medium.com/max/1400/1*9wAYT7RHcaZOCNs0suDcmg.gif)
 :::
 
 # 3. Tableau Dashboard
+
+## What Is a Dashboard?
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+For Stephen Few, a dashboard is a visual display of the few things that matter to reach an objective, arranged on **one screen** and readable **at a glance**.
+
+Like the dashboard of a car: the few numbers needed to drive, readable in a second, with warning lights when something goes wrong.
+
+::: {style="font-size:0.7em;"}
+Few, S. (2006). *Information Dashboard Design: The Effective Visual Communication of Data*. O'Reilly.
+:::
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/car_dashboard.jpeg){fig-align="center" style="max-height:380px;"}
+
+:::
+::::
 
 ## Tableau Dashboard Showcase
 
@@ -364,119 +724,581 @@ One long page, read from top to bottom:
 
 ![](./figures/dd/tableau_good_1.png){fig-align="center"}
 
-![](./figures/dd/tableau_good_3.png){fig-align="center" style="max-height:250px;"}
+::: {style="font-size:0.7em;text-align:center;"}
+Key numbers in colour inside the text, and a **Donate** button
+:::
+
+![](./figures/dd/tableau_good_3.png){fig-align="center" style="max-height:200px;"}
+
+::: {style="font-size:0.7em;text-align:center;"}
+A year player with **Show history**, and a highlighter to select a country
+:::
 
 ## Meaningful Visualisations
 
-![](./figures/dd/tableau_good_2.png){fig-align="center" style="max-height:275px;"}
+![](./figures/dd/tableau_good_2.png){fig-align="center" style="max-height:230px;"}
 
-![](./figures/dd/tableau_good_6.png){fig-align="center" style="max-height:210px;"}
+::: {style="font-size:0.7em;text-align:center;"}
+Two measures on one map, the out-of-school rate (colour) and GDP per capita (circles), with a text to read it
+:::
+
+![](./figures/dd/tableau_good_6.png){fig-align="center" style="max-height:170px;"}
+
+::: {style="font-size:0.7em;text-align:center;"}
+Rural against urban population by region, in the two colours of the dashboard
+:::
 
 ## Insightful Storytelling
 
+![](./figures/dd/tableau_good_4.png){fig-align="center" style="max-height:280px;"}
+
+::: {style="font-size:0.7em;text-align:center;"}
+The causes: one icon each, short texts, and the key numbers in bold and colour
+:::
+
 ![](./figures/dd/tableau_good_5.png){fig-align="center"}
 
-![](./figures/dd/tableau_good_4.png){fig-align="center" style="max-height:370px;"}
+::: {style="font-size:0.7em;text-align:center;"}
+The conclusion: a summary, and a call to action, raising awareness
+:::
 
 ## Example Not to Follow! {.smaller}
 
-![](./figures/dd/tableau_bad.png){fig-align="center" style="max-height:320px;"}
+![](./figures/dd/tableau_bad.png){fig-align="center" style="max-height:300px;"}
 
-::: {.fragment}
-- Typos in the titles: "Wold", "Countires"
-- One colour per country on the map, and a pie with one slice per country: the colours carry no information
-- Raw field names as axis titles ("Obs Value"), two different fonts, and two bar charts on different scales
-- No text to say what the index measures, or what to conclude
+- **Titles**: typos, "Wold" and "Countires"
+- **Colours**: one colour per country on the map, and a pie with one slice per country: the colours carry no information
+- **Axes and fonts**: raw field names as axis titles ("Obs Value"), two bar charts on different scales, and two different fonts
+- **Story**: no text to say what the index measures, or what to conclude
+
+## Before Building: Purpose and Audience {.smaller}
+
+Tableau's best practices for dashboard design:
+
+:::: {layout="[1,1,1,1,1]"}
+::: {#first-column}
+
+![](https://www.tableau.com/sites/default/files/2021-10/Know%20your%20audience.png){fig-align="center" style="max-height:80px;"}
+
+::: {style="font-size:0.8em;text-align:center;line-height:1.2;"}
+Know your audience
+:::
+
+:::
+
+::: {#second-column}
+
+![](https://www.tableau.com/sites/default/files/2021-10/consider%20display%20size.png){fig-align="center" style="max-height:80px;"}
+
+::: {style="font-size:0.8em;text-align:center;line-height:1.2;"}
+Consider display size
+:::
+
+:::
+
+::: {#third-column}
+
+![](https://www.tableau.com/sites/default/files/2021-10/Plan%20for%20fast%20load%20times.png){fig-align="center" style="max-height:80px;"}
+
+::: {style="font-size:0.8em;text-align:center;line-height:1.2;"}
+Plan for fast load times
+:::
+
+:::
+
+::: {#fourth-column}
+
+![](https://www.tableau.com/sites/default/files/2021-10/Leverage%20the%20sweet%20spot.png){fig-align="center" style="max-height:80px;"}
+
+::: {style="font-size:0.8em;text-align:center;line-height:1.2;"}
+Leverage the sweet spot
+:::
+
+:::
+
+::: {#fifth-column}
+
+![](https://www.tableau.com/sites/default/files/2021-10/unnamed%20%281%29.png){fig-align="center" style="max-height:80px;"}
+
+::: {style="font-size:0.8em;text-align:center;line-height:1.2;"}
+Limit views and colours
+:::
+
+:::
+::::
+
+The first one comes before the first sheet. Answer four questions:
+
+- **Who** will read it, and what do they already know?
+- **What question** does it answer, and **what decision** will it support?
+- **Where** will it be read: on a laptop, a phone, a projector?
+- **Explore or explain?** An exploratory dashboard lets readers search the data; an explanatory one tells them one story. Your assignment is explanatory: it ends with a recommendation.
+
+**The 5-second test**: after looking at it for 5 seconds, a reader should be able to say what it is about.
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Dashboard Design Best Practices, Tableau [{{< fa link >}}](https://www.tableau.com/learn/articles/dashboard-design-best-practices)
 :::
 
 ## Design Strategy
 
 Creating a perfect Tableau dashboard is easy if you follow these steps:
 
-1. **Basic figures**: create many figures that can support your story, and leave them with all their default parameters
+1. **Basic figures**: create many figures that can support your story, and keep their default settings
 2. **Basic dashboard**: put the most relevant figures in a dashboard, with its title, text and pictures, but no design work yet
 3. **Figure improvement**: go back to the worksheet of each figure and customise it: colour, size, shapes, title, captions, axes and interactions
 4. **Dashboard improvement**: go back to the dashboard and customise it: background, colours, fonts, layout and actions
 
-## Tableau Dashboard
+## Overall Design Guidelines
 
-A dashboard is made by dropping several **sheets** on a page, organising their position, and adding **objects** (text, images, blank space, ...).
+Keep them in mind at every step:
 
-Design features can then be changed to give the dashboard a professional feel.
-
-Interactions that make all the sheets move together come with step 4: the dashboard actions.
-
-## Tableau Dashboard {.smaller}
-
-![](./figures/dd/tableau_dashboard.gif){fig-align="center" style="max-height:450px;"}
-
-Drag the sheets from the left panel onto the page. **Tiled** keeps them in a tidy grid; **Floating** lets an object sit on top of the others.
-
-## Dashboard Actions {.smaller}
-
-On a dashboard, a highlighter already works on every sheet with the same variable, but a filter only on its own sheet (to extend it: its menu on the **Filters** shelf → **Apply to Worksheets** → **All Using This Data Source**). **Actions** go further: they make all the figures react together.
-
-:::: {layout="[1,1.2]"}
+:::: {layout="[1,1]"}
 ::: {#first-column}
 
-![](./figures/dd/tableau_public_actions.png){fig-align="center"}
+1. Don't overwhelm viewers
+2. Avoid visual clutter
+3. Avoid poor visual design
+4. Don't add too much data
+5. Provide for consistency
+6. Provide for interaction affordances
+7. Manage complexity
 
 :::
 
 ::: {#second-column}
 
-**Dashboard** → **Actions...** → **Add Action**, then choose:
-
-1. what triggers it: **Hover**, **Select** (a click) or **Menu**
-2. which sheet it comes from
-3. which sheets it changes
-
-A **Highlight** action on Hover is the easiest way to make a dashboard smart. A **Filter** action on Hover or Select changes the figures under the reader's eyes: prefer **Menu**.
+8. Organise charts
+9. Increase information
+10. Avoid redundancy of information
+11. Design is an iterative process
+12. Context is very important
+13. Use colour carefully
 
 :::
 ::::
+
+## Dashboard Types
+
+Dashboards come in genres: **curated** ones tell one story (e.g., magazine, infographic), **data collections** let the readers explore (e.g., analytical, repository). Your assignment is a curated dashboard.
+
+![](./figures/dd/dashboard_types.png){fig-align="center"}
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Dashboard Design Patterns [{{< fa link >}}](https://dashboarddesignpatterns.github.io/)
+:::
+
+- [See the Dashboard Design Patterns workshop for more details](https://dashboarddesignpatterns.github.io/workshop.html)
+
+## Key Elements
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+Every dashboard should include these key elements to fill its screenspace:
+
+- A title
+- A written story, with an introduction, an analysis and a conclusion
+- Multiple visualisations
+
+Optional elements can be added, such as images, buttons or menus.
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/dashboard_key.png){fig-align="center"}
+
+::: {style="font-size:0.5em;text-align:center;"}
+Example of a dashboard structure, for illustration only: not necessarily to follow.
+:::
+
+:::
+::::
+
+## Key Elements: Title
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+A good title, as in these [real dashboards](https://www.tableau.com/blog/tableau-public-viz-wrap-interesting-data-visualizations-2022):
+
+- **Pinpoints the problem**: ["Healthcare Crisis in Rural America"](https://public.tableau.com/app/profile/dennis.kao/viz/HealthcareCrisisinRuralAmericaProjectHealthViz/Dashboard1)
+- **Makes a statement or asks a question**: ["#CollegeGameday: Can My Family Out-Pick the Pundits?"](https://public.tableau.com/app/profile/sam.epley/viz/CollegeGamedayCanMyFamilyOut-PickthePundits/PickbyWeek)
+- **Is catchy**: ["NBA Lords of the Rings"](https://public.tableau.com/app/profile/jeff.plattner4532/viz/NBALordsoftheRings/LordsoftheRings)
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/dashboard_key_title.png){fig-align="center"}
+
+:::
+::::
+
+## Key Elements: Story
+
+:::: {layout="[2,1]"}
+::: {#first-column}
+
+The story, the narrative conveying the information, has three parts:
+
+- **Introduction**: presents the context of the issue investigated
+- **Analysis**: extracts the relevant information from each visualisation, each piece linked to the others (temporal, geographical, logical ...)
+- **Conclusion**: summarises the information and provides recommendations to the reader
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/dashboard_key_story.png){fig-align="center"}
+
+:::
+::::
+
+## Key Elements: Visualisations
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+1. Place your visualisations in a relevant order
+2. Make sure they are customised
+3. Add a caption
+4. Add global interactive features
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/dashboard_key_viz.png){fig-align="center"}
+
+:::
+::::
+
+## Big Numbers First
+
+Marketing dashboards often open with a few **KPIs** (Key Performance Indicators) as big numbers: at the top left, each with a comparison. For Loomrow, January to June 2026 against January to June 2025:
+
+:::: {layout="[1,1,1]"}
+::: {#first-column}
+
+::: {style="text-align:center;"}
+[2.06M]{style="font-size:2.2em;font-weight:700;color:#23373b;"}
+
+accounts reached
+
+[{{< fa caret-up >}} against 0.45M]{style="color:#3a9a5b;font-weight:500;font-size:0.9em;"}
+:::
+
+:::
+
+::: {#second-column}
+
+::: {style="text-align:center;"}
+[6.3%]{style="font-size:2.2em;font-weight:700;color:#23373b;"}
+
+engagement rate
+
+[{{< fa caret-down >}} against 6.4%]{style="color:#e34948;font-weight:500;font-size:0.9em;"}
+:::
+
+:::
+
+::: {#third-column}
+
+::: {style="text-align:center;"}
+[€2.75]{style="font-size:2.2em;font-weight:700;color:#23373b;"}
+
+of revenue per €1 spent
+
+[{{< fa caret-down >}} against €3.46]{style="color:#e34948;font-weight:500;font-size:0.9em;"}
+:::
+
+:::
+::::
+
+In Tableau: one sheet per number, with the measure on **Text** in the Marks card, then the sheets side by side in a horizontal container. The engagement rate:
+
+```
+(SUM([Engagements Followers]) + SUM([Engagements Non Followers])) / SUM([Reach])
+```
+
+## Layout: the Sweet Spot {.smaller}
+
+:::: {layout="[1,1.1]"}
+::: {#first-column}
+
+Readers scan a screen from the **top left**, then across and down: put the most important view (or the KPIs) in that corner, and the details below or to the right.
+
+- Few views: Tableau suggests two or three main ones
+- Align the views on a grid, with white space between the groups
+- Place each legend and filter next to the view it controls
+- Keep the same colour for the same category on every sheet
+
+:::
+
+::: {#second-column}
+
+![](https://help.tableau.com/current/pro/desktop/en-us/Img/dashboard_best_practices3.png){fig-align="center" style="max-height:360px;"}
+
+:::
+::::
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Best Practices for Effective Dashboards, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/dashboards_best_practices.htm)
+:::
+
+## Tableau Dashboard
+
+A dashboard is a page made of:
+
+- **Sheets**: the figures, each built in its own worksheet
+- **Objects**: text, images, blank space, buttons ...
+- **Actions**: the interactions that make all the sheets react together
+
+First place the sheets and objects, then change the design features to give the dashboard a professional feel, and add the actions last (step 4 of the design strategy).
+
+## Tableau Dashboard {.smaller}
+
+Click the **New Dashboard** icon at the bottom of the window, then drag the sheets from the left panel onto the page. **Tiled** keeps them in a tidy grid; **Floating** lets an object sit on top of the others.
+
+![](./figures/dd/tableau_dashboard.gif){fig-align="center" style="max-height:450px;"}
+
+## Dashboard Size {.smaller}
+
+:::: {layout="[1.6,1]"}
+::: {#first-column}
+
+Set the size **before** placing anything, in the **Size** menu of the Dashboard pane:
+
+- **Fixed size** (the default): the same on every screen, with scroll bars if the window is smaller. The safest choice for your assignment, e.g., 1200 × 800 px
+- **Range**: between a minimum and a maximum size
+- **Automatic**: fills the window, but the views can be squashed on a small screen
+
+**Device Preview** shows the dashboard on a desktop, a tablet or a phone, and creates a layout for each device.
+
+:::
+
+::: {#second-column}
+
+![](https://help.tableau.com/current/pro/desktop/en-us/Img/sizing3.png){fig-align="center" style="max-height:330px;"}
+
+:::
+::::
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Size and Lay Out Your Dashboard, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/dashboards_organize_floatingandtiled.htm)
+:::
+
+## Layout Containers {.smaller}
+
+A **container** groups objects that resize together: a **Horizontal** container shares its width between them (e.g., a row of KPIs), a **Vertical** one its height (e.g., a column of filters).
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](https://help.tableau.com/current/pro/desktop/en-us/Img/dashboard_layout_containers_horizontal.jpg){fig-align="center" style="max-height:160px;"}
+
+::: {style="font-size:0.7em;text-align:center;"}
+Horizontal: side by side
+:::
+
+:::
+
+::: {#second-column}
+
+![](https://help.tableau.com/current/pro/desktop/en-us/Img/dashboard_layout_containers_vertical.jpg){fig-align="center" style="max-height:160px;"}
+
+::: {style="font-size:0.7em;text-align:center;"}
+Vertical: one above the other
+:::
+
+:::
+::::
+
+- Drag a container from **Objects**, then drop the sheets inside it; **Distribute Evenly** gives them the same size
+- **Tiled** objects share the space without overlapping; a **Floating** object sits on top, at a fixed position (hold {{< fa brands windows >}} <kbd>Shift</kbd> / {{< fa brands apple >}} <kbd>⇧ Shift</kbd> while dragging it)
+- The **Layout** pane lists every object (the item hierarchy) and sets its position, size, background, border and padding
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Size and Lay Out Your Dashboard, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/dashboards_organize_floatingandtiled.htm)
+:::
+
+## Dashboard Objects {.smaller}
+
+The **Objects** of the Dashboard pane add everything that is not a sheet:
+
+![](https://help.tableau.com/current/pro/desktop/en-us/Img/dashboard_object_drag1.png){fig-align="center" style="max-height:150px;"}
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+- **Text**: the title, the story, the sources
+- **Image**: a logo, an icon, a photo
+- **Web Page**: a web page shown inside the dashboard
+- **Blank**: space between objects
+
+:::
+
+::: {#second-column}
+
+- **Navigation**: a button to another dashboard or sheet
+- **Download**: a button to export the dashboard as a PDF, a PowerPoint or an image
+- **Extension**: a feature added by a third party
+
+:::
+::::
+
+Any object or container can get a **Show/Hide button**, e.g., to hide a panel of filters.
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Create a Dashboard, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/dashboards_create.htm)
+:::
+
+## Actions {.center .concept}
+
+## Basic Actions {.smaller}
+
+Filters and highlighters are set up in each sheet; **actions are set up in the dashboard**, and make all its figures react together.
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](https://help.tableau.com/current/pro/desktop/en-us/Img/Actions_dialog.png){fig-align="center" style="max-height:300px;"}
+
+:::
+
+::: {#second-column}
+
+Click **Dashboard** in the top toolbar → **Actions** → **Add Action**, then choose:
+
+1. How to trigger the action: when the cursor goes over a figure (**Hover**), when it clicks on a figure (**Select**), or from an added menu (**Menu**)
+2. Which figure it comes from
+3. Which figures it changes
+
+:::
+::::
+
+**Start with Filter and Highlight actions**: they behave like filters and highlighters, but for the full dashboard. The other actions take more set-up, but they are essential to add buttons, for instance.
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/Img/Actions_dialog.png)
+:::
+
+## Global Filter and Highlight Actions {.smaller}
+
+With the default settings, an action changes all the figures of the dashboard when the reader hovers over a figure, clicks on it, or selects a value from a menu.
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+- **Highlight actions** are **the easiest way to make a dashboard smart**: with **Hover** as the trigger, the figures react together as the cursor moves.
+
+- **Filter actions** are useful too, but **confusing with Hover or Select** as the trigger, as the figures keep changing: trigger them from a **Menu** instead.
+
+:::
+
+::: {#second-column}
+
+![](https://interworks.com/wp-content/uploads/2019/02/GIF1.gif){fig-align="center" style="max-height:320px;"}
+
+:::
+::::
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: InterWorks [{{< fa link >}}](https://interworks.com/wp-content/uploads/2019/02/GIF1.gif)
+:::
+
+## Use as Filter, and Other Actions {.smaller}
+
+:::: {layout="[1.4,1]"}
+::: {#first-column}
+
+**The quickest filter action**: select a sheet on the dashboard and click its **Use as Filter** icon (a funnel). A click on one of its marks then filters all the other sheets.
+
+**The other actions** of the **Actions** dialog:
+
+- **Go to URL**: opens a web page, e.g., the post on Instagram
+- **Go to Sheet**: moves to another sheet or dashboard
+- **Change Parameter** and **Change Set Values**: a click changes a parameter or a set (advanced features)
+
+:::
+
+::: {#second-column}
+
+![](https://help.tableau.com/current/pro/desktop/en-us/Img/layout_container_qs3.png){fig-align="center" style="max-height:320px;"}
+
+:::
+::::
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Actions, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/actions.htm)
+:::
+
+## Live Example: Building a Dashboard {.center .concept}
 
 ## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B" .smaller}
 
 ### Your Loomrow dashboard
 
-Four sheets, two from Lecture 3 and two from today:
+One dashboard, fixed size 1200 × 800 px, to answer: **which format should Loomrow post more of, and why?**
 
-- **Composition**: percent of posts by `format`
-- **Comparison**: box plots of `reach` by `format`
-- **Time**: `reach` by month
-- **Map**: return on ad spend by `country`
+1. Three **KPIs** at the top, in a horizontal container
+2. Four sheets: percent of posts by `format`, box plots of `reach` by `format`, `reach` by month, return on ad spend by `country`
+3. A title and a story: introduction, analysis, conclusion
+4. A **Highlight** action on Hover, and a **Filter** action on Menu from the map
 
-Titles that state the finding, and a text box: **which format should Loomrow post more of, and why?**
+Start now, finish at home.
 
-Then two actions: a **Highlight** on Hover from the composition sheet, and a **Filter** on Menu from the map. Start now, finish at home.
-
-::: {#timer5_4 .timer seconds="600" starton="interaction"}
+::: {#timer5_4 .timer seconds="720" starton="interaction"}
 :::
 
 ## Publish
 
-**Publishing** saves a dashboard online, for everybody to open. In Tableau Public in the browser, **publishing is saving**: **Publish As...**, top right.
-
-![](./figures/dd/tableau_publish_as.png){fig-align="center" style="max-height:80px;"}
-
 :::: {layout="[1.3,1]"}
 ::: {#first-column}
 
-[{{< fa triangle-exclamation >}}]{style="color:#e34948;"} **Everything you publish is public**, the data included.
+**Publishing** saves the dashboard online, where everyone can open it.
 
-On the published page, **Share** gives the link; **Download** gives an image, a PDF, or the workbook with its data (`.twbx`).
+In Tableau Public in the browser, **publishing is saving**: click **Publish As...**, top right.
 
-[{{< fa triangle-exclamation >}}]{style="color:#e34948;"} For your assignment, publish your dashboard and submit its **URL** on Loop.
+[{{< fa triangle-exclamation >}}]{style="color:#e34948;"} Warning: everything you publish is public, the data included.
+
+For your assignment, publish your dashboard and submit its **URL** on Loop.
 
 :::
 
 ::: {#second-column}
 
-![](./figures/dd/tableau_published.png){fig-align="center" style="max-height:290px;"}
+![](./figures/dd/tableau_published.png){fig-align="center" style="max-height:400px;"}
 
 :::
 ::::
+
+## Before You Publish {.smaller}
+
+A checklist for your dashboard:
+
+- [ ] The size is fixed, and nothing is cut off
+- [ ] The title states the finding; each figure has a clear title and labelled axes
+- [ ] The same colour means the same thing on every sheet, and every colour has a legend
+- [ ] The filters and actions work, and change what the reader expects
+- [ ] The story ends with a recommendation, and the sources are cited
+- [ ] The worksheets are hidden: open the menu of the dashboard tab → **Hide All Sheets**
+- [ ] The URL opens in a private window of your browser: it is the link your marker will click
+
+Swap with a neighbour and check each other's dashboard: one compliment, one fix.
+
+## Learn More About Dashboards
+
+More details about dashboards in Tableau, among other resources found online:
+
+- [Best Practices for Effective Dashboards](https://help.tableau.com/current/pro/desktop/en-us/dashboards_best_practices.htm) by Tableau
+- [Size and Lay Out Your Dashboard](https://help.tableau.com/current/pro/desktop/en-us/dashboards_organize_floatingandtiled.htm) by Tableau
+- [Tableau Dashboard Workshop](https://ubc-library-rc.github.io/tableau-dashboard/) by UBC Library Research Commons (on GitHub)
+- [Learning Data Visualization with Tableau](https://hfboyce.github.io/tableau_course/intro.html) by Hayley Boyce (on GitHub)
+- [Dashboard Design Patterns](https://dashboarddesignpatterns.github.io/) by Bach and colleagues
+- [Are You Making These 13 Dashboard Design Mistakes?](https://www.thedataschool.co.uk/anh-vu/are-you-making-these-13-dashboard-design-mistakes/) by The Data School
 
 # 4. Assignment 1 Brief
 
@@ -508,6 +1330,9 @@ Submit the URL of your Tableau Public dashboard on the STA1000 Loop page. **Dead
 
 ## Get Inspired
 
+:::: {layout="[1.6,1]"}
+::: {#first-column}
+
 Past challenges are an excellent way to see outstanding dashboards:
 
 - [Google Big Data Viz Challenge (2012)](https://www.tableau.com/big-data-viz-challenge-entries)
@@ -516,7 +1341,33 @@ Past challenges are an excellent way to see outstanding dashboards:
 - [Data Visualization Society, State of the Industry Challenge](https://www.datavisualizationsociety.org/soti-challenge)
 - [Iron Viz](https://www.tableau.com/community/iron-viz), Tableau's own championship
 
-![](https://media.makeameme.org/created/use-tableau-you.jpg){fig-align="center" style="max-height:200px;"}
+:::
+
+::: {#second-column}
+
+![](https://media.makeameme.org/created/use-tableau-you.jpg){fig-align="center" style="max-height:330px;"}
+
+:::
+::::
+
+## Keep Practising
+
+:::: {layout="[1.2,1]"}
+::: {#first-column}
+
+- [Viz of the Day](https://public.tableau.com/app/discover/viz-of-the-day): a visualisation featured every weekday on Tableau Public
+- [#MakeoverMonday](https://www.makeovermonday.co.uk/): every week, a dataset and a chart to remake
+- [#WorkoutWednesday](https://www.workout-wednesday.com/): every week, a dashboard to rebuild, with its solution
+- [Iron Viz: Student Edition](https://www.tableau.com/blog/iron-viz-student-edition): Tableau's competition for students
+
+:::
+
+::: {#second-column}
+
+![](./figures/dd/dashboard_story_ex.png){fig-align="center" style="max-height:400px;"}
+
+:::
+::::
 
 ## {background="#43464B"}
 

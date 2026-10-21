@@ -125,6 +125,10 @@
       margin-right: 0; 
     }
   </style>
+  <style>
+  .reveal .slides section.concept h2 {background: none; color: #23373b; font-size: 1.6em; font-weight: 400; border-radius: 0; padding: 0 0 15px 0; border-bottom: 1px solid #eb811b;}
+  .reveal .slides div.quarto-figure {margin-bottom: 0;}
+  </style>
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -148,35 +152,57 @@ Damien Dupré
 <ul>
 <li>In Lecture 4 we made figures clear and honest, then prepared the table behind them in Tableau: a pivot, calculated fields, and two files merged into one data source.</li>
 </ul>
-<p><strong>Today, three questions:</strong></p>
-<ol type="1">
-<li>How does Tableau handle <strong>dates</strong> and <strong>locations</strong>?</li>
-<li>How do you make a figure <strong>interactive</strong>?</li>
-<li>How do you turn your figures into a <strong>dashboard</strong> where they work together?</li>
-</ol>
+</section>
+<section id="going-forward" class="slide level2">
+<h2>Going Forward</h2>
+<p>In general, through the lectures we have seen variables:</p>
+<ul>
+<li>Made of character strings (usually interpreted as categorical, but not always)</li>
+<li>Made of numbers (usually interpreted as continuous, but not always)</li>
+</ul>
+<p>But variables can be made of many more values. In business analytics, <strong>dates</strong> and <strong>locations</strong> are particularly important: <strong>how to handle date and location variables in Tableau?</strong></p>
+<div class="fragment">
+<p>Tableau is particularly interesting because it creates interactive figures: <strong>how to make them smart by customising their interactivity?</strong></p>
+</div>
+<div class="fragment">
+<p>Finally, the figures are assembled in a dashboard: <strong>how to make them react together, and how to share the dashboard?</strong></p>
+</div>
 </section>
 <section>
 <section id="date-and-location-types-in-tableau" class="title-slide slide level1 center">
 <h1>1. Date and Location Types in Tableau</h1>
 
 </section>
-<section id="space-and-time-variables" class="slide level2">
+<section id="space-and-time-variables" class="slide level2 smaller">
 <h2>Space and Time Variables</h2>
-<div class="quarto-layout-panel" data-layout="[1.5,1]">
-<div class="quarto-layout-row">
-<div id="first-column" class="quarto-layout-cell" style="flex-basis: 60.0%;justify-content: flex-start;">
-<p>So far, two types of variables:</p>
+<p>So far, we were only interested in two variable types:</p>
 <ul>
-<li><strong>Categorical</strong>, made of characters: the <strong>Dimensions</strong> in Tableau</li>
-<li><strong>Continuous</strong>, made of numbers: the <strong>Measures</strong> in Tableau</li>
+<li><strong>Categorical</strong> (made of characters), also called <strong>Dimensions</strong> in Tableau</li>
+<li><strong>Continuous</strong> (made of numbers), also called <strong>Measures</strong> in Tableau</li>
 </ul>
-<p>Tableau has special features for two more types: <strong>Date</strong> variables, with a calendar icon, and <strong>Location</strong> variables, with a globe icon.</p>
+<p>However, we have seen that sometimes…</p>
+<ul>
+<li>A categorical variable needs to be converted to continuous (e.g., an opinion scale)</li>
+<li>A continuous variable needs to be converted to categorical (e.g., <code>Survived</code>, coded 0/1, in the Titanic data)</li>
+</ul>
+<blockquote>
+<p>In Tableau, change the type of a variable by drag-and-drop between <strong>Dimensions</strong> and <strong>Measures</strong> in the Data pane</p>
+</blockquote>
+<div class="fragment">
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<p>In addition to categorical and continuous variables, Tableau has special features to handle <strong>Location</strong> and <strong>Date</strong> type variables.</p>
 </div>
-<div id="second-column" class="quarto-layout-cell" style="flex-basis: 40.0%;justify-content: center;">
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="./figures/dd/tableau_data_icons.png" class="quarto-figure quarto-figure-center" style="width:100%; max-height:440px;"></p>
+<p><img data-src="https://i2tutorials.com/wp-content/media/2023/03/d.png" class="quarto-figure quarto-figure-center" style="max-height:150px;"></p>
 </figure>
+</div>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: i2tutorials <a href="https://i2tutorials.com/wp-content/media/2023/03/d.png"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
 </div>
 </div>
 </div>
@@ -184,81 +210,95 @@ Damien Dupré
 </section>
 <section id="date-type-variables" class="slide level2">
 <h2>Date Type Variables</h2>
-<p>A <strong>date</strong> refers to a specific time: any combination of year, month, day, hour, minute and second.</p>
-<p>“March 23, 1984”, “03/23/84”, “23/03/1984” and “1984-03-23” have <strong>different formats but refer to the same date</strong>. Lecture 2: insist on <strong>YYYY-MM-DD</strong> (ISO 8601), which sorts correctly.</p>
-<p>In <code>insta-data.csv</code>, <code>posted_at</code> (<code>2025-01-08 20:00:00</code>) should come in as a <strong>Date &amp; Time</strong>, with a calendar icon. If it shows Abc or #, click the icon and choose <strong>Date &amp; Time</strong>.</p>
+<p>A date refers to a specific time: it can be any combination and format of year, month, day, hour, minute, second …</p>
+<p>For example, “March 23, 1984”, “03/23/84”, “23/03/1984” and “1984-03-23” have <strong>different formats but refer to the same date</strong>.</p>
+<p>In data science, we use the ISO 8601 international standard format (YYYY-MM-DD), “1984-03-23”, which sorts dates easily.</p>
+<p>By default, a date variable should be properly encoded: a <strong>calendar icon</strong> appears before it. If it is encoded as categorical (Abc) or continuous (#), convert it to <strong>Date</strong> or <strong>Date &amp; Time</strong>. In <code>insta-data.csv</code>, <code>posted_at</code> (<code>2025-01-08 20:00:00</code>) is a Date &amp; Time.</p>
 </section>
 <section id="line-and-area-charts" class="slide level2">
 <h2>Line and Area Charts</h2>
-<div class="quarto-layout-panel" data-layout="[1.2,1]">
-<div class="quarto-layout-row">
-<div id="first-column" class="quarto-layout-cell" style="flex-basis: 54.6%;justify-content: flex-start;">
-<p>A date usually goes on <strong>Columns</strong>, the X axis, to show how another variable changes over time.</p>
-<p>The other variable goes on <strong>Rows</strong>, with a <strong>statistical aggregation</strong>: SUM by default, but COUNT, AVERAGE or MEDIAN are in the menu of the pill.</p>
-<p>Tableau starts with the <strong>YEAR</strong>: click the <strong>+</strong> on the date pill to go down to the quarter, the month, the day.</p>
-</div>
-<div id="second-column" class="quarto-layout-cell" style="flex-basis: 45.5%;justify-content: center;">
+<p>Date variables are usually used as the <strong>X axis</strong> (<strong>Columns</strong> in Tableau) to display the evolution of another variable over time.</p>
+<p>The resolution of the chart can be adjusted by clicking on the <strong>+</strong> symbol of the date variable: from the year to the quarter, the month, the day …</p>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="./figures/dd/tableau_linecharts.png" class="quarto-figure quarto-figure-center" style="max-height:450px;"></p>
+<p><img data-src="https://help.tableau.com/current/pro/desktop/en-us/Img/datefunctions3.png" class="quarto-figure quarto-figure-center" style="max-height:330px;"></p>
 </figure>
 </div>
-</div>
-</div>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: Tableau Help <a href="https://help.tableau.com/current/pro/desktop/en-us/Img/datefunctions3.png"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
 </div>
 </section>
-<section id="one-date-three-levels" class="slide level2 smaller">
-<h2>One Date, Three Levels</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="./figures/loomrow/viz_date_levels.png" class="quarto-figure quarto-figure-center" style="max-height:330px;"></p>
-</figure>
-</div>
-<p>The same <code>SUM(reach)</code> tells three stories. By <strong>year</strong>, 2026 looks like a decline, but it has only six months. By <strong>quarter</strong>, one quarter stands out. By <strong>month</strong>, it is one month, and mostly one post: Lecture 3’s reel. <strong>Check the level before you read the line.</strong></p>
-</section>
-<section id="date-parts-or-date-values" class="slide level2">
-<h2>Date Parts or Date Values?</h2>
-<div class="quarto-layout-panel" data-layout="[1,1.4]">
-<div class="quarto-layout-row">
-<div id="first-column" class="quarto-layout-cell" style="flex-basis: 41.7%;justify-content: center;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="./figures/dd/tableau_date_menu.png" class="quarto-figure quarto-figure-center" style="max-height:450px;"></p>
-</figure>
-</div>
-</div>
-<div id="second-column" class="quarto-layout-cell" style="flex-basis: 58.3%;justify-content: flex-start;">
-<p>The menu of a date pill (<i class="fa-brands fa-windows" aria-label="windows"></i> right-click / <i class="fa-brands fa-apple" aria-label="apple"></i> <kbd>⌃ Control</kbd> + click) has two lists:</p>
-<p><strong>Date parts</strong>, at the top: “May” means every May, whatever the year. The pill is <strong>blue</strong>, discrete.</p>
-<p><strong>Date values</strong>, below: “May 2015” means that month only. The pill is <strong>green</strong>, continuous: a timeline.</p>
-<p><strong>Exact Date</strong> keeps the full date and time of every row.</p>
-</div>
-</div>
-</div>
-</section>
-<section id="two-measures-one-chart" class="slide level2 smaller">
-<h2>Two Measures, One Chart</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="./figures/dd/tableau_dual_axis.gif" class="quarto-figure quarto-figure-center" style="max-height:340px;"></p>
-</figure>
-</div>
+<section id="line-and-area-charts-1" class="slide level2 smaller">
+<h2>Line and Area Charts</h2>
+<p>While the date variable is in one field, drag and drop the other variable in the other field. It uses a <strong>statistical aggregation</strong>: by default the sum (SUM), but it can be changed to count, median, average …</p>
+<p>To add a <strong>second line in the same figure</strong>:</p>
 <ol type="1">
-<li>Drag a second measure onto <strong>Rows</strong>, next to the first: two charts, one above the other</li>
-<li>Open the menu of the second pill → <strong>Dual Axis</strong>: one chart, with a second axis on the right</li>
+<li>Drag and drop the second variable in <strong>Rows</strong>, next to the first one</li>
+<li>Open the menu of its pill (<i class="fa-brands fa-windows" aria-label="windows"></i> right-click / <i class="fa-brands fa-apple" aria-label="apple"></i> <kbd>⌃ Control</kbd> + click) and select <strong>Dual Axis</strong> to merge them</li>
+<li>If both variables have the same unit (e.g., euros), open the menu of the right axis and select <strong>Synchronise Axis</strong></li>
 </ol>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/dd/tableau_dual_axis.gif" class="quarto-figure quarto-figure-center" style="max-height:300px;"></p>
+</figure>
+</div>
 <div style="font-size:0.7em;text-align:center;">
 <p>The recordings in this lecture use a Covid-19 sample: the clicks are the same with your own data.</p>
 </div>
 </section>
-<section id="synchronise-the-axes" class="slide level2">
-<h2>Synchronise the Axes</h2>
+<section id="time-as-a-dimension-or-as-a-measure" class="slide level2 smaller">
+<h2>Time as a Dimension or as a Measure</h2>
+<p>A date can be used as a <strong>Dimension</strong> (discrete, blue pill) or as a <strong>Measure</strong> (continuous, green pill). Switch from one to the other in the menu of the date pill: <strong>Discrete</strong> or <strong>Continuous</strong>.</p>
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><strong>As a Dimension</strong>: each unit of time (year, quarter, month …) is a category with its own header. The line stops at the end of each year: <strong>gaps between the units</strong>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="./figures/loomrow/viz_dual_axis.png" class="quarto-figure quarto-figure-center" style="max-height:290px;"></p>
+<p><img data-src="https://help.tableau.com/current/pro/desktop/en-us/Img/dates_3.png" class="quarto-figure quarto-figure-center" style="max-height:290px;"></p>
 </figure>
 </div>
-<p>With <strong>Dual Axis</strong>, each measure keeps its own scale: €4,170 of spend and €15,425 of revenue are drawn at the same height, the trick of Lecture 4’s Nicolas Cage chart. When both measures share a unit, open the menu of the right axis → <strong>Synchronise Axis</strong>.</p>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><strong>As a Measure</strong>: time is a continuous axis, a timeline. The line runs from the first date to the last: <strong>no gaps between the units</strong>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://help.tableau.com/current/pro/desktop/en-us/Img/dates_5.png" class="quarto-figure quarto-figure-center" style="max-height:290px;"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<p>A Dimension compares the same units year by year; a Measure follows the trend over the whole period.</p>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: Change Date Levels, Tableau Help <a href="https://help.tableau.com/current/pro/desktop/en-us/dates_levels.htm"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
+</section>
+<section id="line-and-area-charts-2" class="slide level2">
+<h2>Line and Area Charts</h2>
+<p>More details about Tableau and time series figures, among other resources found online:</p>
+<div class="quarto-layout-panel" data-layout="[1.3,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 56.5%;justify-content: flex-start;">
+<ul>
+<li><a href="https://help.tableau.com/current/pro/desktop/en-us/buildexamples_line.htm">Building Line Charts</a> by Tableau</li>
+<li><a href="https://help.tableau.com/current/pro/desktop/en-us/dates_levels.htm">Change Date Levels</a> by Tableau</li>
+<li><a href="https://help.tableau.com/current/pro/desktop/en-us/functions_functions_date.htm">Date Functions</a> by Tableau</li>
+<li><a href="https://www.pluralsight.com/guides/tableau-playbook-line-chart">Tableau Playbook: Line Chart</a> by Pluralsight</li>
+</ul>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 43.5%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/dd/tableau_linecharts.png" class="quarto-figure quarto-figure-center" style="max-height:430px;"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="live-example-loomrow-over-time" class="slide level2 center concept">
+<h2>Live Example: Loomrow Over Time</h2>
 </section>
 <section id="your-turn" class="slide level2" data-background="#43464B">
 <h2><i class="fa-solid fa-screwdriver-wrench" aria-label="screwdriver-wrench"></i> Your Turn!</h2>
@@ -277,41 +317,75 @@ Damien Dupré
                     </script>
                 
 </section>
-<section id="location-type-variables" class="slide level2">
+<section id="location-type-variables" class="slide level2 smaller">
 <h2>Location Type Variables</h2>
-<p>A list of geographical places: continents, countries, regions, counties, cities, postcodes …</p>
-<p>A location variable should come in with a <strong>globe icon</strong>. If it shows Abc (text) or # (numbers, e.g., postcodes), click its icon → <strong>Geographic Role</strong> → <strong>Country/Region</strong>, <strong>City</strong>, …</p>
+<p>A list of geographical locations by:</p>
+<ul>
+<li>Continents (Europe, Asia, Africa, Oceania, North America, South America)</li>
+<li>Countries (Ireland, France, Spain, Germany …)</li>
+<li>States, regions, counties, cities …</li>
+</ul>
+<p>By default, a location variable should be properly encoded: a <strong>globe icon</strong> appears before it. If it is encoded as categorical (made of characters) or continuous (made of numbers), give it a <strong>Geographic Role</strong>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="https://help.tableau.com/current/pro/desktop/en-us/Img/maps_getstarted6.gif" class="quarto-figure quarto-figure-center" style="max-height:260px;"></p>
+<p><img data-src="https://help.tableau.com/current/pro/desktop/en-us/Img/maps_getstarted6.gif" class="quarto-figure quarto-figure-center" style="max-height:250px;"></p>
 </figure>
 </div>
 <div style="font-size:0.5em;text-align:center;">
-<p>Source: Get Started Mapping with Tableau <a href="https://help.tableau.com/current/pro/desktop/en-us/buildexamples_maps.htm"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+<p>Source: Get Started Mapping with Tableau, Tableau Help <a href="https://help.tableau.com/current/pro/desktop/en-us/buildexamples_maps.htm"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
 </div>
 </section>
 <section id="mapping-with-tableau" class="slide level2 smaller">
 <h2>Mapping with Tableau</h2>
+<p>To create a map:</p>
+<ol type="1">
+<li>Drag and drop the <strong>location variable in Rows or Columns</strong> of the worksheet</li>
+<li>Use <strong>Show Me</strong> and select one of the map figures (the Longitude and Latitude variables are generated automatically):
+<ul>
+<li><strong>Symbol map</strong>: the data are reduced to a point (good for cities)</li>
+<li><strong>Map</strong>: the data fill the full shape of the location</li>
+</ul></li>
+<li>Drag and drop another variable in the <strong>Colour</strong> box of the Marks card, to display how its values change by location</li>
+</ol>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="./figures/dd/tableau_map.gif" class="quarto-figure quarto-figure-center" style="max-height:330px;"></p>
+<p><img data-src="https://i0.wp.com/datadent.org/wp-content/uploads/2020/03/Map-change-colors.gif" class="quarto-figure quarto-figure-center" style="max-height:260px;"></p>
 </figure>
 </div>
-<ol type="1">
-<li>Put the location variable on <strong>Columns</strong> or <strong>Rows</strong>, then open <strong>Show Me</strong>: Tableau generates the <strong>Latitude</strong> and <strong>Longitude</strong></li>
-<li>Choose a <strong>symbol map</strong>, where each place is a point (good for cities), or a <strong>filled map</strong>, where each place is filled with colour (not for cities)</li>
-<li>Put another variable on <strong>Colour</strong> or <strong>Size</strong></li>
-</ol>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: datadent.org <a href="https://i0.wp.com/datadent.org/wp-content/uploads/2020/03/Map-change-colors.gif"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
 </section>
-<section id="filled-or-symbol-map" class="slide level2">
-<h2>Filled or Symbol Map?</h2>
-<p>Lecture 4: <strong>land doesn’t vote, people do</strong>. A filled map gives the most ink to the largest area, whatever its value.</p>
+<section id="mapping-with-tableau-1" class="slide level2 smaller">
+<h2>Mapping with Tableau</h2>
+<p>More details about Tableau and maps, among other resources found online:</p>
 <ul>
-<li>A <strong>count</strong> (purchases, spend, followers): a <strong>symbol map</strong>, with the count on <strong>Size</strong></li>
-<li>A <strong>rate</strong> (return on ad spend, conversion rate): a <strong>filled map</strong>, with the rate on <strong>Colour</strong></li>
+<li><a href="https://help.tableau.com/current/pro/desktop/en-us/buildexamples_maps.htm">Get Started Mapping with Tableau</a> by Tableau</li>
+<li><a href="https://help.tableau.com/current/pro/desktop/en-us/maps_howto_simple.htm">Build a Simple Map</a> by Tableau</li>
+<li><a href="https://www.youtube.com/watch?v=MT-HlqUHLFU">Tableau Maps: How to Create Stunning Maps in Tableau</a> by Vizual Intelligence (video)</li>
+<li><a href="https://www.tutorialgateway.org/maps-in-tableau/">Create a Map in Tableau</a> by Tutorial Gateway</li>
+<li><a href="https://www.youtube.com/watch?v=bwUj2NZHTC4">Create a Map with Multiple Layers in Tableau</a> by Anthony Smoak (video)</li>
 </ul>
-<div class="fragment">
-<p>Maps are easy in Tableau: make one only when geography changes a decision.</p>
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://www.edureka.co/community/?qa=blob&amp;qa_blobid=15134316276860426432.png" class="quarto-figure quarto-figure-center" style="max-height:200px;"></p>
+</figure>
+</div>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://static.packt-cdn.com/products/9781786465634/graphics/B05527_05_01.jpg" class="quarto-figure quarto-figure-center" style="max-height:200px;"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div style="font-size:0.7em;text-align:center;">
+<p>A symbol map (left) and a filled map (right)</p>
 </div>
 </section>
 <section id="a-second-file-with-countries" class="slide level2 smaller">
@@ -371,6 +445,9 @@ Damien Dupré
 <li>With a <strong>join</strong>, each paid post appears once per country: <code>SUM(spend_eur)</code> jumps to €106,899.36</li>
 </ul>
 </section>
+<section id="live-example-mapping-loomrows-ads" class="slide level2 center concept">
+<h2>Live Example: Mapping Loomrow’s Ads</h2>
+</section>
 <section id="your-turn-1" class="slide level2" data-background="#43464B">
 <h2><i class="fa-solid fa-screwdriver-wrench" aria-label="screwdriver-wrench"></i> Your Turn!</h2>
 <h3 id="map-loomrows-ads">Map Loomrow’s ads</h3>
@@ -394,70 +471,260 @@ Damien Dupré
 <h1>2. Interactive Customisations in Tableau</h1>
 
 </section>
-<section id="aliases" class="slide level2">
-<h2>Aliases</h2>
-<p>An <strong>alias</strong> renames the categories a variable displays. Only the labels change: the original values are kept for the calculations.</p>
-
-<img data-src="./figures/dd/tableau_alias_dialog.png" class="quarto-figure quarto-figure-center r-stretch"><p>In the Data pane, open the menu of a Dimension (<i class="fa-brands fa-windows" aria-label="windows"></i> right-click / <i class="fa-brands fa-apple" aria-label="apple"></i> <kbd>⌃ Control</kbd> + click) → <strong>Aliases…</strong>. Here, in a Titanic dataset, the 0 and 1 of <code>Survived</code> now read <em>Did not survive</em> and <em>Survived</em>.</p>
+<section id="where-we-stopped" class="slide level2">
+<h2>Where We Stopped</h2>
+<p>Last week, in Tableau:</p>
+<ul>
+<li><strong>Dates</strong>: a Dimension (blue pill, gaps between the units) or a Measure (green pill, one timeline), and two measures on a <strong>Dual Axis</strong></li>
+<li><strong>Locations</strong>: a <strong>Geographic Role</strong>, then a symbol map or a filled map</li>
+<li><strong>A second file</strong>: <code>ads-by-country.csv</code>, related to <code>insta-data.csv</code> on <code>post_id</code></li>
+</ul>
+<p><strong>Today</strong>:</p>
+<ol type="1">
+<li>Make the figures smart with interactive customisations</li>
+<li>Assemble the figures in a dashboard, with actions</li>
+<li>The brief of Assignment 1</li>
+</ol>
 </section>
-<section id="tooltips" class="slide level2 smaller">
-<h2>Tooltips</h2>
-<div class="quarto-layout-panel" data-layout="[1,1.4]">
-<div class="quarto-layout-row">
-<div id="first-column" class="quarto-layout-cell" style="flex-basis: 41.7%;justify-content: flex-start;">
-<p>The <strong>tooltip</strong> is the box that appears when the cursor hovers over, or clicks on, a mark.</p>
-<p>It gives the actual numbers behind the figure, and tells a short story about what is currently seen.</p>
-<p>Edit it from <strong>Tooltip</strong> on the <strong>Marks</strong> card. Fields between <code>&lt; &gt;</code> change with the mark under the cursor.</p>
+<section id="aliases-and-groups" class="slide level2 center concept">
+<h2>Aliases and Groups</h2>
+</section>
+<section id="variable-alias" class="slide level2 smaller">
+<h2>Variable Alias</h2>
+<p>Not an interactive feature, but a simple and useful tip: an <strong>alias</strong> renames the categories displayed by a variable, while the calculations keep the original values.</p>
+<p><strong>How</strong>: in the Data pane, open the menu of the variable (<i class="fa-brands fa-windows" aria-label="windows"></i> right-click / <i class="fa-brands fa-apple" aria-label="apple"></i> <kbd>⌃ Control</kbd> + click) → <strong>Aliases…</strong>, then type the new names.</p>
+<div style="font-size:0.8em;text-align:center;">
+<p><strong>Without aliases</strong>: <code>Survived</code> (Titanic data) shows its codes, 0 and 1</p>
 </div>
-<div id="second-column" class="quarto-layout-cell" style="flex-basis: 58.3%;justify-content: center;">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="./figures/dd/tableau_tooltip_editor.png" class="quarto-figure quarto-figure-center"></p>
+<p><img data-src="./figures/dd/tableau_alias_1.png" class="quarto-figure quarto-figure-center" style="max-height:135px;"></p>
+</figure>
+</div>
+<div style="font-size:0.8em;text-align:center;">
+<p><strong>With aliases</strong>: 0 is displayed as Did not survive, 1 as Survived</p>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/dd/tableau_alias_2.png" class="quarto-figure quarto-figure-center" style="max-height:135px;"></p>
+</figure>
+</div>
+</section>
+<section id="groups" class="slide level2 smaller">
+<h2>Groups</h2>
+<p>An alias renames one category; a <strong>group</strong> merges several categories into one: to correct spellings, or to compare families of categories.</p>
+<div class="quarto-layout-panel" data-layout="[1.2,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 54.6%;justify-content: flex-start;">
+<p><strong>How</strong>: in the Data pane, open the menu of the variable (<i class="fa-brands fa-windows" aria-label="windows"></i> right-click / <i class="fa-brands fa-apple" aria-label="apple"></i> <kbd>⌃ Control</kbd> + click) → <strong>Create</strong> → <strong>Group…</strong>, then:</p>
+<ol type="1">
+<li>Select the categories to merge and click <strong>Group</strong></li>
+<li>Rename the group</li>
+<li>Tick <strong>Include ‘Other’</strong> to merge all the remaining categories</li>
+</ol>
+<p><strong>Shortcut</strong>: select marks in the figure, then click the paperclip icon of their tooltip.</p>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 45.5%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://help.tableau.com/current/pro/desktop/en-us/Img/ad-hoc6.png" class="quarto-figure quarto-figure-center" style="max-height:110px;"></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://help.tableau.com/current/pro/desktop/en-us/Img/ad-hoc24.png" class="quarto-figure quarto-figure-center" style="max-height:180px;"></p>
 </figure>
 </div>
 </div>
 </div>
 </div>
+<p><strong>Loomrow</strong>: <code>campaign</code> mixes three launches (SS25_Launch, AW25_Preorder, SS26_Launch) and three sales (Summer_Sale_25, Black_Friday_25, Deadstock_Drop_26), two groups to compare.</p>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: Group Your Data, Tableau Help <a href="https://help.tableau.com/current/pro/desktop/en-us/sortgroup_groups_creating.htm"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
 </section>
-<section id="write-the-tooltip-as-a-sentence" class="slide level2">
-<h2>Write the Tooltip as a Sentence</h2>
-<div class="quarto-layout-panel" data-layout="[1,1]">
+<section id="your-turn-2" class="slide level2" data-background="#43464B">
+<h2><i class="fa-solid fa-screwdriver-wrench" aria-label="screwdriver-wrench"></i> Your Turn!</h2>
+<h3 id="rename-and-group">Rename and group</h3>
+<p>With <code>insta-data.csv</code>:</p>
+<ol type="1">
+<li>Alias <code>is_paid</code>: <strong>False</strong> as Organic, <strong>True</strong> as Paid</li>
+<li>Group the campaigns into <strong>Launches</strong> and <strong>Sales</strong></li>
+<li><code>SUM([Attributed Revenue Eur]) / SUM([Spend Eur])</code> by campaign group: which group returns more per euro spent?</li>
+</ol>
+                    <div id="timer5_3"></div>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            initializeTimer("timer5_3", 300, "interaction");
+                        });
+                    </script>
+                
+</section>
+<section id="marks-labels-and-tooltips" class="slide level2 center concept">
+<h2>Marks, Labels and Tooltips</h2>
+</section>
+<section id="marks-card" class="slide level2 smaller">
+<h2>Marks Card</h2>
+<p>Tableau designs the default figure automatically, according to what it considers the most relevant. The <strong>Marks card</strong> changes this design:</p>
+<div class="quarto-layout-panel" data-layout="[1.7,1]">
 <div class="quarto-layout-row">
-<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<p><strong>Default</strong>, on <code>reach</code> by month:</p>
-<div style="font-size:1.25em;">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 63.0%;justify-content: flex-start;">
+<ol type="1">
+<li><strong>The type of mark</strong>: the drop-down at the top (Automatic, Bar, Line, Circle …)</li>
+<li><strong>The design of the marks</strong>: Colour, Size, Label, Detail and Tooltip</li>
+</ol>
+<p>Each property of the design can be set:</p>
+<ul>
+<li><strong>For all the marks</strong>: click it, e.g., one colour for all the bars</li>
+<li><strong>By the values of a variable</strong>, already used or additional: drag the variable onto it, e.g., <code>format</code> on <strong>Colour</strong> gives one colour per format, <code>reach</code> on <strong>Size</strong> bigger marks for a bigger reach</li>
+</ul>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 37.0%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://help.tableau.com/current/pro/desktop/en-us/Img/build_manual_shelves_marks1.png" class="quarto-figure quarto-figure-center" style="max-height:340px;"></p>
+</figure>
+</div>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: Shelves and Cards Reference, Tableau Help <a href="https://help.tableau.com/current/pro/desktop/en-us/buildmanual_shelves.htm"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="labels-and-annotations" class="slide level2 smaller">
+<h2>Labels and Annotations</h2>
+<div class="quarto-layout-panel" data-layout="[1,1.25]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 44.4%;justify-content: flex-start;">
+<p><strong>Labels</strong> write the values on the marks. Click <strong>Label</strong> in the Marks card, then choose the marks to label: all of them, the minimum and maximum, the line ends, or only the selected or highlighted ones.</p>
+<p><strong>Annotations</strong> point at an insight. Open the menu of a mark (<i class="fa-brands fa-windows" aria-label="windows"></i> right-click / <i class="fa-brands fa-apple" aria-label="apple"></i> <kbd>⌃ Control</kbd> + click) → <strong>Annotate</strong>, then choose:</p>
+<ul>
+<li><strong>Mark</strong>: attached to a mark, it follows it when the view changes</li>
+<li><strong>Point</strong>: attached to a position in the figure</li>
+<li><strong>Area</strong>: a box around a group of marks</li>
+</ul>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 55.6%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://help.tableau.com/current/pro/desktop/en-us/Img/annotate1.gif" class="quarto-figure quarto-figure-center" style="max-height:340px;"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: Add Annotations, Tableau Help <a href="https://help.tableau.com/current/pro/desktop/en-us/annotations_annotations_add.htm"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
+</section>
+<section id="tooltip-principle" class="slide level2">
+<h2>Tooltip Principle</h2>
+<p>The <strong>tooltip</strong> is a series of information (numeric or graphic) displayed in a temporary box when the cursor goes over, or clicks on, an element of a figure. It gives the actual numbers behind the figure, and tells a short story about what is currently seen.</p>
+<div class="quarto-layout-panel" data-layout="[1,1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://interworks.com/wp-content/uploads/sites/default/files/wp-content/uploads/2010/08/TTDefault.png" class="quarto-figure quarto-figure-center" style="max-height:150px;height:150px;object-fit:contain;"></p>
+</figure>
+</div>
+<div style="font-size:0.7em;text-align:center;">
+<p>The default tooltip</p>
+</div>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://interworks.com/wp-content/uploads/sites/default/files/wp-content/uploads/2010/08/CondFormatMore.png" class="quarto-figure quarto-figure-center" style="max-height:150px;height:150px;object-fit:contain;"></p>
+</figure>
+</div>
+<div style="font-size:0.7em;text-align:center;">
+<p>A tooltip with conditional formatting</p>
+</div>
+</div>
+<div id="third-column" class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://cdns.tblsft.com/sites/default/files/blog/vit-gif-for-blog_leave-for-work.gif" class="quarto-figure quarto-figure-center" style="max-height:150px;height:150px;object-fit:contain;"></p>
+</figure>
+</div>
+<div style="font-size:0.7em;text-align:center;">
+<p>A figure in the tooltip</p>
+</div>
+</div>
+</div>
+</div>
+<div style="font-size:0.5em;text-align:center;">
+<p>Sources: InterWorks <a href="https://interworks.com/wp-content/uploads/sites/default/files/wp-content/uploads/2010/08/TTDefault.png"><i class="fa-solid fa-link" aria-label="link"></i></a> <a href="https://interworks.com/blog/interworks/2010/09/03/tableau-tooltips-conditional-formatting/"><i class="fa-solid fa-link" aria-label="link"></i></a> and Tableau <a href="https://cdns.tblsft.com/sites/default/files/blog/vit-gif-for-blog_leave-for-work.gif"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
+</section>
+<section id="tooltip-editing" class="slide level2">
+<h2>Tooltip Editing</h2>
+<p>By default, the tooltip lists the variables of the figure, one per line. Click <strong>Tooltip</strong> in the Marks card to edit it: the text is free, and each <strong>variable between <code>&lt; &gt;</code></strong> shows its value under the cursor (in annotations too).</p>
+<div class="quarto-layout-panel" data-layout="[1.2,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 54.6%;justify-content: flex-start;">
+<p>For example, on <code>reach</code> by month:</p>
+<div style="font-size:1.1em;">
+<pre><code>Month of Posted At:  &lt;MONTH(Posted At)&gt;
+Reach:               &lt;SUM(Reach)&gt;</code></pre>
+</div>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 45.5%;justify-content: flex-start;">
+<p>Will show:</p>
+<div style="font-size:1.1em;">
 <pre><code>Month of Posted At:  August 2025
 Reach:               685,460</code></pre>
 </div>
-<p><strong>Rewritten</strong>:</p>
-<div style="font-size:1.25em;">
-<pre><code>In &lt;MONTH(Posted At)&gt;,
-&lt;CNTD(Post Id)&gt; posts reached
-&lt;SUM(Reach)&gt; accounts. The best
-one alone: &lt;MAX(Reach)&gt;.</code></pre>
 </div>
 </div>
-<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<p><strong>Shows</strong>:</p>
-<p><em>In August 2025, 26 posts reached 685,460 accounts. The best one alone: 535,086.</em></p>
-<p><br></p>
-<p>To use a field that is not in the view, drag it onto <strong>Tooltip</strong> on the Marks card, then set its aggregation from the menu of its pill: <strong>Count (Distinct)</strong> for <code>post_id</code>, <strong>Maximum</strong> for <code>reach</code>.</p>
 </div>
+<p>Rewritten as a sentence, the same tooltip tells a story:</p>
+<div style="font-size:1.1em;">
+<pre><code>In &lt;MONTH(Posted At)&gt;, &lt;CNTD(Post Id)&gt; posts reached &lt;SUM(Reach)&gt; accounts!</code></pre>
 </div>
+<p>Will show:</p>
+<div style="font-size:1.1em;">
+<pre><code>In August 2025, 26 posts reached 685,460 accounts!</code></pre>
 </div>
 </section>
-<section id="a-figure-in-the-tooltip" class="slide level2 smaller">
-<h2>A Figure in the Tooltip</h2>
+<section id="tooltip-advanced" class="slide level2 smaller">
+<h2>Tooltip Advanced</h2>
+<p>Two ways to put more in a tooltip:</p>
+<ul>
+<li><strong>Another variable</strong>: drag it onto <strong>Tooltip</strong> in the Marks card, e.g., <code>post_id</code>, counted with <strong>Count (Distinct)</strong></li>
+<li><strong>A full figure</strong>: when editing the tooltip, click <strong>Insert</strong> → <strong>Sheets</strong> → the name of the figure to add (<em>Viz in Tooltip</em> in Tableau Help)</li>
+</ul>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="./figures/dd/tableau_sheet_tooltip.gif" class="quarto-figure quarto-figure-center" style="max-height:360px;"></p>
+<p><img data-src="./figures/dd/tableau_sheet_tooltip.gif" class="quarto-figure quarto-figure-center" style="max-height:380px;"></p>
 </figure>
 </div>
-<p>Instead of a value, a tooltip can show a whole figure: in the tooltip editor, <strong>Insert</strong> → <strong>Sheets</strong> → the sheet to show. Hover a country, and its own time series appears. With Loomrow: hover a month, and see its reach by <code>format</code>.</p>
 </section>
-<section id="filters" class="slide level2">
-<h2>Filters</h2>
-<p>Show <strong>only specific data</strong> with the <strong>Filters</strong> shelf: drag a variable onto it, then choose which categories to keep (Dimension) or which range of values (Measure).</p>
+<section id="your-turn-3" class="slide level2" data-background="#43464B">
+<h2><i class="fa-solid fa-screwdriver-wrench" aria-label="screwdriver-wrench"></i> Your Turn!</h2>
+<h3 id="labels-and-tooltips">Labels and tooltips</h3>
+<p>On your sheet of <code>reach</code> by month:</p>
+<ol type="1">
+<li>Label the highest month, and annotate it with the post that explains it</li>
+<li>Rewrite the tooltip as a sentence, with the number of posts</li>
+<li>Insert a sheet in the tooltip: <code>reach</code> by <code>format</code> for the month under the cursor</li>
+</ol>
+                    <div id="timer5_5"></div>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            initializeTimer("timer5_5", 360, "interaction");
+                        });
+                    </script>
+                
+</section>
+<section id="filters-and-highlighters" class="slide level2 center concept">
+<h2>Filters and Highlighters</h2>
+</section>
+<section id="local-filters" class="slide level2">
+<h2>Local Filters</h2>
+<p>A <strong>filter</strong> displays only specific data. Drag a variable onto the <strong>Filters</strong> shelf, then select what to keep: categories for a categorical variable, values for a continuous one.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="https://help.tableau.com/current/pro/desktop/en-us/Img/filtering-drag.gif" class="quarto-figure quarto-figure-center" style="max-height:320px;"></p>
@@ -467,76 +734,184 @@ one alone: &lt;MAX(Reach)&gt;.</code></pre>
 <p>Source: Filter Data from Your Views, Tableau Help <a href="https://help.tableau.com/current/pro/desktop/en-us/filtering.htm"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
 </div>
 </section>
-<section id="filter-and-highlighter-menus" class="slide level2 smaller">
-<h2>Filter and Highlighter Menus</h2>
-<div class="quarto-layout-panel" data-layout="[1,1.5]">
+<section id="types-of-filters" class="slide level2 smaller">
+<h2>Types of Filters</h2>
+<div class="quarto-layout-panel" data-layout="[1.35,1]">
 <div class="quarto-layout-row">
-<div id="first-column" class="quarto-layout-cell" style="flex-basis: 40.0%;justify-content: center;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="./figures/dd/tableau_show_filter_menu.png" class="quarto-figure quarto-figure-center"></p>
-</figure>
-</div>
-</div>
-<div id="second-column" class="quarto-layout-cell" style="flex-basis: 60.0%;justify-content: flex-start;">
-<p>A <strong>menu</strong> lets the reader make their own selection. Open the menu of a pill in the view:</p>
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 57.5%;justify-content: flex-start;">
+<p>The filter dialog depends on the variable:</p>
 <ul>
-<li><strong>Show Filter</strong>: keeps the selected values and removes the others</li>
-<li><strong>Show Highlighter</strong>: keeps every value and dims the ones not selected</li>
+<li>A <strong>Dimension</strong> (categories) has four tabs:
+<ul>
+<li><strong>General</strong>: tick the categories to keep</li>
+<li><strong>Wildcard</strong>: the names that contain, start or end with a text</li>
+<li><strong>Condition</strong>: the categories whose measure meets a rule, e.g., a <code>SUM([Reach])</code> of at least 10,000</li>
+<li><strong>Top</strong>: the top or bottom <em>N</em>, e.g., the 10 posts with the highest <code>SUM([Reach])</code></li>
+</ul></li>
+<li>A <strong>Measure</strong> keeps a range of values: at least, at most, or between two values</li>
+<li>A <strong>Date</strong> keeps a range of dates, <strong>relative dates</strong> (e.g., the last 3 months), or date parts (e.g., the years 2025 and 2026)</li>
 </ul>
-<p>Customise each card from its own drop-down arrow: list, drop-down, slider, …</p>
 </div>
-</div>
-</div>
-</section>
-<section id="filter-or-highlight" class="slide level2 smaller">
-<h2>Filter or Highlight?</h2>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 42.6%;justify-content: center;">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="./figures/loomrow/viz_filter_highlight.png" class="quarto-figure quarto-figure-center" style="max-height:370px;"></p>
+<p><img data-src="https://help.tableau.com/current/pro/desktop/en-us/Img/filtering-drag1.png" class="quarto-figure quarto-figure-center" style="max-height:360px;"></p>
 </figure>
 </div>
-<p>The <strong>filter</strong> leaves sustainability alone: 507,491 accounts, but is that a lot? The <strong>highlighter</strong> keeps the other themes, dimmed: sustainability is the lowest of the six.</p>
-<p><strong>Filter</strong> when the rest of the data does not matter, <strong>highlight</strong> when the comparison with the rest does.</p>
+</div>
+</div>
+</div>
 <div style="font-size:0.5em;text-align:center;">
-<p>Source: Highlight Data Points in Context, Tableau Help <a href="https://help.tableau.com/current/pro/desktop/en-us/actions_highlight_highlighter.htm"><i class="fa-solid fa-link" aria-label="link"></i></a>. To go further: Highlight vs Filter Actions in Tableau: When Should You Use Each?, Andy Kriebel (video) <a href="https://www.youtube.com/watch?v=Ezq644Th3SM"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+<p>Source: Filter Data from Your Views, Tableau Help <a href="https://help.tableau.com/current/pro/desktop/en-us/filtering.htm"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
 </div>
 </section>
-<section id="time-animation-player" class="slide level2 smaller">
-<h2>Time Animation Player</h2>
-<p>Put a date on the <strong>Pages</strong> shelf: the view becomes a series of pages, one per month (or year, or day), with <strong>playback controls</strong> to play them in a row.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="https://help.tableau.com/current/pro/desktop/en-us/Img/pages6.gif" class="quarto-figure quarto-figure-center" style="max-height:300px;"></p>
-</figure>
-</div>
-<p>Tick <strong>Show History</strong> to keep the marks of the previous pages on screen. With Loomrow: <code>impressions</code> against <code>likes</code>, and <code>posted_at</code> as a month on <strong>Pages</strong>.</p>
-<div style="font-size:0.5em;text-align:center;">
-<p>Source: Shelves and Cards Reference, Tableau Help <a href="https://help.tableau.com/current/pro/desktop/en-us/buildmanual_shelves.htm"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
-</div>
-</section>
-<section id="your-turn-2" class="slide level2" data-background="#43464B">
-<h2><i class="fa-solid fa-screwdriver-wrench" aria-label="screwdriver-wrench"></i> Your Turn!</h2>
-<h3 id="make-your-figures-smart">Make your figures smart</h3>
-<p>On your Loomrow sheets:</p>
+<section id="local-filter-menu" class="slide level2 smaller">
+<h2>Local Filter Menu</h2>
+<p>A <strong>filter menu</strong> (a <em>filter card</em> in Tableau Help) lets the readers make their own selection.</p>
+<div class="quarto-layout-panel" data-layout="[1.5,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 60.0%;justify-content: flex-start;">
+<p><strong>Add it</strong>:</p>
 <ol type="1">
-<li>Alias <code>is_paid</code>: <strong>False</strong> as Organic, <strong>True</strong> as Paid</li>
-<li>Rewrite the tooltip of <code>reach</code> by month as a sentence</li>
-<li><code>reach</code> by <code>theme</code>: a filter on <code>theme</code>, then a highlighter. Select customer in each: where does it rank?</li>
-<li>Your scatterplot, by month on <strong>Pages</strong>: press play</li>
+<li>Click <strong>Analysis</strong> in the top toolbar → <strong>Filters</strong> → the variable the readers choose from</li>
+<li>Customise the menu from its drop-down arrow</li>
 </ol>
-                    <div id="timer5_3"></div>
+<p><span style="color:#2a78d6;"><i class="fa-solid fa-circle-arrow-right" aria-label="circle-arrow-right"></i></span> Note: the same result comes from the <strong>Filters</strong> shelf: open the menu of the variable → <strong>Show Filter</strong>.</p>
+<p><strong>Choose its style</strong>:</p>
+<ul>
+<li><strong>Single value</strong>: a list, a drop-down or a slider</li>
+<li><strong>Multiple values</strong>: a list or a drop-down</li>
+<li><strong>Range</strong>: a slider, for measures and dates</li>
+</ul>
+<p>Tick <strong>Only Relevant Values</strong> to hide the values that the other filters exclude.</p>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 40.0%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://help.tableau.com/current/pro/desktop/en-us/Img/show_filter2.gif" class="quarto-figure quarto-figure-center" style="max-height:400px;"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: Filter Data from Your Views, Tableau Help <a href="https://help.tableau.com/current/pro/desktop/en-us/filtering.htm"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
+</section>
+<section id="one-filter-several-sheets" class="slide level2 smaller">
+<h2>One Filter, Several Sheets</h2>
+<p>By default, a filter only changes its own sheet. On a dashboard, the readers expect one filter menu to change all the figures.</p>
+<div class="quarto-layout-panel" data-layout="[1.1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 52.4%;justify-content: flex-start;">
+<p>On the <strong>Filters</strong> shelf, open the menu of the variable → <strong>Apply to Worksheets</strong>:</p>
+<ul>
+<li><strong>All Using Related Data Sources</strong>: every sheet using <code>insta-data.csv</code> or <code>ads-by-country.csv</code>, related on <code>post_id</code></li>
+<li><strong>All Using This Data Source</strong>: every sheet using the same data source</li>
+<li><strong>Selected Worksheets…</strong>: the sheets you tick</li>
+<li><strong>Only This Worksheet</strong>: the default</li>
+</ul>
+<p>A filter shared by several sheets gets an icon on the Filters shelf.</p>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 47.6%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://help.tableau.com/current/pro/desktop/en-us/Img/shared_filters4.png" class="quarto-figure quarto-figure-center" style="max-height:320px;"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: Apply Filters to Multiple Worksheets, Tableau Help <a href="https://help.tableau.com/current/pro/desktop/en-us/filtering_global.htm"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
+</section>
+<section id="local-highlighter-menu" class="slide level2 smaller">
+<h2>Local Highlighter Menu</h2>
+<p>A <strong>highlighter menu</strong> lets the readers focus the figures on some categories. Unlike a filter, it keeps all the data in the figure: the categories not selected are only dimmed.</p>
+<div class="quarto-layout-panel" data-layout="[1,1.2]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 45.5%;justify-content: flex-start;">
+<p><strong>Add it</strong>:</p>
+<ol type="1">
+<li>Click <strong>Analysis</strong> in the top toolbar → <strong>Highlighters</strong> → the variable the readers highlight from</li>
+<li>Customise the menu from its drop-down arrow (fewer options than a filter menu)</li>
+</ol>
+<p>On a dashboard, the highlighter menu applies to all the figures that use the highlighted variable.</p>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 54.6%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://cdnl.tblsft.com/sites/default/files/blog/third_highlighter.gif" class="quarto-figure quarto-figure-center" style="max-height:300px;"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: Quickly Find Marks in Context with Tableau 10’s New Highlighter, Tableau <a href="https://www.tableau.com/blog/check-out-new-highlighter-tableau-10-54969"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
+</section>
+<section id="your-turn-4" class="slide level2" data-background="#43464B">
+<h2><i class="fa-solid fa-screwdriver-wrench" aria-label="screwdriver-wrench"></i> Your Turn!</h2>
+<h3 id="filter-and-highlight">Filter and highlight</h3>
+<ol type="1">
+<li>A filter menu on <code>format</code> (multiple values, drop-down) on your monthly sheet, applied to all the sheets using <code>insta-data.csv</code></li>
+<li>A bar chart of the 10 posts with the highest <code>reach</code> (a Top filter on <code>post_id</code>): which formats and themes?</li>
+<li><code>reach</code> by <code>theme</code>: a filter on <code>theme</code>, then a highlighter. Select customer in each: where does it rank?</li>
+</ol>
+                    <div id="timer5_6"></div>
                     <script>
                         document.addEventListener("DOMContentLoaded", function () {
-                            initializeTimer("timer5_3", 360, "interaction");
+                            initializeTimer("timer5_6", 420, "interaction");
                         });
                     </script>
                 
+</section>
+<section id="time-animation-player" class="slide level2 center concept">
+<h2>Time Animation Player</h2>
+</section>
+<section id="time-animation-player-1" class="slide level2">
+<h2>Time Animation Player</h2>
+<p>Drag a date variable onto the <strong>Pages</strong> shelf to play the figure over time:</p>
+<ol type="1">
+<li>A player appears: play forwards or backwards, page by page, at the speed you choose</li>
+<li>Tick <strong>Show History</strong> to keep the marks of the previous pages as trails</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://miro.medium.com/max/1400/1*9wAYT7RHcaZOCNs0suDcmg.gif" class="quarto-figure quarto-figure-center" style="max-height:260px;"></p>
+</figure>
+</div>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: Medium <a href="https://miro.medium.com/max/1400/1*9wAYT7RHcaZOCNs0suDcmg.gif"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
 </section></section>
 <section>
 <section id="tableau-dashboard" class="title-slide slide level1 center">
 <h1>3. Tableau Dashboard</h1>
 
+</section>
+<section id="what-is-a-dashboard" class="slide level2">
+<h2>What Is a Dashboard?</h2>
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<p>For Stephen Few, a dashboard is a visual display of the few things that matter to reach an objective, arranged on <strong>one screen</strong> and readable <strong>at a glance</strong>.</p>
+<p>Like the dashboard of a car: the few numbers needed to drive, readable in a second, with warning lights when something goes wrong.</p>
+<div style="font-size:0.7em;">
+<p>Few, S. (2006). <em>Information Dashboard Design: The Effective Visual Communication of Data</em>. O’Reilly.</p>
+</div>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/dd/car_dashboard.jpeg" class="quarto-figure quarto-figure-center" style="max-height:380px;"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
 </section>
 <section id="tableau-dashboard-showcase" class="slide level2">
 <h2>Tableau Dashboard Showcase</h2>
@@ -578,147 +953,598 @@ one alone: &lt;MAX(Reach)&gt;.</code></pre>
 <p><img data-src="./figures/dd/tableau_good_1.png" class="quarto-figure quarto-figure-center"></p>
 </figure>
 </div>
+<div style="font-size:0.7em;text-align:center;">
+<p>Key numbers in colour inside the text, and a <strong>Donate</strong> button</p>
+</div>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="./figures/dd/tableau_good_3.png" class="quarto-figure quarto-figure-center" style="max-height:250px;"></p>
+<p><img data-src="./figures/dd/tableau_good_3.png" class="quarto-figure quarto-figure-center" style="max-height:200px;"></p>
 </figure>
+</div>
+<div style="font-size:0.7em;text-align:center;">
+<p>A year player with <strong>Show history</strong>, and a highlighter to select a country</p>
 </div>
 </section>
 <section id="meaningful-visualisations" class="slide level2">
 <h2>Meaningful Visualisations</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="./figures/dd/tableau_good_2.png" class="quarto-figure quarto-figure-center" style="max-height:275px;"></p>
+<p><img data-src="./figures/dd/tableau_good_2.png" class="quarto-figure quarto-figure-center" style="max-height:230px;"></p>
 </figure>
+</div>
+<div style="font-size:0.7em;text-align:center;">
+<p>Two measures on one map, the out-of-school rate (colour) and GDP per capita (circles), with a text to read it</p>
 </div>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="./figures/dd/tableau_good_6.png" class="quarto-figure quarto-figure-center" style="max-height:210px;"></p>
+<p><img data-src="./figures/dd/tableau_good_6.png" class="quarto-figure quarto-figure-center" style="max-height:170px;"></p>
 </figure>
+</div>
+<div style="font-size:0.7em;text-align:center;">
+<p>Rural against urban population by region, in the two colours of the dashboard</p>
 </div>
 </section>
 <section id="insightful-storytelling" class="slide level2">
 <h2>Insightful Storytelling</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="./figures/dd/tableau_good_5.png" class="quarto-figure quarto-figure-center"></p>
+<p><img data-src="./figures/dd/tableau_good_4.png" class="quarto-figure quarto-figure-center" style="max-height:280px;"></p>
 </figure>
+</div>
+<div style="font-size:0.7em;text-align:center;">
+<p>The causes: one icon each, short texts, and the key numbers in bold and colour</p>
 </div>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="./figures/dd/tableau_good_4.png" class="quarto-figure quarto-figure-center" style="max-height:370px;"></p>
+<p><img data-src="./figures/dd/tableau_good_5.png" class="quarto-figure quarto-figure-center"></p>
 </figure>
+</div>
+<div style="font-size:0.7em;text-align:center;">
+<p>The conclusion: a summary, and a call to action, raising awareness</p>
 </div>
 </section>
 <section id="example-not-to-follow" class="slide level2 smaller">
 <h2>Example Not to Follow!</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="./figures/dd/tableau_bad.png" class="quarto-figure quarto-figure-center" style="max-height:320px;"></p>
+<p><img data-src="./figures/dd/tableau_bad.png" class="quarto-figure quarto-figure-center" style="max-height:300px;"></p>
 </figure>
 </div>
-<div class="fragment">
 <ul>
-<li>Typos in the titles: “Wold”, “Countires”</li>
-<li>One colour per country on the map, and a pie with one slice per country: the colours carry no information</li>
-<li>Raw field names as axis titles (“Obs Value”), two different fonts, and two bar charts on different scales</li>
-<li>No text to say what the index measures, or what to conclude</li>
+<li><strong>Titles</strong>: typos, “Wold” and “Countires”</li>
+<li><strong>Colours</strong>: one colour per country on the map, and a pie with one slice per country: the colours carry no information</li>
+<li><strong>Axes and fonts</strong>: raw field names as axis titles (“Obs Value”), two bar charts on different scales, and two different fonts</li>
+<li><strong>Story</strong>: no text to say what the index measures, or what to conclude</li>
 </ul>
+</section>
+<section id="before-building-purpose-and-audience" class="slide level2 smaller">
+<h2>Before Building: Purpose and Audience</h2>
+<p>Tableau’s best practices for dashboard design:</p>
+<div class="quarto-layout-panel" data-layout="[1,1,1,1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 20.0%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://www.tableau.com/sites/default/files/2021-10/Know%20your%20audience.png" class="quarto-figure quarto-figure-center" style="max-height:80px;"></p>
+</figure>
+</div>
+<div style="font-size:0.8em;text-align:center;line-height:1.2;">
+<p>Know your audience</p>
+</div>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 20.0%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://www.tableau.com/sites/default/files/2021-10/consider%20display%20size.png" class="quarto-figure quarto-figure-center" style="max-height:80px;"></p>
+</figure>
+</div>
+<div style="font-size:0.8em;text-align:center;line-height:1.2;">
+<p>Consider display size</p>
+</div>
+</div>
+<div id="third-column" class="quarto-layout-cell" style="flex-basis: 20.0%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://www.tableau.com/sites/default/files/2021-10/Plan%20for%20fast%20load%20times.png" class="quarto-figure quarto-figure-center" style="max-height:80px;"></p>
+</figure>
+</div>
+<div style="font-size:0.8em;text-align:center;line-height:1.2;">
+<p>Plan for fast load times</p>
+</div>
+</div>
+<div id="fourth-column" class="quarto-layout-cell" style="flex-basis: 20.0%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://www.tableau.com/sites/default/files/2021-10/Leverage%20the%20sweet%20spot.png" class="quarto-figure quarto-figure-center" style="max-height:80px;"></p>
+</figure>
+</div>
+<div style="font-size:0.8em;text-align:center;line-height:1.2;">
+<p>Leverage the sweet spot</p>
+</div>
+</div>
+<div id="fifth-column" class="quarto-layout-cell" style="flex-basis: 20.0%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://www.tableau.com/sites/default/files/2021-10/unnamed%20%281%29.png" class="quarto-figure quarto-figure-center" style="max-height:80px;"></p>
+</figure>
+</div>
+<div style="font-size:0.8em;text-align:center;line-height:1.2;">
+<p>Limit views and colours</p>
+</div>
+</div>
+</div>
+</div>
+<p>The first one comes before the first sheet. Answer four questions:</p>
+<ul>
+<li><strong>Who</strong> will read it, and what do they already know?</li>
+<li><strong>What question</strong> does it answer, and <strong>what decision</strong> will it support?</li>
+<li><strong>Where</strong> will it be read: on a laptop, a phone, a projector?</li>
+<li><strong>Explore or explain?</strong> An exploratory dashboard lets readers search the data; an explanatory one tells them one story. Your assignment is explanatory: it ends with a recommendation.</li>
+</ul>
+<p><strong>The 5-second test</strong>: after looking at it for 5 seconds, a reader should be able to say what it is about.</p>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: Dashboard Design Best Practices, Tableau <a href="https://www.tableau.com/learn/articles/dashboard-design-best-practices"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
 </div>
 </section>
 <section id="design-strategy" class="slide level2">
 <h2>Design Strategy</h2>
 <p>Creating a perfect Tableau dashboard is easy if you follow these steps:</p>
 <ol type="1">
-<li><strong>Basic figures</strong>: create many figures that can support your story, and leave them with all their default parameters</li>
+<li><strong>Basic figures</strong>: create many figures that can support your story, and keep their default settings</li>
 <li><strong>Basic dashboard</strong>: put the most relevant figures in a dashboard, with its title, text and pictures, but no design work yet</li>
 <li><strong>Figure improvement</strong>: go back to the worksheet of each figure and customise it: colour, size, shapes, title, captions, axes and interactions</li>
 <li><strong>Dashboard improvement</strong>: go back to the dashboard and customise it: background, colours, fonts, layout and actions</li>
 </ol>
 </section>
+<section id="overall-design-guidelines" class="slide level2">
+<h2>Overall Design Guidelines</h2>
+<p>Keep them in mind at every step:</p>
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<ol type="1">
+<li>Don’t overwhelm viewers</li>
+<li>Avoid visual clutter</li>
+<li>Avoid poor visual design</li>
+<li>Don’t add too much data</li>
+<li>Provide for consistency</li>
+<li>Provide for interaction affordances</li>
+<li>Manage complexity</li>
+</ol>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<ol start="8" type="1">
+<li>Organise charts</li>
+<li>Increase information</li>
+<li>Avoid redundancy of information</li>
+<li>Design is an iterative process</li>
+<li>Context is very important</li>
+<li>Use colour carefully</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="dashboard-types" class="slide level2">
+<h2>Dashboard Types</h2>
+<p>Dashboards come in genres: <strong>curated</strong> ones tell one story (e.g., magazine, infographic), <strong>data collections</strong> let the readers explore (e.g., analytical, repository). Your assignment is a curated dashboard.</p>
+
+<img data-src="./figures/dd/dashboard_types.png" class="quarto-figure quarto-figure-center r-stretch"><div style="font-size:0.5em;text-align:center;">
+<p>Source: Dashboard Design Patterns <a href="https://dashboarddesignpatterns.github.io/"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
+<ul>
+<li><a href="https://dashboarddesignpatterns.github.io/workshop.html">See the Dashboard Design Patterns workshop for more details</a></li>
+</ul>
+</section>
+<section id="key-elements" class="slide level2">
+<h2>Key Elements</h2>
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<p>Every dashboard should include these key elements to fill its screenspace:</p>
+<ul>
+<li>A title</li>
+<li>A written story, with an introduction, an analysis and a conclusion</li>
+<li>Multiple visualisations</li>
+</ul>
+<p>Optional elements can be added, such as images, buttons or menus.</p>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/dd/dashboard_key.png" class="quarto-figure quarto-figure-center"></p>
+</figure>
+</div>
+<div style="font-size:0.5em;text-align:center;">
+<p>Example of a dashboard structure, for illustration only: not necessarily to follow.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="key-elements-title" class="slide level2">
+<h2>Key Elements: Title</h2>
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<p>A good title, as in these <a href="https://www.tableau.com/blog/tableau-public-viz-wrap-interesting-data-visualizations-2022">real dashboards</a>:</p>
+<ul>
+<li><strong>Pinpoints the problem</strong>: <a href="https://public.tableau.com/app/profile/dennis.kao/viz/HealthcareCrisisinRuralAmericaProjectHealthViz/Dashboard1">“Healthcare Crisis in Rural America”</a></li>
+<li><strong>Makes a statement or asks a question</strong>: <a href="https://public.tableau.com/app/profile/sam.epley/viz/CollegeGamedayCanMyFamilyOut-PickthePundits/PickbyWeek">“#CollegeGameday: Can My Family Out-Pick the Pundits?”</a></li>
+<li><strong>Is catchy</strong>: <a href="https://public.tableau.com/app/profile/jeff.plattner4532/viz/NBALordsoftheRings/LordsoftheRings">“NBA Lords of the Rings”</a></li>
+</ul>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/dd/dashboard_key_title.png" class="quarto-figure quarto-figure-center"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="key-elements-story" class="slide level2">
+<h2>Key Elements: Story</h2>
+<div class="quarto-layout-panel" data-layout="[2,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 66.7%;justify-content: flex-start;">
+<p>The story, the narrative conveying the information, has three parts:</p>
+<ul>
+<li><strong>Introduction</strong>: presents the context of the issue investigated</li>
+<li><strong>Analysis</strong>: extracts the relevant information from each visualisation, each piece linked to the others (temporal, geographical, logical …)</li>
+<li><strong>Conclusion</strong>: summarises the information and provides recommendations to the reader</li>
+</ul>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/dd/dashboard_key_story.png" class="quarto-figure quarto-figure-center"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="key-elements-visualisations" class="slide level2">
+<h2>Key Elements: Visualisations</h2>
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<ol type="1">
+<li>Place your visualisations in a relevant order</li>
+<li>Make sure they are customised</li>
+<li>Add a caption</li>
+<li>Add global interactive features</li>
+</ol>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/dd/dashboard_key_viz.png" class="quarto-figure quarto-figure-center"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="big-numbers-first" class="slide level2">
+<h2>Big Numbers First</h2>
+<p>Marketing dashboards often open with a few <strong>KPIs</strong> (Key Performance Indicators) as big numbers: at the top left, each with a comparison. For Loomrow, January to June 2026 against January to June 2025:</p>
+<div class="quarto-layout-panel" data-layout="[1,1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: flex-start;">
+<div style="text-align:center;">
+<p><span style="font-size:2.2em;font-weight:700;color:#23373b;">2.06M</span></p>
+<p>accounts reached</p>
+<p><span style="color:#3a9a5b;font-weight:500;font-size:0.9em;"><i class="fa-solid fa-caret-up" aria-label="caret-up"></i> against 0.45M</span></p>
+</div>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: flex-start;">
+<div style="text-align:center;">
+<p><span style="font-size:2.2em;font-weight:700;color:#23373b;">6.3%</span></p>
+<p>engagement rate</p>
+<p><span style="color:#e34948;font-weight:500;font-size:0.9em;"><i class="fa-solid fa-caret-down" aria-label="caret-down"></i> against 6.4%</span></p>
+</div>
+</div>
+<div id="third-column" class="quarto-layout-cell" style="flex-basis: 33.3%;justify-content: flex-start;">
+<div style="text-align:center;">
+<p><span style="font-size:2.2em;font-weight:700;color:#23373b;">€2.75</span></p>
+<p>of revenue per €1 spent</p>
+<p><span style="color:#e34948;font-weight:500;font-size:0.9em;"><i class="fa-solid fa-caret-down" aria-label="caret-down"></i> against €3.46</span></p>
+</div>
+</div>
+</div>
+</div>
+<p>In Tableau: one sheet per number, with the measure on <strong>Text</strong> in the Marks card, then the sheets side by side in a horizontal container. The engagement rate:</p>
+<pre><code>(SUM([Engagements Followers]) + SUM([Engagements Non Followers])) / SUM([Reach])</code></pre>
+</section>
+<section id="layout-the-sweet-spot" class="slide level2 smaller">
+<h2>Layout: the Sweet Spot</h2>
+<div class="quarto-layout-panel" data-layout="[1,1.1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 47.6%;justify-content: flex-start;">
+<p>Readers scan a screen from the <strong>top left</strong>, then across and down: put the most important view (or the KPIs) in that corner, and the details below or to the right.</p>
+<ul>
+<li>Few views: Tableau suggests two or three main ones</li>
+<li>Align the views on a grid, with white space between the groups</li>
+<li>Place each legend and filter next to the view it controls</li>
+<li>Keep the same colour for the same category on every sheet</li>
+</ul>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 52.4%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://help.tableau.com/current/pro/desktop/en-us/Img/dashboard_best_practices3.png" class="quarto-figure quarto-figure-center" style="max-height:360px;"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: Best Practices for Effective Dashboards, Tableau Help <a href="https://help.tableau.com/current/pro/desktop/en-us/dashboards_best_practices.htm"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
+</section>
 <section id="tableau-dashboard-1" class="slide level2">
 <h2>Tableau Dashboard</h2>
-<p>A dashboard is made by dropping several <strong>sheets</strong> on a page, organising their position, and adding <strong>objects</strong> (text, images, blank space, …).</p>
-<p>Design features can then be changed to give the dashboard a professional feel.</p>
-<p>Interactions that make all the sheets move together come with step 4: the dashboard actions.</p>
+<p>A dashboard is a page made of:</p>
+<ul>
+<li><strong>Sheets</strong>: the figures, each built in its own worksheet</li>
+<li><strong>Objects</strong>: text, images, blank space, buttons …</li>
+<li><strong>Actions</strong>: the interactions that make all the sheets react together</li>
+</ul>
+<p>First place the sheets and objects, then change the design features to give the dashboard a professional feel, and add the actions last (step 4 of the design strategy).</p>
 </section>
 <section id="tableau-dashboard-2" class="slide level2 smaller">
 <h2>Tableau Dashboard</h2>
+<p>Click the <strong>New Dashboard</strong> icon at the bottom of the window, then drag the sheets from the left panel onto the page. <strong>Tiled</strong> keeps them in a tidy grid; <strong>Floating</strong> lets an object sit on top of the others.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="./figures/dd/tableau_dashboard.gif" class="quarto-figure quarto-figure-center" style="max-height:450px;"></p>
 </figure>
 </div>
-<p>Drag the sheets from the left panel onto the page. <strong>Tiled</strong> keeps them in a tidy grid; <strong>Floating</strong> lets an object sit on top of the others.</p>
 </section>
-<section id="dashboard-actions" class="slide level2 smaller">
-<h2>Dashboard Actions</h2>
-<p>On a dashboard, a highlighter already works on every sheet with the same variable, but a filter only on its own sheet (to extend it: its menu on the <strong>Filters</strong> shelf → <strong>Apply to Worksheets</strong> → <strong>All Using This Data Source</strong>). <strong>Actions</strong> go further: they make all the figures react together.</p>
-<div class="quarto-layout-panel" data-layout="[1,1.2]">
+<section id="dashboard-size" class="slide level2 smaller">
+<h2>Dashboard Size</h2>
+<div class="quarto-layout-panel" data-layout="[1.6,1]">
 <div class="quarto-layout-row">
-<div id="first-column" class="quarto-layout-cell" style="flex-basis: 45.5%;justify-content: center;">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 61.5%;justify-content: flex-start;">
+<p>Set the size <strong>before</strong> placing anything, in the <strong>Size</strong> menu of the Dashboard pane:</p>
+<ul>
+<li><strong>Fixed size</strong> (the default): the same on every screen, with scroll bars if the window is smaller. The safest choice for your assignment, e.g., 1200 × 800 px</li>
+<li><strong>Range</strong>: between a minimum and a maximum size</li>
+<li><strong>Automatic</strong>: fills the window, but the views can be squashed on a small screen</li>
+</ul>
+<p><strong>Device Preview</strong> shows the dashboard on a desktop, a tablet or a phone, and creates a layout for each device.</p>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 38.5%;justify-content: center;">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="./figures/dd/tableau_public_actions.png" class="quarto-figure quarto-figure-center"></p>
+<p><img data-src="https://help.tableau.com/current/pro/desktop/en-us/Img/sizing3.png" class="quarto-figure quarto-figure-center" style="max-height:330px;"></p>
 </figure>
 </div>
 </div>
-<div id="second-column" class="quarto-layout-cell" style="flex-basis: 54.6%;justify-content: flex-start;">
-<p><strong>Dashboard</strong> → <strong>Actions…</strong> → <strong>Add Action</strong>, then choose:</p>
-<ol type="1">
-<li>what triggers it: <strong>Hover</strong>, <strong>Select</strong> (a click) or <strong>Menu</strong></li>
-<li>which sheet it comes from</li>
-<li>which sheets it changes</li>
-</ol>
-<p>A <strong>Highlight</strong> action on Hover is the easiest way to make a dashboard smart. A <strong>Filter</strong> action on Hover or Select changes the figures under the reader’s eyes: prefer <strong>Menu</strong>.</p>
 </div>
 </div>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: Size and Lay Out Your Dashboard, Tableau Help <a href="https://help.tableau.com/current/pro/desktop/en-us/dashboards_organize_floatingandtiled.htm"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
 </div>
 </section>
-<section id="your-turn-3" class="slide level2 smaller" data-background="#43464B">
+<section id="layout-containers" class="slide level2 smaller">
+<h2>Layout Containers</h2>
+<p>A <strong>container</strong> groups objects that resize together: a <strong>Horizontal</strong> container shares its width between them (e.g., a row of KPIs), a <strong>Vertical</strong> one its height (e.g., a column of filters).</p>
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://help.tableau.com/current/pro/desktop/en-us/Img/dashboard_layout_containers_horizontal.jpg" class="quarto-figure quarto-figure-center" style="max-height:160px;"></p>
+</figure>
+</div>
+<div style="font-size:0.7em;text-align:center;">
+<p>Horizontal: side by side</p>
+</div>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://help.tableau.com/current/pro/desktop/en-us/Img/dashboard_layout_containers_vertical.jpg" class="quarto-figure quarto-figure-center" style="max-height:160px;"></p>
+</figure>
+</div>
+<div style="font-size:0.7em;text-align:center;">
+<p>Vertical: one above the other</p>
+</div>
+</div>
+</div>
+</div>
+<ul>
+<li>Drag a container from <strong>Objects</strong>, then drop the sheets inside it; <strong>Distribute Evenly</strong> gives them the same size</li>
+<li><strong>Tiled</strong> objects share the space without overlapping; a <strong>Floating</strong> object sits on top, at a fixed position (hold <i class="fa-brands fa-windows" aria-label="windows"></i> <kbd>Shift</kbd> / <i class="fa-brands fa-apple" aria-label="apple"></i> <kbd>⇧ Shift</kbd> while dragging it)</li>
+<li>The <strong>Layout</strong> pane lists every object (the item hierarchy) and sets its position, size, background, border and padding</li>
+</ul>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: Size and Lay Out Your Dashboard, Tableau Help <a href="https://help.tableau.com/current/pro/desktop/en-us/dashboards_organize_floatingandtiled.htm"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
+</section>
+<section id="dashboard-objects" class="slide level2 smaller">
+<h2>Dashboard Objects</h2>
+<p>The <strong>Objects</strong> of the Dashboard pane add everything that is not a sheet:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://help.tableau.com/current/pro/desktop/en-us/Img/dashboard_object_drag1.png" class="quarto-figure quarto-figure-center" style="max-height:150px;"></p>
+</figure>
+</div>
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<ul>
+<li><strong>Text</strong>: the title, the story, the sources</li>
+<li><strong>Image</strong>: a logo, an icon, a photo</li>
+<li><strong>Web Page</strong>: a web page shown inside the dashboard</li>
+<li><strong>Blank</strong>: space between objects</li>
+</ul>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<ul>
+<li><strong>Navigation</strong>: a button to another dashboard or sheet</li>
+<li><strong>Download</strong>: a button to export the dashboard as a PDF, a PowerPoint or an image</li>
+<li><strong>Extension</strong>: a feature added by a third party</li>
+</ul>
+</div>
+</div>
+</div>
+<p>Any object or container can get a <strong>Show/Hide button</strong>, e.g., to hide a panel of filters.</p>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: Create a Dashboard, Tableau Help <a href="https://help.tableau.com/current/pro/desktop/en-us/dashboards_create.htm"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
+</section>
+<section id="actions" class="slide level2 center concept">
+<h2>Actions</h2>
+</section>
+<section id="basic-actions" class="slide level2 smaller">
+<h2>Basic Actions</h2>
+<p>Filters and highlighters are set up in each sheet; <strong>actions are set up in the dashboard</strong>, and make all its figures react together.</p>
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://help.tableau.com/current/pro/desktop/en-us/Img/Actions_dialog.png" class="quarto-figure quarto-figure-center" style="max-height:300px;"></p>
+</figure>
+</div>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<p>Click <strong>Dashboard</strong> in the top toolbar → <strong>Actions</strong> → <strong>Add Action</strong>, then choose:</p>
+<ol type="1">
+<li>How to trigger the action: when the cursor goes over a figure (<strong>Hover</strong>), when it clicks on a figure (<strong>Select</strong>), or from an added menu (<strong>Menu</strong>)</li>
+<li>Which figure it comes from</li>
+<li>Which figures it changes</li>
+</ol>
+</div>
+</div>
+</div>
+<p><strong>Start with Filter and Highlight actions</strong>: they behave like filters and highlighters, but for the full dashboard. The other actions take more set-up, but they are essential to add buttons, for instance.</p>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: Tableau Help <a href="https://help.tableau.com/current/pro/desktop/en-us/Img/Actions_dialog.png"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
+</section>
+<section id="global-filter-and-highlight-actions" class="slide level2 smaller">
+<h2>Global Filter and Highlight Actions</h2>
+<p>With the default settings, an action changes all the figures of the dashboard when the reader hovers over a figure, clicks on it, or selects a value from a menu.</p>
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<ul>
+<li><p><strong>Highlight actions</strong> are <strong>the easiest way to make a dashboard smart</strong>: with <strong>Hover</strong> as the trigger, the figures react together as the cursor moves.</p></li>
+<li><p><strong>Filter actions</strong> are useful too, but <strong>confusing with Hover or Select</strong> as the trigger, as the figures keep changing: trigger them from a <strong>Menu</strong> instead.</p></li>
+</ul>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://interworks.com/wp-content/uploads/2019/02/GIF1.gif" class="quarto-figure quarto-figure-center" style="max-height:320px;"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: InterWorks <a href="https://interworks.com/wp-content/uploads/2019/02/GIF1.gif"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
+</section>
+<section id="use-as-filter-and-other-actions" class="slide level2 smaller">
+<h2>Use as Filter, and Other Actions</h2>
+<div class="quarto-layout-panel" data-layout="[1.4,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 58.3%;justify-content: flex-start;">
+<p><strong>The quickest filter action</strong>: select a sheet on the dashboard and click its <strong>Use as Filter</strong> icon (a funnel). A click on one of its marks then filters all the other sheets.</p>
+<p><strong>The other actions</strong> of the <strong>Actions</strong> dialog:</p>
+<ul>
+<li><strong>Go to URL</strong>: opens a web page, e.g., the post on Instagram</li>
+<li><strong>Go to Sheet</strong>: moves to another sheet or dashboard</li>
+<li><strong>Change Parameter</strong> and <strong>Change Set Values</strong>: a click changes a parameter or a set (advanced features)</li>
+</ul>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 41.7%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://help.tableau.com/current/pro/desktop/en-us/Img/layout_container_qs3.png" class="quarto-figure quarto-figure-center" style="max-height:320px;"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: Actions, Tableau Help <a href="https://help.tableau.com/current/pro/desktop/en-us/actions.htm"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
+</section>
+<section id="live-example-building-a-dashboard" class="slide level2 center concept">
+<h2>Live Example: Building a Dashboard</h2>
+</section>
+<section id="your-turn-5" class="slide level2 smaller" data-background="#43464B">
 <h2><i class="fa-solid fa-screwdriver-wrench" aria-label="screwdriver-wrench"></i> Your Turn!</h2>
 <h3 id="your-loomrow-dashboard">Your Loomrow dashboard</h3>
-<p>Four sheets, two from Lecture 3 and two from today:</p>
-<ul>
-<li><strong>Composition</strong>: percent of posts by <code>format</code></li>
-<li><strong>Comparison</strong>: box plots of <code>reach</code> by <code>format</code></li>
-<li><strong>Time</strong>: <code>reach</code> by month</li>
-<li><strong>Map</strong>: return on ad spend by <code>country</code></li>
-</ul>
-<p>Titles that state the finding, and a text box: <strong>which format should Loomrow post more of, and why?</strong></p>
-<p>Then two actions: a <strong>Highlight</strong> on Hover from the composition sheet, and a <strong>Filter</strong> on Menu from the map. Start now, finish at home.</p>
+<p>One dashboard, fixed size 1200 × 800 px, to answer: <strong>which format should Loomrow post more of, and why?</strong></p>
+<ol type="1">
+<li>Three <strong>KPIs</strong> at the top, in a horizontal container</li>
+<li>Four sheets: percent of posts by <code>format</code>, box plots of <code>reach</code> by <code>format</code>, <code>reach</code> by month, return on ad spend by <code>country</code></li>
+<li>A title and a story: introduction, analysis, conclusion</li>
+<li>A <strong>Highlight</strong> action on Hover, and a <strong>Filter</strong> action on Menu from the map</li>
+</ol>
+<p>Start now, finish at home.</p>
                     <div id="timer5_4"></div>
                     <script>
                         document.addEventListener("DOMContentLoaded", function () {
-                            initializeTimer("timer5_4", 600, "interaction");
+                            initializeTimer("timer5_4", 720, "interaction");
                         });
                     </script>
                 
 </section>
 <section id="publish" class="slide level2">
 <h2>Publish</h2>
-<p><strong>Publishing</strong> saves a dashboard online, for everybody to open. In Tableau Public in the browser, <strong>publishing is saving</strong>: <strong>Publish As…</strong>, top right.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="./figures/dd/tableau_publish_as.png" class="quarto-figure quarto-figure-center" style="max-height:80px;"></p>
-</figure>
-</div>
 <div class="quarto-layout-panel" data-layout="[1.3,1]">
 <div class="quarto-layout-row">
 <div id="first-column" class="quarto-layout-cell" style="flex-basis: 56.5%;justify-content: flex-start;">
-<p><span style="color:#e34948;"><i class="fa-solid fa-triangle-exclamation" aria-label="triangle-exclamation"></i></span> <strong>Everything you publish is public</strong>, the data included.</p>
-<p>On the published page, <strong>Share</strong> gives the link; <strong>Download</strong> gives an image, a PDF, or the workbook with its data (<code>.twbx</code>).</p>
-<p><span style="color:#e34948;"><i class="fa-solid fa-triangle-exclamation" aria-label="triangle-exclamation"></i></span> For your assignment, publish your dashboard and submit its <strong>URL</strong> on Loop.</p>
+<p><strong>Publishing</strong> saves the dashboard online, where everyone can open it.</p>
+<p>In Tableau Public in the browser, <strong>publishing is saving</strong>: click <strong>Publish As…</strong>, top right.</p>
+<p><span style="color:#e34948;"><i class="fa-solid fa-triangle-exclamation" aria-label="triangle-exclamation"></i></span> Warning: everything you publish is public, the data included.</p>
+<p>For your assignment, publish your dashboard and submit its <strong>URL</strong> on Loop.</p>
 </div>
 <div id="second-column" class="quarto-layout-cell" style="flex-basis: 43.5%;justify-content: center;">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="./figures/dd/tableau_published.png" class="quarto-figure quarto-figure-center" style="max-height:290px;"></p>
+<p><img data-src="./figures/dd/tableau_published.png" class="quarto-figure quarto-figure-center" style="max-height:400px;"></p>
 </figure>
 </div>
 </div>
 </div>
 </div>
+</section>
+<section id="before-you-publish" class="slide level2 smaller">
+<h2>Before You Publish</h2>
+<p>A checklist for your dashboard:</p>
+<ul class="task-list">
+<li><label><input type="checkbox">The size is fixed, and nothing is cut off</label></li>
+<li><label><input type="checkbox">The title states the finding; each figure has a clear title and labelled axes</label></li>
+<li><label><input type="checkbox">The same colour means the same thing on every sheet, and every colour has a legend</label></li>
+<li><label><input type="checkbox">The filters and actions work, and change what the reader expects</label></li>
+<li><label><input type="checkbox">The story ends with a recommendation, and the sources are cited</label></li>
+<li><label><input type="checkbox">The worksheets are hidden: open the menu of the dashboard tab → <strong>Hide All Sheets</strong></label></li>
+<li><label><input type="checkbox">The URL opens in a private window of your browser: it is the link your marker will click</label></li>
+</ul>
+<p>Swap with a neighbour and check each other’s dashboard: one compliment, one fix.</p>
+</section>
+<section id="learn-more-about-dashboards" class="slide level2">
+<h2>Learn More About Dashboards</h2>
+<p>More details about dashboards in Tableau, among other resources found online:</p>
+<ul>
+<li><a href="https://help.tableau.com/current/pro/desktop/en-us/dashboards_best_practices.htm">Best Practices for Effective Dashboards</a> by Tableau</li>
+<li><a href="https://help.tableau.com/current/pro/desktop/en-us/dashboards_organize_floatingandtiled.htm">Size and Lay Out Your Dashboard</a> by Tableau</li>
+<li><a href="https://ubc-library-rc.github.io/tableau-dashboard/">Tableau Dashboard Workshop</a> by UBC Library Research Commons (on GitHub)</li>
+<li><a href="https://hfboyce.github.io/tableau_course/intro.html">Learning Data Visualization with Tableau</a> by Hayley Boyce (on GitHub)</li>
+<li><a href="https://dashboarddesignpatterns.github.io/">Dashboard Design Patterns</a> by Bach and colleagues</li>
+<li><a href="https://www.thedataschool.co.uk/anh-vu/are-you-making-these-13-dashboard-design-mistakes/">Are You Making These 13 Dashboard Design Mistakes?</a> by The Data School</li>
+</ul>
 </section></section>
 <section>
 <section id="assignment-1-brief" class="title-slide slide level1 center">
@@ -751,6 +1577,9 @@ one alone: &lt;MAX(Reach)&gt;.</code></pre>
 </section>
 <section id="get-inspired" class="slide level2">
 <h2>Get Inspired</h2>
+<div class="quarto-layout-panel" data-layout="[1.6,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 61.5%;justify-content: flex-start;">
 <p>Past challenges are an excellent way to see outstanding dashboards:</p>
 <ul>
 <li><a href="https://www.tableau.com/big-data-viz-challenge-entries">Google Big Data Viz Challenge (2012)</a></li>
@@ -759,10 +1588,37 @@ one alone: &lt;MAX(Reach)&gt;.</code></pre>
 <li><a href="https://www.datavisualizationsociety.org/soti-challenge">Data Visualization Society, State of the Industry Challenge</a></li>
 <li><a href="https://www.tableau.com/community/iron-viz">Iron Viz</a>, Tableau’s own championship</li>
 </ul>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 38.5%;justify-content: center;">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="https://media.makeameme.org/created/use-tableau-you.jpg" class="quarto-figure quarto-figure-center" style="max-height:200px;"></p>
+<p><img data-src="https://media.makeameme.org/created/use-tableau-you.jpg" class="quarto-figure quarto-figure-center" style="max-height:330px;"></p>
 </figure>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="keep-practising" class="slide level2">
+<h2>Keep Practising</h2>
+<div class="quarto-layout-panel" data-layout="[1.2,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 54.6%;justify-content: flex-start;">
+<ul>
+<li><a href="https://public.tableau.com/app/discover/viz-of-the-day">Viz of the Day</a>: a visualisation featured every weekday on Tableau Public</li>
+<li><a href="https://www.makeovermonday.co.uk/">#MakeoverMonday</a>: every week, a dataset and a chart to remake</li>
+<li><a href="https://www.workout-wednesday.com/">#WorkoutWednesday</a>: every week, a dashboard to rebuild, with its solution</li>
+<li><a href="https://www.tableau.com/blog/iron-viz-student-edition">Iron Viz: Student Edition</a>: Tableau’s competition for students</li>
+</ul>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 45.5%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/dd/dashboard_story_ex.png" class="quarto-figure quarto-figure-center" style="max-height:400px;"></p>
+</figure>
+</div>
+</div>
+</div>
 </div>
 </section>
 <section id="section" class="slide level2" data-background="#43464B">
