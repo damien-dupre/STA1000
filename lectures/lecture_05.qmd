@@ -1243,14 +1243,13 @@ Source: Actions, Tableau Help [{{< fa link >}}](https://help.tableau.com/current
 
 One dashboard, fixed size 1200 × 800 px, to answer: **which format should Loomrow post more of, and why?**
 
-1. Three **KPIs** at the top, in a horizontal container
-2. Four sheets: percent of posts by `format`, box plots of `reach` by `format`, `reach` by month, return on ad spend by `country`
-3. A title and a story: introduction, analysis, conclusion
-4. A **Highlight** action on Hover, and a **Filter** action on Menu from the map
+1. Four sheets: percent of posts by `format`, box plots of `reach` by `format`, `reach` by month, return on ad spend by `country`
+2. A title and a story: introduction, analysis, conclusion
+3. A **Highlight** action on Hover, and a **Filter** action on Menu from the map
 
 Start now, finish at home.
 
-::: {#timer5_4 .timer seconds="720" starton="interaction"}
+::: {#timer5_4 .timer seconds="600" starton="interaction"}
 :::
 
 ## Publish
@@ -1274,20 +1273,6 @@ For your assignment, publish your dashboard and submit its **URL** on Loop.
 
 :::
 ::::
-
-## Before You Publish {.smaller}
-
-A checklist for your dashboard:
-
-- [ ] The size is fixed, and nothing is cut off
-- [ ] The title states the finding; each figure has a clear title and labelled axes
-- [ ] The same colour means the same thing on every sheet, and every colour has a legend
-- [ ] The filters and actions work, and change what the reader expects
-- [ ] The story ends with a recommendation, and the sources are cited
-- [ ] The worksheets are hidden: open the menu of the dashboard tab → **Hide All Sheets**
-- [ ] The URL opens in a private window of your browser: it is the link your marker will click
-
-Swap with a neighbour and check each other's dashboard: one compliment, one fix.
 
 ## Learn More About Dashboards
 
