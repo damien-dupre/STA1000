@@ -14,7 +14,7 @@
   <meta name="generator" content="quarto-1.8.25">
 
   <meta name="author" content="Damien Dupré">
-  <title>Lecture 6: Visualisation for Stakeholders</title>
+  <title>Lecture 6: Python I - Getting Started with Python</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -32,8 +32,74 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="lecture_06_files/libs/revealjs/dist/theme/quarto-8ff52f0e31ad5c532cba6b018e3cb49b.css">
+  <link rel="stylesheet" href="lecture_06_files/libs/revealjs/dist/theme/quarto-158af071109d29c7035ba1450a51c90c.css">
   <link href="lecture_06_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="lecture_06_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="lecture_06_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -131,7 +197,7 @@
     <div class="slides">
 
 <section id="title-slide" data-background-iframe="colored-particles/index.html" class="quarto-title-block center">
-  <h1 class="title">Lecture 6: Visualisation for Stakeholders</h1>
+  <h1 class="title">Lecture 6: Python I - Getting Started with Python</h1>
   <p class="subtitle">STA1000 - Data Analytics and Metrics</p>
 
 <div class="quarto-title-authors">
@@ -145,493 +211,740 @@ Damien Dupré
 </section>
 <section id="previously" class="slide level2">
 <h2>Previously …</h2>
-<p>Lecture 4 gave you five principles: honest axes, easy reading, restraint, colour that means something, details that are right. Those keep a chart from being wrong.</p>
-<div class="fragment">
-<p>They do not make it <strong>land</strong>. You have views that answer your questions; a client has different questions, and about ninety seconds of attention.</p>
-</div>
-</section>
-<section id="learning-outcomes" class="slide level2">
-<h2>Learning Outcomes</h2>
-<p>By the end of this lecture you will be able to:</p>
 <ul>
-<li>Distinguish an analyst’s view from a client’s view, and build both</li>
-<li>Apply the ranking of visual channels to a marketing chart</li>
-<li>Identify the standard ways a chart misleads, deliberately or otherwise</li>
-<li>Critique a real marketing dashboard, and survive having yours critiqued</li>
+<li>Lectures 2 to 5 took the Loomrow posts through Tableau: a file, the right figures, calculated fields, two files merged, and a dashboard. Assignment 1 is due on 22 November at 12pm.</li>
 </ul>
-</section>
-<section>
-<section id="what-a-chart-is-for" class="title-slide slide level1 center">
-<h1>1. What a Chart Is For</h1>
-
-</section>
-<section id="why-we-bother" class="slide level2">
-<h2>Why We Bother</h2>
-<ul>
-<li>Humans are extremely good at reading visual patterns and poor at reading tables</li>
-<li>Charts reveal properties of the data nobody thought to test for</li>
-<li>They are understandable to non-specialists, which is most of the people who make decisions</li>
-<li>They are a <em>lingua franca</em> across functions: finance, product and marketing can argue over the same chart</li>
-</ul>
-<div class="fragment">
-<p><strong>A chart succeeds when it raises the next question.</strong> “I wonder why that is” is the sound of someone accepting the fact and moving to the explanation.</p>
-<div class="callout callout-note no-icon callout-style-simple">
-<div class="callout-body">
-<div class="callout-content">
-<p>Charts rarely settle an argument on their own. If a chart will not settle it, what is it for?</p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="what-excellence-looks-like" class="slide level2 smaller">
-<h2>What Excellence Looks Like</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="./figures/external/smm635_graphical_excellence.png" height="255"></p>
-<figcaption>Source: <a href="https://github.com/simoneSantoni/data-viz-smm635">SMM635 Data Visualisation, Bayes Business School</a></figcaption>
-</figure>
-</div>
-<p><em>Ideas, ink, space, time. A good chart spends the least ink on the fewest ideas that carry the point.</em></p>
-</section>
-<section id="one-dataset-many-charts" class="slide level2">
-<h2>One Dataset, Many Charts</h2>
-<p>The same small dataset can be drawn a hundred different ways, each emphasising a different comparison.</p>
-<div class="fragment">
-<p>One shows change over time within a country. One shows the ranking at a single date. One shows regional grouping. One shows one country overtaking another.</p>
-</div>
-<div class="fragment">
-<p><strong>None of them is dishonest. They answer different questions.</strong> The choice of which comparison to foreground is the analyst’s, and it is rarely visible to the audience.</p>
-</div>
-</section>
-<section id="one-dataset-six-charts" class="slide level2 smaller">
-<h2>One Dataset, Six Charts</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="./figures/external/mgt100_one_dataset_six_charts.png" height="350"></p>
-<figcaption>Source: <a href="https://github.com/kennethcwilbur/mgt100">MGT 100 Customer Analytics, UC San Diego</a> (CC BY 4.0)</figcaption>
-</figure>
-</div>
-<p><em>World Heritage sites in three countries, 2004 and 2022. Each chart makes a different comparison easy and the others hard.</em></p>
-</section>
-<section id="each-chart-makes-one-point" class="slide level2">
-<h2>Each Chart Makes One Point</h2>
-<p>Graphics journalists work to a hard rule: <strong>one chart, one point, obvious how to read it.</strong></p>
-<p>In practice, most good charts say one of four things:</p>
+<p><strong>Today, three questions:</strong></p>
 <ol type="1">
-<li>The number went up or down recently</li>
-<li>The number moved when something happened</li>
-<li>One line, or one group of lines, diverges from the rest</li>
-<li>The distribution has two lumps rather than one</li>
+<li>Why <strong>Python</strong>, and where do you <strong>run</strong> it, with nothing to install?</li>
+<li>How do you write your <strong>first lines</strong> of Python?</li>
+<li>What do you do when it <strong>breaks</strong>?</li>
 </ol>
-<div class="fragment">
-<p>Scientific and analyst charts are often the opposite: four variables, six symbols, and the explanation two pages away.</p>
-<div class="callout callout-note no-icon callout-style-simple">
-<div class="callout-body">
-<div class="callout-content">
-<p>Take the chart you brought. Which of the four points does it make? If it makes two, which one loses?</p>
-</div>
-</div>
-</div>
-</div>
 </section>
-<section id="the-four-points-a-chart-usually-makes" class="slide level2 smaller">
-<h2>The Four Points a Chart Usually Makes</h2>
-<div class="columns" style="gap:0px;">
-<div class="column" style="width:50%;line-height:0;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="./figures/external/mgt100_merrill_number_goes_up.png" class="quarto-figure quarto-figure-center" height="200"></p>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="./figures/external/mgt100_merrill_lines_diverge.png" class="quarto-figure quarto-figure-center" height="200"></p>
-</figure>
-</div>
-</div><div class="column" style="width:50%;line-height:0;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="./figures/external/mgt100_merrill_event.png" class="quarto-figure quarto-figure-center" height="200"></p>
-</figure>
-</div>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="./figures/external/mgt100_merrill_bimodal.png" class="quarto-figure quarto-figure-center" height="200"></p>
-</figure>
-</div>
-</div></div>
-<div style="font-size:0.5em;">
-<p>Number goes up, lines diverge, something happened, the distribution is bimodal. Jeremy Merrill, Washington Post, via <a href="https://github.com/kennethcwilbur/mgt100">MGT 100 Customer Analytics, UC San Diego</a> (CC BY 4.0)</p>
-</div>
-</section></section>
 <section>
-<section id="two-audiences" class="title-slide slide level1 center">
-<h1>2. Two Audiences</h1>
+<section id="why-python" class="title-slide slide level1 center">
+<h1>1. Why Python?</h1>
 
 </section>
-<section id="what-an-analyst-needs" class="slide level2">
-<h2>What an Analyst Needs</h2>
+<section id="why-python-1" class="slide level2">
+<h2>Why Python?</h2>
+<div class="quarto-layout-panel" data-layout="[1.5,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 60.0%;justify-content: flex-start;">
+<p>Of the free, open-source languages of data analytics, Python is by far the most used in organisations. It is:</p>
 <ul>
-<li>Detail, at the grain the question lives at</li>
-<li>Uncertainty made visible</li>
-<li>The ability to drill down and check</li>
-<li>Access to the raw rows when something looks wrong</li>
-<li>Ugly is fine. Fast is better</li>
+<li><strong>Readable</strong>: the code looks close to English</li>
+<li><strong>Free</strong>: no licence, ever</li>
+<li><strong>Huge</strong>: over half a million packages, one of them made for tables</li>
+<li><strong>Employable</strong>: analyst job ads ask for it</li>
 </ul>
-</section>
-<section id="what-a-client-needs" class="slide level2">
-<h2>What a Client Needs</h2>
-<ul>
-<li>One number, its direction, and what to do about it</li>
-<li>The comparison that makes the number mean something</li>
-<li>The caveat, once, in words</li>
-<li>No vocabulary they have to learn to read the chart</li>
-</ul>
-<div class="fragment">
-<p><strong>These are not the same chart with different formatting.</strong> They are usually different charts, and the analyst’s chart is the one that produced the client’s.</p>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 40.0%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://imgs.xkcd.com/comics/python.png" class="quarto-figure quarto-figure-center" style="max-height:330px;"></p>
+</figure>
+</div>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: xkcd 353 <a href="https://xkcd.com/353/"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
+</div>
+</div>
 </div>
 </section>
-<section id="the-title-does-the-work" class="slide level2 smaller">
-<h2>The Title Does the Work</h2>
+<section id="same-data-another-tool" class="slide level2">
+<h2>Same Data, Another Tool</h2>
 <div class="quarto-layout-panel" data-layout="[1,1]">
 <div class="quarto-layout-row">
 <div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<p><strong>Analyst title</strong></p>
-<p>“Sessions by source / medium, weekly, 2026-01 to 2026-03”</p>
-<p>Describes the fields.</p>
+<p><strong>Tableau</strong></p>
+<ul>
+<li>You <strong>click</strong>: drag, drop, filter</li>
+<li>Excellent to explore, and to show</li>
+<li>The steps live in your head: to redo them next month, you click them all again</li>
+</ul>
 </div>
 <div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<p><strong>Client title</strong></p>
-<p>“Referral traffic has replaced search as our main source since February”</p>
-<p>States the finding.</p>
+<p><strong>Python</strong></p>
+<ul>
+<li>You <strong>write</strong> each step as a line</li>
+<li>The lines are the record: they can be checked, shared, and rerun on next month’s file in one click</li>
+<li>The language AI assistants write best</li>
+</ul>
 </div>
 </div>
 </div>
-<div class="fragment">
-<p>If you cannot write the second title, you have not finished the analysis. The chart is not the deliverable, the sentence is.</p>
-<!-- Speaker notes: make them do this live for one chart each. It is the single
-     highest-yield change in the whole lecture and it takes thirty seconds per
-     chart. It also exposes charts that do not have a finding, which is the more
-     valuable diagnosis. -->
-</div>
+<p>Tableau to show the data, Python to prepare and question it. You need both.</p>
 </section>
-<section id="a-title-that-does-the-work" class="slide level2 smaller">
-<h2>A Title That Does the Work</h2>
+<section id="what-python-is-not" class="slide level2">
+<h2>What Python Is Not</h2>
+<ul>
+<li>Python is <strong>not</strong> a spreadsheet. There is no grid, and nothing recalculates by itself</li>
+<li>Python is <strong>not</strong> intelligent. It does exactly what you write, including the mistakes</li>
+<li>Python is <strong>not</strong> fast to write at the beginning. It becomes fast when a task has to be done twice</li>
+</ul>
+<p>The value of code is <strong>reproducibility</strong>: the same lines, run on next month’s file, give next month’s answer in one second.</p>
+<p>We do <strong>not</strong> learn programming: no loops, no functions of our own. Today, plain Python; from Lecture 7, <strong>pandas</strong>, for tables.</p>
+</section>
+<section id="language-vs-interface" class="slide level2">
+<h2>Language vs Interface</h2>
+<p><strong>Python</strong> is the language; you write and run it in an <strong>interface</strong>. Python is like a car’s engine, the interface is like its dashboard.</p>
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><strong>Python: the engine</strong></p>
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="./figures/external/mgt100_title_does_the_work.png" height="350"></p>
-<figcaption>Source: <a href="https://github.com/kennethcwilbur/mgt100">MGT 100 Customer Analytics, UC San Diego</a> (CC BY 4.0)</figcaption>
+<p><img data-src="./figures/dd/car_motor.jpeg" class="quarto-figure quarto-figure-center" style="max-height:250px;"></p>
 </figure>
 </div>
-<p><em>You know the finding before you have read a single axis label.</em></p>
+<p>Does the work. You never look at it directly.</p>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><strong>The interface: the dashboard</strong></p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/dd/car_dashboard.jpeg" class="quarto-figure quarto-figure-center" style="max-height:250px;"></p>
+</figure>
+</div>
+<p>Where you type, where you see results and errors.</p>
+</div>
+</div>
+</div>
 </section></section>
 <section>
-<section id="encoding" class="title-slide slide level1 center">
-<h1>3. Encoding</h1>
+<section id="google-colab" class="title-slide slide level1 center">
+<h1>2. Google Colab</h1>
 
 </section>
-<section id="the-ranking-of-visual-channels" class="slide level2 smaller">
-<h2>The Ranking of Visual Channels</h2>
-<p>Cleveland and McGill established, experimentally, how accurately people read quantities from different visual channels. Best to worst:</p>
+<section id="google-colab-1" class="slide level2">
+<h2>Google Colab</h2>
+<div class="quarto-layout-panel" data-layout="[1.6,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 61.5%;justify-content: flex-start;">
+<p>Our interface is <strong>Google Colab</strong>. In your browser:</p>
 <ol type="1">
-<li><strong>Position</strong> along a common scale</li>
-<li><strong>Position</strong> along non-aligned scales</li>
-<li><strong>Length</strong></li>
-<li><strong>Angle</strong> and slope</li>
-<li><strong>Area</strong></li>
-<li><strong>Volume</strong>, curvature</li>
-<li><strong>Colour</strong> hue, saturation</li>
+<li>Go to <a href="https://colab.research.google.com" class="uri">https://colab.research.google.com</a></li>
+<li>Sign in: your DCU Google account works</li>
+<li><strong>File</strong> → <strong>New notebook in Drive</strong></li>
 </ol>
-<div class="fragment">
-<p>Everything above the line in a good chart is doing its work with the top three.</p>
-<div class="callout callout-note no-icon callout-style-simple">
-<div class="callout-body">
-<div class="callout-content">
-<p>A pie chart encodes quantity as angle and area, positions four and five. What does it buy in exchange for that cost, and when is the trade worth it?</p>
+<p><strong>Nothing to install</strong>: Python runs on Google’s computers, from any laptop.</p>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 38.5%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://hutchdatascience.org/Intro_to_Python/images/colab.png" class="quarto-figure quarto-figure-center" style="max-height:300px;"></p>
+</figure>
+</div>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: Fred Hutch Data Science Lab, Introduction to Python <a href="https://hutchdatascience.org/Intro_to_Python/"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
 </div>
 </div>
 </div>
 </div>
+<p>Your notebook is a <code>.ipynb</code> file in <strong>Colab Notebooks</strong>, a folder of your Google Drive. Rename it from its title, top left.</p>
 </section>
-<section id="chart-choice-by-question" class="slide level2">
-<h2>Chart Choice by Question</h2>
+<section id="a-notebook-is-made-of-cells" class="slide level2">
+<h2>A Notebook Is Made of Cells</h2>
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<p><strong>Code cells</strong></p>
+<p>Hold Python. Run one, and its result appears underneath.</p>
+<p>Add one with <strong>+ Code</strong>.</p>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<p><strong>Text cells</strong></p>
+<p>Hold your notes: what the next cell is for, and what you found.</p>
+<p>Add one with <strong>+ Text</strong>.</p>
+</div>
+</div>
+</div>
+<p>A notebook is a <strong>report and an analysis at the same time</strong>. A notebook with forty code cells and no text is not an analysis: it is a transcript.</p>
+</section>
+<section id="run-a-cell" class="slide level2">
+<h2>Run a Cell</h2>
 <table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
 <thead>
 <tr class="header">
-<th>Question</th>
-<th>Chart</th>
+<th style="text-align: left;">Action</th>
+<th style="text-align: left;"><i class="fa-brands fa-windows" aria-label="windows"></i> Windows</th>
+<th style="text-align: left;"><i class="fa-brands fa-apple" aria-label="apple"></i> Mac</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>How has it changed?</td>
-<td>Line</td>
+<td style="text-align: left;">Run the cell, move to the next</td>
+<td style="text-align: left;"><kbd>Shift</kbd> + <kbd>Enter</kbd></td>
+<td style="text-align: left;"><kbd>⇧ Shift</kbd> + <kbd>↩︎ Return</kbd></td>
 </tr>
 <tr class="even">
-<td>How do categories compare?</td>
-<td>Bar, sorted by value not alphabetically</td>
+<td style="text-align: left;">Run the cell, stay on it</td>
+<td style="text-align: left;"><kbd>Ctrl</kbd> + <kbd>Enter</kbd></td>
+<td style="text-align: left;"><kbd>⌘ Cmd</kbd> + <kbd>↩︎ Return</kbd></td>
 </tr>
 <tr class="odd">
-<td>What is the distribution?</td>
-<td>Histogram, or box plot for comparisons</td>
+<td style="text-align: left;">Insert a code cell below</td>
+<td style="text-align: left;"><kbd>Ctrl</kbd> + <kbd>M</kbd>, then <kbd>B</kbd></td>
+<td style="text-align: left;"><kbd>⌘ Cmd</kbd> + <kbd>M</kbd>, then <kbd>B</kbd></td>
 </tr>
 <tr class="even">
-<td>What is the composition?</td>
-<td>Stacked bar, rarely a pie</td>
+<td style="text-align: left;">Turn the cell into text</td>
+<td style="text-align: left;"><kbd>Ctrl</kbd> + <kbd>M</kbd>, then <kbd>M</kbd></td>
+<td style="text-align: left;"><kbd>⌘ Cmd</kbd> + <kbd>M</kbd>, then <kbd>M</kbd></td>
 </tr>
 <tr class="odd">
-<td>Where does it drop off?</td>
-<td>Funnel, with counts at every step</td>
-</tr>
-<tr class="even">
-<td>Is there a relationship?</td>
-<td>Scatter, with the n stated</td>
+<td style="text-align: left;">Undo</td>
+<td style="text-align: left;"><kbd>Ctrl</kbd> + <kbd>Z</kbd></td>
+<td style="text-align: left;"><kbd>⌘ Cmd</kbd> + <kbd>Z</kbd></td>
 </tr>
 </tbody>
 </table>
-<div class="fragment">
-<p><strong>Start from the question, not from the chart menu.</strong> Tableau’s Show Me panel inverts that order, which is why it is so easy to produce a beautiful chart of nothing.</p>
-</div>
+<p>Or click the <i class="fa-solid fa-circle-play" aria-label="circle-play"></i> button at the left of the cell.</p>
 </section>
-<section id="the-data-ink-ratio" class="slide level2">
-<h2>The Data-Ink Ratio</h2>
-<p>Tufte’s principle: <strong>maximise the share of ink that represents data.</strong></p>
-<div class="fragment">
-<p>Remove, in this order: 3D effects, background fills, heavy gridlines, borders, redundant legends, decorative images, drop shadows.</p>
-</div>
-<div class="fragment">
-<p>Add back only what a reader needs to decode the chart. The test is subtraction: delete an element and see whether the chart still works.</p>
-</div>
-</section>
-<section id="the-data-ink-ratio-concretely" class="slide level2 smaller">
-<h2>The Data-Ink Ratio, Concretely</h2>
-<div class="quarto-layout-panel" data-layout="[1,1]">
-<div class="quarto-layout-row">
-<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><strong>Default</strong></p>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="./figures/external/smm635_scatter_traditional.png" class="quarto-figure quarto-figure-center"></p>
-</figure>
-</div>
-</div>
-<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><strong>Same data, less ink</strong></p>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="./figures/external/smm635_scatter_tufte.png" class="quarto-figure quarto-figure-center"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div style="font-size:0.55em;text-align:center;">
-<p>Source: <a href="https://github.com/simoneSantoni/data-viz-smm635">SMM635 Data Visualisation, Bayes Business School</a></p>
-</div>
-<p><em>The right-hand version deletes the frame and spends the freed ink on the marginal distributions. Nothing was lost.</em></p>
-</section>
-<section id="chart-junk-and-its-modern-forms" class="slide level2">
-<h2>Chart Junk, and Its Modern Forms</h2>
-<p>The 1980s version was 3D bars and a picture of a duck. The current version is subtler:</p>
+<section id="the-runtime" class="slide level2">
+<h2>The Runtime</h2>
+<p>The first cell you run connects the notebook to a <strong>runtime</strong>: a computer at Google that holds your Python session.</p>
 <ul>
-<li>A rainbow palette on an ordered variable</li>
-<li>Colour used to encode a category <strong>and</strong> decorate the background</li>
-<li>Animated transitions between states nobody asked to compare</li>
-<li>An interactive filter for a dimension with two values</li>
-<li>A dashboard with eleven tiles, because there were eleven metrics</li>
+<li>Everything you create lives there: results, tables, uploaded files</li>
+<li>Left idle for too long, or after 12 hours at most, the runtime is stopped and all of it is gone. Your <strong>code</strong> is safe in the notebook; your <strong>results</strong> are not</li>
+<li>Cells run <strong>in the order you run them</strong>, not in the order they appear</li>
 </ul>
-<div class="fragment">
-<p><strong>Every element on a dashboard competes for attention with every other.</strong> That is the cost, and it is paid by the reader.</p>
-</div>
+<p><strong>Runtime</strong> → <strong>Restart session and run all</strong>: if the notebook runs from top to bottom, it works. If it fails, it never did.</p>
 </section>
-<section id="the-duck" class="slide level2 smaller">
-<h2>The Duck</h2>
-<div class="quarto-layout-panel" data-layout="[1,1]">
-<div class="quarto-layout-row">
-<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><strong>A building shaped like a duck</strong></p>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="./figures/external/smm635_big_duck.png" class="quarto-figure quarto-figure-center"></p>
-</figure>
-</div>
-</div>
-<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><strong>A chart shaped like a duck</strong></p>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="./figures/external/smm635_duck_chart.png" class="quarto-figure quarto-figure-center"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div style="font-size:0.55em;text-align:center;">
-<p>Source: <a href="https://github.com/simoneSantoni/data-viz-smm635">SMM635 Data Visualisation, Bayes Business School</a></p>
-</div>
-<p><em>Tufte’s term. When the decoration becomes the structure, the chart is the duck.</em></p>
-</section>
-<section id="honest-charting-five-rules" class="slide level2">
-<h2>Honest Charting: Five Rules</h2>
+<section id="your-turn" class="slide level2" data-background="#43464B">
+<h2><i class="fa-solid fa-screwdriver-wrench" aria-label="screwdriver-wrench"></i> Your Turn!</h2>
+<h3 id="your-first-notebook">Your first notebook</h3>
 <ol type="1">
-<li>Start axes at zero, or say clearly that you have not</li>
-<li>Show all the relevant data and label it accurately</li>
-<li>Bin, smooth and aggregate judiciously, and say which you did</li>
-<li>Show uncertainty when it would change the reading</li>
-<li>Cite the source, including the date you pulled it</li>
+<li>Open <a href="https://colab.research.google.com" class="uri">https://colab.research.google.com</a>, signed in with your DCU account</li>
+<li><strong>File</strong> → <strong>New notebook in Drive</strong></li>
+<li>Click its name, top left, and type <code>STA1000 Lecture 6</code></li>
+<li>In the code cell, type <code>print("Hello, my name is Aoife")</code>, with your name</li>
+<li>Run it: <i class="fa-brands fa-windows" aria-label="windows"></i> <kbd>Shift</kbd> + <kbd>Enter</kbd> / <i class="fa-brands fa-apple" aria-label="apple"></i> <kbd>⇧ Shift</kbd> + <kbd>↩︎ Return</kbd></li>
+<li>Click <strong>+ Text</strong>, top left, and type <code># My first notebook</code></li>
+<li><strong>Runtime</strong> → <strong>Restart session and run all</strong></li>
 </ol>
-<div class="fragment">
-<p><strong>A misleading chart can indicate bad faith.</strong> Two goals here: not being misread, and spotting when someone else is misleading you.</p>
-<div class="callout callout-note no-icon callout-style-simple">
-<div class="callout-body">
-<div class="callout-content">
-<p>Rule 1 has a genuine exception: a series where the interesting variation is 2% of the level. How do you take the exception honestly?</p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="the-standard-failures" class="slide level2">
-<h2>The Standard Failures</h2>
-<ul>
-<li><strong>Truncated axis</strong> on a bar chart, which turns a 3% difference into a landslide</li>
-<li><strong>Dual axes</strong>, which let you manufacture any crossing point you like by choosing the scales</li>
-<li><strong>Colour as the only encoding</strong>, which fails for about 8% of men</li>
-<li><strong>Pie with nine slices</strong>, which is a sorted bar chart wearing a disguise</li>
-<li><strong>A rate with no denominator</strong>, which is Lecture 5, again, forever</li>
-</ul>
-</section>
-<section id="a-famous-failure-and-its-repair" class="slide level2 smaller">
-<h2>A Famous Failure, and Its Repair</h2>
-<div class="quarto-layout-panel" data-layout="[1,1]">
-<div class="quarto-layout-row">
-<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><strong>As published</strong></p>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="./figures/external/smm635_fuel_economy.png" class="quarto-figure quarto-figure-center"></p>
-</figure>
-</div>
-</div>
-<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><strong>As it should have been</strong></p>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="./figures/external/smm635_fuel_economy_redo.png" class="quarto-figure quarto-figure-center"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div style="font-size:0.55em;text-align:center;">
-<p>Source: <a href="https://github.com/simoneSantoni/data-viz-smm635">SMM635 Data Visualisation, Bayes Business School</a></p>
-</div>
-<p><em>A 53% increase in fuel economy standards drawn as a 783% increase in line length. The redraw uses the same numbers.</em></p>
+                    <div id="timer6_1"></div>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            initializeTimer("timer6_1", 300, "interaction");
+                        });
+                    </script>
+                
 </section></section>
 <section>
-<section id="critique" class="title-slide slide level1 center">
-<h1>4. Critique</h1>
+<section id="your-first-python-code" class="title-slide slide level1 center">
+<h1>3. Your First Python Code</h1>
 
 </section>
-<section id="live-critique" class="slide level2" data-background="#43464B">
-<h2>Live Critique</h2>
-<p>Two real dashboards on screen: the GA4 default home, and one agency or Looker Studio gallery template.</p>
-<p>For each, as a room:</p>
-<ol type="1">
-<li>Who is the audience, judging only by what is on it?</li>
-<li>What decision could it support?</li>
-<li>Which tile would you delete first, and what would you notice sooner?</li>
-<li>Which number on it has no denominator?</li>
-</ol>
+<section id="print" class="slide level2">
+<h2>print()</h2>
+<p><code>print()</code> displays something under the cell.</p>
+<div id="b8dbb73b" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a><span class="bu">print</span>(<span class="st">"Hello, Loomrow!"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Hello, Loomrow!</code></pre>
+</div>
+</div>
+<p>Everything between the quotes is text, called a <strong>string</strong>. The brackets belong to <code>print</code>, which is a <strong>function</strong>: a name followed by brackets, that does something with what is inside them.</p>
+<div id="f9b38aa9" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a><span class="bu">print</span>(<span class="st">"Loomrow posted"</span>, <span class="dv">431</span>, <span class="st">"times"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loomrow posted 431 times</code></pre>
+</div>
+</div>
 </section>
-<section id="exercise" class="slide level2" data-background="#43464B">
-<h2>Exercise</h2>
-<p>In pairs:</p>
+<section id="python-as-a-calculator" class="slide level2">
+<h2>Python as a Calculator</h2>
+<p>A code cell also shows the value of its <strong>last line</strong>, without <code>print()</code>:</p>
+<div id="ff624602" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href=""></a><span class="fl">76928.88</span> <span class="op">/</span> <span class="fl">24345.78</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="26">
+<pre><code>3.1598445397929336</code></pre>
+</div>
+</div>
+<p>The revenue of Loomrow’s ads divided by what they cost: €3.16 of revenue for each euro spent, the answer to Lecture 5’s dual axis.</p>
+<p>But only the last line:</p>
+<div id="85d1fd31" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href=""></a><span class="dv">1</span> <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb7-2"><a href=""></a><span class="dv">10</span> <span class="op">+</span> <span class="dv">10</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="27">
+<pre><code>20</code></pre>
+</div>
+</div>
+<p><code>+</code>, <code>-</code>, <code>*</code> and <code>/</code> as on a calculator; brackets first, as in maths: <code>(2 + 3) * 4</code> is 20.</p>
+</section>
+<section id="comments" class="slide level2">
+<h2>Comments</h2>
+<p>Anything after a <code>#</code> is ignored by Python.</p>
+<div id="e3c8cbc0" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href=""></a><span class="co"># revenue per euro spent on Meta ads, all campaigns</span></span>
+<span id="cb9-2"><a href=""></a><span class="fl">76928.88</span> <span class="op">/</span> <span class="fl">24345.78</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="28">
+<pre><code>3.1598445397929336</code></pre>
+</div>
+</div>
+<p>Comments are written for <strong>the person reading the code in six months</strong>, who is almost always you.</p>
+<p>Write comments explaining <em>why</em>, not <em>what</em>. <code># divide</code> is useless. <code># revenue per euro spent on Meta ads, all campaigns</code> is gold.</p>
+</section>
+<section id="storing-a-result" class="slide level2">
+<h2>Storing a Result</h2>
+<p>A result you do not store disappears.</p>
+<div id="c5df8526" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href=""></a>spend <span class="op">=</span> <span class="fl">24345.78</span></span>
+<span id="cb11-2"><a href=""></a>revenue <span class="op">=</span> <span class="fl">76928.88</span></span>
+<span id="cb11-3"><a href=""></a>roas <span class="op">=</span> revenue <span class="op">/</span> spend</span>
+<span id="cb11-4"><a href=""></a><span class="bu">print</span>(roas)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>3.1598445397929336</code></pre>
+</div>
+</div>
+<p><code>spend</code>, <code>revenue</code> and <code>roas</code> are <strong>variables</strong>. The <code>=</code> sign does not mean equality: it means <strong>“take what is on the right, and give it this name”</strong>. Read it right to left.</p>
+</section>
+<section id="round-a-result" class="slide level2">
+<h2>Round a Result</h2>
+<div id="f98532f7" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href=""></a><span class="bu">print</span>(<span class="bu">round</span>(roas, <span class="dv">2</span>))</span>
+<span id="cb13-2"><a href=""></a><span class="bu">print</span>(<span class="bu">round</span>(roas))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>3.16
+3</code></pre>
+</div>
+</div>
+<p><code>round(value, digits)</code> is a function with two things inside its brackets, separated by a comma: what to round, and to how many decimals. Without the second, it rounds to a whole number.</p>
+<p>A variable can be used anywhere its value could be:</p>
+<div id="bcbb240a" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href=""></a><span class="bu">print</span>(<span class="st">"Revenue per euro spent:"</span>, <span class="bu">round</span>(roas, <span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Revenue per euro spent: 3.16</code></pre>
+</div>
+</div>
+</section>
+<section id="naming-rules" class="slide level2">
+<h2>Naming Rules</h2>
+<p>Python <strong>requires</strong>:</p>
+<ul>
+<li>Letters, digits and underscores only: no spaces, no dashes</li>
+<li>No digit first: <code>2025_spend</code> fails, <code>spend_2025</code> works</li>
+<li><strong>Case sensitive</strong>: <code>Spend</code>, <code>spend</code> and <code>SPEND</code> are three different names</li>
+</ul>
+<p><strong>Convention</strong>: <code>snake_case</code>, short but descriptive, no accents.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href=""></a>x1 <span class="op">=</span> <span class="fl">24345.78</span>          <span class="co"># what is this?</span></span>
+<span id="cb17-2"><a href=""></a>spend_eur <span class="op">=</span> <span class="fl">24345.78</span>   <span class="co"># ah.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Naming is not decoration. It is most of what makes code readable.</p>
+</section>
+<section id="order-matters-twice" class="slide level2">
+<h2>Order Matters, Twice</h2>
 <ol type="1">
-<li>Take one chart from your own Tableau workbook</li>
-<li>Rewrite its title as a finding rather than a field name</li>
-<li>Redesign it for a client rather than for yourself</li>
-<li>Swap with your partner and critique theirs against the channel ranking and the five honesty rules</li>
-<li>List the three changes that most improved it</li>
+<li>Python reads a cell <strong>top to bottom</strong></li>
+<li>Colab runs cells <strong>in the order you click them</strong>, not top to bottom</li>
 </ol>
-<p><strong>25 minutes</strong></p>
+<p>This is the number one cause of “but it worked five minutes ago”.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href=""></a><span class="co"># Cell 3, run first</span></span>
+<span id="cb18-2"><a href=""></a><span class="bu">print</span>(revenue)     <span class="co"># NameError: name 'revenue' is not defined</span></span>
+<span id="cb18-3"><a href=""></a></span>
+<span id="cb18-4"><a href=""></a><span class="co"># Cell 1, run second</span></span>
+<span id="cb18-5"><a href=""></a>revenue <span class="op">=</span> <span class="fl">76928.88</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The small number in <code>[ ]</code> to the left of each cell tells you the order in which cells were really run.</p>
+</section>
+<section id="your-turn-1" class="slide level2" data-background="#43464B">
+<h2><i class="fa-solid fa-screwdriver-wrench" aria-label="screwdriver-wrench"></i> Your Turn!</h2>
+<h3 id="a-small-calculation">A small calculation</h3>
+<p>LR0184, the reel of 21 August 2025: 8,316 likes, comments, saves and shares, for 535,086 accounts reached. Type it in <strong>one</strong> code cell, and run it:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href=""></a><span class="co"># engagement rate of LR0184</span></span>
+<span id="cb19-2"><a href=""></a>engagements <span class="op">=</span> <span class="dv">8316</span></span>
+<span id="cb19-3"><a href=""></a>reach <span class="op">=</span> <span class="dv">535086</span></span>
+<span id="cb19-4"><a href=""></a>rate <span class="op">=</span> engagements <span class="op">/</span> reach <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb19-5"><a href=""></a><span class="bu">print</span>(<span class="bu">round</span>(rate, <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>What does it print, and is it high or low for a post?</p>
+                    <div id="timer6_2"></div>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            initializeTimer("timer6_2", 300, "interaction");
+                        });
+                    </script>
+                
+</section>
+<section id="solution" class="slide level2">
+<h2>Solution</h2>
+<div id="e04c3da3" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href=""></a><span class="co"># engagement rate of LR0184</span></span>
+<span id="cb20-2"><a href=""></a>engagements <span class="op">=</span> <span class="dv">8316</span></span>
+<span id="cb20-3"><a href=""></a>reach <span class="op">=</span> <span class="dv">535086</span></span>
+<span id="cb20-4"><a href=""></a>rate <span class="op">=</span> engagements <span class="op">/</span> reach <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb20-5"><a href=""></a><span class="bu">print</span>(<span class="bu">round</span>(rate, <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>1.6</code></pre>
+</div>
+</div>
+<p>8,316 engagements, but only <strong>1.6%</strong> of the 535,086 accounts reached: <strong>low</strong>, as the median Loomrow post engages 5.9%. A viral post is seen by many people who never react to it.</p>
 </section></section>
 <section>
-<section id="ai-as-a-design-critic" class="title-slide slide level1 center">
-<h1>5. AI as a Design Critic</h1>
+<section id="every-value-has-a-type" class="title-slide slide level1 center">
+<h1>4. Every Value Has a Type</h1>
 
 </section>
-<section id="ai-this-block-chat-with-context" class="slide level2">
-<h2>AI This Block: Chat with context</h2>
-<p>Where we are on the module’s AI spine, set out in Lecture 1 and named properly in Lecture 12:</p>
-<blockquote>
-<p><strong>Chat with context</strong></p>
-</blockquote>
-</section>
-<section id="paste-the-chart-ask-what-is-wrong" class="slide level2">
-<h2>Paste the Chart, Ask What Is Wrong</h2>
-<p>Screenshot critique is one of the strongest uses of a multimodal assistant, because the encoding rules are explicit, well documented and heavily written about.</p>
-<blockquote>
-<p>“Here is a chart from my dashboard [screenshot]. Critique it against the Cleveland and McGill ranking of visual channels. Say specifically what a non-technical client would misread, and what they would conclude that the data does not support.”</p>
-</blockquote>
-<div class="fragment">
-<p>The last clause matters. “Critique this chart” gets you a list of tidying. “What would they wrongly conclude” gets you the failure.</p>
+<section id="what-type-is-it" class="slide level2">
+<h2>What Type Is It?</h2>
+<p><code>type()</code> tells you what kind of value you are holding.</p>
+<div id="c63548f3" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href=""></a><span class="bu">print</span>(<span class="bu">type</span>(<span class="dv">431</span>))</span>
+<span id="cb22-2"><a href=""></a><span class="bu">print</span>(<span class="bu">type</span>(<span class="fl">24345.78</span>))</span>
+<span id="cb22-3"><a href=""></a><span class="bu">print</span>(<span class="bu">type</span>(<span class="st">"reel"</span>))</span>
+<span id="cb22-4"><a href=""></a><span class="bu">print</span>(<span class="bu">type</span>(<span class="va">True</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'int'&gt;
+&lt;class 'float'&gt;
+&lt;class 'str'&gt;
+&lt;class 'bool'&gt;</code></pre>
+</div>
 </div>
 </section>
-<section id="two-more-prompts-worth-keeping" class="slide level2">
-<h2>Two More Prompts Worth Keeping</h2>
-<blockquote>
-<p>“Rewrite this chart title as a finding rather than a field name. Give me three versions at different levels of confidence.”</p>
-</blockquote>
-<div class="fragment">
-<blockquote>
-<p>“What would a CFO ask when they see this? What would a marketing manager ask? Which of those questions can this chart answer?”</p>
-</blockquote>
-</div>
-<div class="fragment">
-<p>The three-confidence-levels trick is useful because it forces you to choose how strong a claim your data supports, rather than defaulting to the strongest phrasing that sounds fine.</p>
-</div>
+<section id="the-four-basic-types" class="slide level2">
+<h2>The Four Basic Types</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Example</th>
+<th style="text-align: left;">Used for</th>
+<th style="text-align: left;">In Tableau</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>int</code></td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;"><code>431</code></td>
+<td style="text-align: left;">counts: posts, reach, likes</td>
+<td style="text-align: left;">#</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>float</code></td>
+<td style="text-align: left;">decimal</td>
+<td style="text-align: left;"><code>24345.78</code></td>
+<td style="text-align: left;">euros, rates</td>
+<td style="text-align: left;">#</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>str</code></td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;"><code>"reel"</code></td>
+<td style="text-align: left;">text, categories</td>
+<td style="text-align: left;">Abc</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>bool</code></td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;"><code>True</code></td>
+<td style="text-align: left;">yes or no</td>
+<td style="text-align: left;">T|F</td>
+</tr>
+</tbody>
+</table>
+<p>Lecture 7 meets them again, as the types of the 26 columns of <code>insta-data.csv</code>.</p>
 </section>
-<section id="what-it-cannot-see" class="slide level2">
-<h2>What It Cannot See</h2>
+<section id="type-decides-what-works" class="slide level2">
+<h2>Type Decides What Works</h2>
+<div id="938523eb" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href=""></a><span class="dv">2</span> <span class="op">+</span> <span class="dv">3</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="34">
+<pre><code>5</code></pre>
+</div>
+</div>
+<div id="76813ac1" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href=""></a><span class="co">"2"</span> <span class="op">+</span> <span class="st">"3"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="35">
+<pre><code>'23'</code></pre>
+</div>
+</div>
+<div id="5c60df55" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href=""></a><span class="dv">2</span> <span class="op">+</span> <span class="st">"3"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-error">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">TypeError</span>                                 Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[36], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> <span style="color:rgb(98,98,98)">2</span> <span style="color:rgb(98,98,98)">+</span> <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">3</span><span style="color:rgb(175,0,0)">"</span>
+
+<span class="ansi-red-fg">TypeError</span>: unsupported operand type(s) for +: 'int' and 'str'</pre>
+</div>
+</div>
+</div>
+<p>Same operator <code>+</code>, three different behaviours. <strong>Read the type before blaming the operator.</strong></p>
+</section>
+<section id="numbers-that-are-not-numbers" class="slide level2">
+<h2>Numbers That Are Not Numbers</h2>
+<div id="6bf39184" class="cell" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href=""></a>reach_text <span class="op">=</span> <span class="st">"5184"</span></span>
+<span id="cb29-2"><a href=""></a><span class="bu">print</span>(<span class="bu">type</span>(reach_text))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'str'&gt;</code></pre>
+</div>
+</div>
+<p>Between quotes, <code>"5184"</code> is text, not a number: <code>reach_text + 1</code> fails. Convert it first:</p>
+<div id="39dcb809" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href=""></a><span class="bu">print</span>(<span class="bu">int</span>(reach_text) <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb31-2"><a href=""></a><span class="bu">print</span>(<span class="bu">float</span>(<span class="st">"24345.78"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>5185
+24345.78</code></pre>
+</div>
+</div>
+<p><code>int()</code> gives a whole number, <code>float()</code> a decimal. A column that looks numeric but is stored as text is the most common surprise when a file is read: Lecture 7 shows how to spot it.</p>
+</section>
+<section id="true-or-false" class="slide level2">
+<h2>True or False</h2>
+<p>A <strong>comparison</strong> gives a boolean, <code>True</code> or <code>False</code>:</p>
+<div id="a02ac50f" class="cell" data-execution_count="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href=""></a>reach <span class="op">=</span> <span class="dv">535086</span></span>
+<span id="cb33-2"><a href=""></a><span class="bu">print</span>(reach <span class="op">&gt;</span> <span class="dv">100000</span>)</span>
+<span id="cb33-3"><a href=""></a><span class="bu">print</span>(reach <span class="op">==</span> <span class="dv">5184</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>True
+False</code></pre>
+</div>
+</div>
+<p>Text can be compared too, and <strong>case matters</strong>:</p>
+<div id="b4033a32" class="cell" data-execution_count="17">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href=""></a>post_format <span class="op">=</span> <span class="st">"reel"</span></span>
+<span id="cb35-2"><a href=""></a><span class="bu">print</span>(post_format <span class="op">==</span> <span class="st">"reel"</span>)</span>
+<span id="cb35-3"><a href=""></a><span class="bu">print</span>(post_format <span class="op">==</span> <span class="st">"Reel"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>True
+False</code></pre>
+</div>
+</div>
+<p><span style="color:#e34948;"><i class="fa-solid fa-triangle-exclamation" aria-label="triangle-exclamation"></i></span> <strong><code>=</code> stores, <code>==</code> compares.</strong> Mixing them up happens to everyone.</p>
+</section>
+<section id="your-turn-2" class="slide level2" data-background="#43464B">
+<h2><i class="fa-solid fa-screwdriver-wrench" aria-label="screwdriver-wrench"></i> Your Turn!</h2>
+<h3 id="text-or-number">Text or number?</h3>
+<p>Copied from the Instagram app, LR0184’s reach arrives between quotes. Type each block in its own code cell, and run it:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href=""></a><span class="co"># 1. the reach, as copied: what type is it?</span></span>
+<span id="cb37-2"><a href=""></a>reach_text <span class="op">=</span> <span class="st">"535086"</span></span>
+<span id="cb37-3"><a href=""></a><span class="bu">type</span>(reach_text)</span>
+<span id="cb37-4"><a href=""></a></span>
+<span id="cb37-5"><a href=""></a><span class="co"># 2. more accounts than 100 typical posts, of 5,184 each?</span></span>
+<span id="cb37-6"><a href=""></a>reach_text <span class="op">&gt;</span> <span class="dv">100</span> <span class="op">*</span> <span class="dv">5184</span></span>
+<span id="cb37-7"><a href=""></a></span>
+<span id="cb37-8"><a href=""></a><span class="co"># 3. the same question, once the text is a number</span></span>
+<span id="cb37-9"><a href=""></a>reach <span class="op">=</span> <span class="bu">int</span>(reach_text)</span>
+<span id="cb37-10"><a href=""></a>reach <span class="op">&gt;</span> <span class="dv">100</span> <span class="op">*</span> <span class="dv">5184</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Block 2 fails <strong>on purpose</strong>: why?</p>
+                    <div id="timer6_3"></div>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            initializeTimer("timer6_3", 300, "interaction");
+                        });
+                    </script>
+                
+</section>
+<section id="solution-1" class="slide level2">
+<h2>Solution</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 39%">
+<col style="width: 17%">
+<col style="width: 43%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Block</th>
+<th style="text-align: left;">Result</th>
+<th style="text-align: left;">Why</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1. <code>type(reach_text)</code></td>
+<td style="text-align: left;"><code>str</code></td>
+<td style="text-align: left;">between quotes, a number is text</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2. <code>reach_text &gt; 100 * 5184</code></td>
+<td style="text-align: left;"><code>TypeError</code></td>
+<td style="text-align: left;">text cannot be compared with a number</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3. <code>reach &gt; 100 * 5184</code></td>
+<td style="text-align: left;"><code>True</code></td>
+<td style="text-align: left;"><code>int()</code> made it a number: 535,086 is more than 518,400</td>
+</tr>
+</tbody>
+</table>
+<p><strong>LR0184 alone reached more accounts than 103 typical posts.</strong> Numbers copied or exported as text are common: check the type first.</p>
+</section></section>
+<section>
+<section id="when-it-breaks" class="title-slide slide level1 center">
+<h1>5. When It Breaks</h1>
+
+</section>
+<section id="errors-are-normal" class="slide level2">
+<h2>Errors Are Normal</h2>
 <ul>
-<li>Whether the finding is <strong>true</strong>. It is critiquing an image, not your data</li>
-<li>Whether the comparison is the one your client cares about</li>
-<li>Whether the number has a denominator, unless the denominator is on the chart</li>
-<li>Your audience, unless you describe them, and it will not ask</li>
+<li>Beginners think an error means they failed</li>
+<li>Professionals see thirty errors before lunch</li>
+<li>An error is Python <strong>telling you exactly where it stopped</strong></li>
 </ul>
-<div class="callout callout-note no-icon callout-style-simple">
-<div class="callout-body">
-<div class="callout-content">
-<p>It will make your chart prettier and more conventional. Under what circumstances is “more conventional” the wrong direction?</p>
-</div>
-</div>
-</div>
+<p>The one skill that separates people who learn to code from people who give up is <strong>reading the error message</strong>.</p>
 </section>
-<section id="exercise-1" class="slide level2" data-background="#43464B">
-<h2>Exercise</h2>
+<section id="anatomy-of-an-error" class="slide level2">
+<h2>Anatomy of an Error</h2>
+<div id="1e73697b" class="cell" data-execution_count="18">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href=""></a><span class="bu">print</span>(<span class="st">"Loomrow posted "</span> <span class="op">+</span> <span class="dv">431</span> <span class="op">+</span> <span class="st">" times"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-error">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">TypeError</span>                                 Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[41], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> <span style="color:rgb(0,135,0)">print</span>(<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">Loomrow posted </span><span style="color:rgb(175,0,0)">"</span> <span style="color:rgb(98,98,98)">+</span> <span style="color:rgb(98,98,98)">431</span> <span style="color:rgb(98,98,98)">+</span> <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)"> times</span><span style="color:rgb(175,0,0)">"</span>)
+
+<span class="ansi-red-fg">TypeError</span>: can only concatenate str (not "int") to str</pre>
+</div>
+</div>
+</div>
+<p>Read it <strong>bottom up</strong>:</p>
+<ul>
+<li>Last line: the <strong>type</strong> of error, and a description</li>
+<li>Above it: the line of your code that caused it, with an arrow</li>
+<li><code>TypeError</code> here means: you cannot add text and a number. <code>print("Loomrow posted", 431, "times")</code> works</li>
+</ul>
+</section>
+<section id="the-errors-you-will-meet-this-month" class="slide level2">
+<h2>The Errors You Will Meet This Month</h2>
+<div id="8b362d04" class="cell" data-execution_count="19">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href=""></a><span class="bu">print</span>(<span class="st">"hello)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-error">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-cyan-fg">  Cell </span><span class="ansi-green-fg">In[42], line 1</span>
+<span class="ansi-red-fg">    print("hello)</span>
+          ^
+<span class="ansi-red-fg">SyntaxError</span><span class="ansi-red-fg">:</span> unterminated string literal (detected at line 1)
+</pre>
+</div>
+</div>
+</div>
+<p><code>SyntaxError</code>: a quote or a bracket is not closed. Look at the line mentioned, and at the one before.</p>
+<div id="66348260" class="cell" data-execution_count="20">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href=""></a><span class="bu">print</span>(revenu)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-error">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[43], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> <span style="color:rgb(0,135,0)">print</span>(revenu)
+
+<span class="ansi-red-fg">NameError</span>: name 'revenu' is not defined</pre>
+</div>
+</div>
+</div>
+<p><code>NameError</code>: the name does not exist. Almost always a typo, or a cell you did not run.</p>
+</section>
+<section id="the-errors-you-will-meet-this-month-1" class="slide level2">
+<h2>The Errors You Will Meet This Month</h2>
+<div id="972b3ab9" class="cell" data-execution_count="21">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href=""></a><span class="bu">print</span>(<span class="st">"5"</span> <span class="op">*</span> <span class="st">"3"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-error">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">TypeError</span>                                 Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[44], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> <span style="color:rgb(0,135,0)">print</span>(<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">5</span><span style="color:rgb(175,0,0)">"</span> <span style="color:rgb(98,98,98)">*</span> <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">3</span><span style="color:rgb(175,0,0)">"</span>)
+
+<span class="ansi-red-fg">TypeError</span>: can't multiply sequence by non-int of type 'str'</pre>
+</div>
+</div>
+</div>
+<p><code>TypeError</code>: the operation makes no sense for these kinds of value.</p>
+<div id="0ab47068" class="cell" data-execution_count="22">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href=""></a>Print(<span class="st">"hello"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-error">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[45], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> Print(<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">hello</span><span style="color:rgb(175,0,0)">"</span>)
+
+<span class="ansi-red-fg">NameError</span>: name 'Print' is not defined</pre>
+</div>
+</div>
+</div>
+<p><code>NameError</code> again, and the reason matters: <strong>Python is case sensitive</strong>. <code>Print</code>, <code>print</code> and <code>PRINT</code> are three different names.</p>
+</section>
+<section id="how-to-solve-an-error" class="slide level2">
+<h2>How to Solve an Error</h2>
 <ol type="1">
-<li>Screenshot one of your charts (<i class="fa-brands fa-windows" aria-label="windows"></i> <kbd>⊞ Win</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd>, <i class="fa-brands fa-apple" aria-label="apple"></i> <kbd>⌘ Cmd</kbd> + <kbd>⇧ Shift</kbd> + <kbd>4</kbd>) and ask for a critique</li>
-<li>Apply the two changes you agree with</li>
-<li>Note one piece of its advice you rejected, and why</li>
-<li>Ask it to rewrite the title at three confidence levels, and pick the one your data supports</li>
+<li>Read the <strong>last line</strong> of the message</li>
+<li>Look at the line it points to, and the one above</li>
+<li>Check the obvious: capital letters, quotes, brackets, commas</li>
+<li>Copy the error message into a search engine or an AI assistant</li>
+<li>Ask a neighbour, then ask me</li>
 </ol>
-<p><strong>15 minutes</strong></p>
+<p>Steps 1 to 3 solve most errors in this module, and they take twenty seconds.</p>
+<p><strong>Until Lecture 10, type the code yourself</strong>, and ask an AI assistant to <strong>explain</strong>, not to write: a line you cannot read is a line you cannot check.</p>
 </section>
-<section id="going-further" class="slide level2">
-<h2>Going Further</h2>
-<ul>
-<li>Cleveland and McGill (1984), <em>Graphical Perception</em> — the source of the ranking, and it is readable</li>
-<li>Tufte, <em>The Visual Display of Quantitative Information</em> — ch.&nbsp;2 on graphical integrity, ch.&nbsp;4 on data-ink</li>
-<li>Cairo, <em>The Functional Art</em> — the design process framework, and the best bridge between journalism and analysis</li>
-<li>Wilke, <em>Fundamentals of Data Visualization</em> — free online, and the practical reference you will actually keep open</li>
-</ul>
+<section id="your-turn-3" class="slide level2" data-background="#43464B">
+<h2><i class="fa-solid fa-screwdriver-wrench" aria-label="screwdriver-wrench"></i> Your Turn!</h2>
+<h3 id="break-it-fix-it">Break it, fix it</h3>
+<p>This cell should print what each of Meta’s 833 purchases cost, but it holds <strong>three</strong> mistakes:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb43"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href=""></a>Purchases <span class="op">=</span> <span class="dv">833</span></span>
+<span id="cb43-2"><a href=""></a>ad_spend <span class="op">=</span> <span class="fl">24345.78</span></span>
+<span id="cb43-3"><a href=""></a>cost <span class="op">=</span> ad_spend <span class="op">/</span> purchases</span>
+<span id="cb43-4"><a href=""></a><span class="bu">print</span>(<span class="st">"Cost per purchase: "</span> <span class="op">+</span> cost)</span>
+<span id="cb43-5"><a href=""></a>Print(<span class="bu">round</span>(cost, <span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ol type="1">
+<li>Type it in one code cell, as it is, and run it</li>
+<li>Read the <strong>last line</strong> of the error</li>
+<li>Fix that one mistake, and run it again</li>
+<li>Repeat until the cost prints twice</li>
+</ol>
+                    <div id="timer6_4"></div>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            initializeTimer("timer6_4", 300, "interaction");
+                        });
+                    </script>
+                
 </section>
-<section id="next-lecture" class="slide level2">
-<h2>Next Lecture</h2>
-<p>Block 3 begins. We move to Python for the analyses Tableau makes awkward, and we stop and name what we are doing with AI.</p>
-<p><strong>Prepare</strong>: nothing to build. Come with the question about AI you have been not asking.</p>
+<section id="solution-2" class="slide level2">
+<h2>Solution</h2>
+<div id="19e5278a" class="cell" data-execution_count="23">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href=""></a>purchases <span class="op">=</span> <span class="dv">833</span>                       <span class="co"># was Purchases, then used as purchases</span></span>
+<span id="cb44-2"><a href=""></a>ad_spend <span class="op">=</span> <span class="fl">24345.78</span></span>
+<span id="cb44-3"><a href=""></a>cost <span class="op">=</span> ad_spend <span class="op">/</span> purchases</span>
+<span id="cb44-4"><a href=""></a><span class="bu">print</span>(<span class="st">"Cost per purchase:"</span>, cost)     <span class="co"># was "Cost per purchase: " + cost</span></span>
+<span id="cb44-5"><a href=""></a><span class="bu">print</span>(<span class="bu">round</span>(cost, <span class="dv">2</span>))                 <span class="co"># was Print</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Cost per purchase: 29.22662665066026
+29.23</code></pre>
+</div>
+</div>
+<p>€29.23 of ad spend for each purchase. Three errors, three lessons: a name must be spelt the same way every time, text and numbers do not add up, and <code>Print</code> is not <code>print</code>. Stuck on an error? Paste it into an AI assistant and ask it to explain it in one sentence.</p>
+</section>
+<section id="section" class="slide level2" data-background="#43464B">
+<h2></h2>
+<style>img.circle {border-radius:50%;}</style>
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<p><img class="circle" src="https://github.com/damien-dupre.png"></p>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<p><strong>Thanks for your attention and don’t hesitate to ask if you have any questions!</strong></p>
+<p><a href="https://datasci.social/@damien_dupre"><i class="fa-brands fa-mastodon" aria-label="mastodon"></i> <span class="citation" data-cites="damien_dupre">@damien_dupre</span></a></p>
+<p><a href="https://github.com/damien-dupre"><i class="fa-brands fa-github" aria-label="github"></i> <span class="citation" data-cites="damien-dupre">@damien-dupre</span></a></p>
+<p><a href="https://damien-dupre.github.io"><i class="fa-solid fa-link" aria-label="link"></i> https://damien-dupre.github.io</a></p>
+<p><a href="mailto:damien.dupre@dcu.ie"><i class="fa-solid fa-paper-plane" aria-label="paper-plane"></i> damien.dupre@dcu.ie</a></p>
+</div>
+</div>
+</div>
 
 </section></section>
     </div>

@@ -401,9 +401,14 @@ Instagram is effectively the entire top of the funnel.
 
 ## Your Turn {background="#43464B"}
 
-1. Go to loop page and download the file insta-data.csv
+### A one-page report on Loomrow's posts
 
-2. Create a 1 page PDF report of follower's engagement in the last 18 months with actionable insights.
+1. On Loop, tile **Lecture Data**, download `insta-data.csv`
+2. Open it in Excel
+3. Click any cell of the table, then **Data** → **Sort**: **Sort by** `engagements_followers`, **Order** **Largest to Smallest**, then **OK**
+4. Read the `format` and `theme` of the first five posts
+5. In Word, write a title and two sentences: what these five posts share, and what Loomrow should do
+6. **File** → **Save As**, and choose **PDF** as the format
 
 ```{r}
 #| echo: false

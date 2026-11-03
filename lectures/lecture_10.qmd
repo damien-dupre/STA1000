@@ -8,7 +8,7 @@ subtitle: STA1000 - Data Analytics and Metrics
 Nine sessions. You have used an AI assistant in most of them:
 
 - To clean a messy file (Lecture 2)
-- To critique a chart, then your own figure (Lectures 4 and 8)
+- To critique a chart, then your own figure (Lectures 4 and 9)
 - To explain an error, or a line of pandas you could not read (Lectures 6 to 9)
 
 . . .
@@ -127,7 +127,7 @@ browser.
 You state a goal. It writes code, runs it, reads the traceback, corrects itself,
 and continues.
 
-> "Load ga4_export.csv, clean the date and numeric columns, and report sessions
+> "Load ga4-export.csv, clean the date and numeric columns, and report sessions
 > and conversion rate by channel and week. Tell me anything that looks wrong."
 
 . . .
@@ -295,14 +295,14 @@ the code.
 ## Exercise {background="#43464B" .smaller}
 
 Use an agent (Claude, ChatGPT with code execution, or Colab's assistant) on
-Loomrow's GA4 export from Lecture 9:
+Loomrow's GA4 export, `ga4-export.csv` on Loop:
 
 > "Load this export, clean it, and report sessions and purchases by channel and
 > by week. List your assumptions before you start."
 
 Then, without looking at the code:
 
-1. Check the total sessions against Lecture 9's: 177,124
+1. Check the total sessions: 177,124. To read the file yourself, skip GA4's notes: `pd.read_csv("ga4-export.csv", comment="#")`
 2. Check one channel and one week by hand
 3. Find the largest and smallest values and ask whether they make sense
 4. Write down one assumption it made that you would have made differently
@@ -323,7 +323,7 @@ Then, without looking at the code:
 . . .
 
 Every one of these is a thing you have learned to worry about: medians and small
-groups in Lectures 3 and 5, GA4's definitions in Lecture 9.
+groups in Lectures 3 and 5, the denominator of every rate in Lecture 8.
 That is why this lecture is here and not in week one: you can now tell when the
 answer is wrong.
 

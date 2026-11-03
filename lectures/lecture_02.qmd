@@ -19,9 +19,9 @@ filters:
 
 ![](https://raw.githubusercontent.com/damien-dupre/img/refs/heads/main/clean_tweet.png)
 
-## {{< fa screwdriver-wrench >}}️ Your Turn! {background="#43464B"}
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
-### Find what is going wrong with this table
+### Spot what software cannot read in this table
 
 ![](https://raw.githubusercontent.com/damien-dupre/img/refs/heads/main/clean_zoom.jpg)
 
@@ -54,13 +54,15 @@ snake_case is preferable but any would do
 #### 5. Save as .csv file
 Better format and keeps only the current sheet
 
-## {{< fa screwdriver-wrench >}}️ Your Turn! {background="#43464B"}
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
-On the module Loop page, got to "Lecture Data" and download the document called `unicef.xlsx`:
+### Clean a messy file with AI
 
-**1. Using AI, clean the 1st sheet of this file but only until column P, remove all other columns.**
-
-**2. Calculate the sum of the 2nd column to obtain the world population in 2018.**
+1. On Loop, tile **Lecture Data**, download `unicef.xlsx`
+2. Upload it to an AI assistant (Copilot, ChatGPT, Gemini ...)
+3. Type: *Clean the first sheet, columns A to P only: one heading row in snake_case, no empty rows or columns, one row per country, as a .csv file*
+4. Download the .csv file and open it in Excel (if you only get a table, copy it into a blank Excel sheet)
+5. Click the letter **B** above the 2nd column: Excel shows its **Sum** at the bottom, the world population in 2018 (in thousands)
 
 ::: {#timer2_1 .timer seconds="300" starton="interaction"}
 :::
@@ -121,13 +123,16 @@ comma, so the delimiter becomes a semicolon. Load it with default settings and
 
 **Connectors** (Google Sheets, SQL, BigQuery) are live. **A file is a photograph; a connector is a window.**
 
-## Your Turn! {background="#43464B"}
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
-Download `data/formats/` from Loop. In pairs:
+### Open the same posts in three formats
 
-1. Open `insta-data.csv` in a text editor, then in Excel. What did Excel change?
-2. Open `insta-data-european.csv` in Excel. What went wrong, and why?
-3. Open `insta-data.json`. How many rows does it have, and how can you tell?
+In pairs, download from Loop the three files used below.
+
+1. Open `insta-data.csv` in a text editor: {{< fa brands windows >}} right-click → **Open with** → Notepad, or {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click → **Open With** → TextEdit
+2. Open `insta-data.csv` in Excel, and compare it with the text editor
+3. Open `insta-data-european.csv` in Excel
+4. Open `insta-data.json` in the text editor, as in step 1
 
 ::: {#timer2_2 .timer seconds="420" starton="interaction"}
 :::
@@ -441,13 +446,15 @@ Without being too complicated, there is two major ways to connect data in Tablea
 
 # Live Demo
 
-## Your turn {background="#43464B"}
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
-From the loop page, on the tile "Lecture Data", use the file `insta-data.csv`
+### Your first figure in Tableau
 
-1. Open it in Tableau Public (do not save it as .xlsx first)
-
-2. Try to figure out how to create your first visualisation.
+1. On Loop, tile **Lecture Data**, download `insta-data.csv`
+2. Go to [public.tableau.com](https://public.tableau.com), sign in, and click **Create a Viz**
+3. Click **Upload from computer** and choose `insta-data.csv`
+4. Click **Sheet 1**, at the bottom of the window
+5. Drag `format` onto **Columns**, then `reach` onto **Rows**
 
 ::: {#timer2_5 .timer seconds="300" starton="interaction"}
 :::
@@ -572,15 +579,17 @@ Choose between:
 
 # Live Demo
 
-## Your Turn {background="#43464B"}
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B" .smaller}
 
-With the `insta-data.csv` file, create:
+### Three figures and a dashboard
 
-- 1 worksheet with a bar chart using the variables `theme` and `likes`
-- 1 worksheet with a line chart using `posted_at` and `impressions`
-- 1 worksheet with a scatterplot using `likes` and `impressions`
+For a new sheet, click the **New Worksheet** icon at the bottom of the window.
 
-**Then, create a dashboard with these visualisations an publish your dashboard.**
+1. New sheet: `theme` on **Columns**, `likes` on **Rows**
+2. New sheet: `posted_at` on **Columns**, its menu → the second **Month**, then `impressions` on **Rows**
+3. New sheet: `likes` on **Columns**, `impressions` on **Rows**, then each pill's menu → **Dimension**
+4. Click the **New Dashboard** icon, at the bottom, and drag the three sheets from the **Sheets** list onto it
+5. Click **Publish As...**, top right, name the workbook, and click **Publish**
 
 ::: {#timer2_6 .timer seconds="420" starton="interaction"}
 :::

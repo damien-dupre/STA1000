@@ -1,33 +1,47 @@
 ---
-title: "Lecture 6: Python I - Colab and pandas"
+title: "Lecture 6: Python I - Getting Started with Python"
 subtitle: STA1000 - Data Analytics and Metrics
 jupyter: python3
 filters:
   - timer
 ---
 
-```{python}
-#| include: false
-# The slides read the repository copy of the data; students read the file they
-# uploaded to Colab, which is the code shown on the slides.
-import pandas as pd
-pd.set_option("display.max_columns", 7)
-pd.set_option("display.max_rows", 8)
-pd.set_option("display.width", 80)
-insta = pd.read_csv("../data/insta-data.csv")
-```
-
 ## Previously ...
 
-- Lectures 2 to 5 took the Loomrow posts through Tableau: a file, the right figures, calculated fields, two files merged, and a dashboard. Assignment 1 is due mid-November.
+- Lectures 2 to 5 took the Loomrow posts through Tableau: a file, the right figures, calculated fields, two files merged, and a dashboard. Assignment 1 is due on 22 November at 12pm.
 
 **Today, three questions:**
 
-1. Why do the same work again in **Python**?
-2. Where do you **run** Python, with nothing to install?
-3. How do you **open, question and filter** a table with **pandas**?
+1. Why **Python**, and where do you **run** it, with nothing to install?
+2. How do you write your **first lines** of Python?
+3. What do you do when it **breaks**?
 
 # 1. Why Python?
+
+## Why Python?
+
+:::: {layout="[1.5,1]"}
+::: {#first-column}
+
+Of the free, open-source languages of data analytics, Python is by far the most used in organisations. It is:
+
+- **Readable**: the code looks close to English
+- **Free**: no licence, ever
+- **Huge**: over half a million packages, one of them made for tables
+- **Employable**: analyst job ads ask for it
+
+:::
+
+::: {#second-column}
+
+![](https://imgs.xkcd.com/comics/python.png){fig-align="center" style="max-height:330px;"}
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: xkcd 353 [{{< fa link >}}](https://xkcd.com/353/)
+:::
+
+:::
+::::
 
 ## Same Data, Another Tool
 
@@ -48,50 +62,78 @@ insta = pd.read_csv("../data/insta-data.csv")
 
 - You **write** each step as a line
 - The lines are the record: they can be checked, shared, and rerun on next month's file in one click
-- The language AI assistants write best, and one that analyst job ads ask for
+- The language AI assistants write best
 
 :::
 ::::
 
-::: {.fragment}
 Tableau to show the data, Python to prepare and question it. You need both.
+
+## What Python Is Not
+
+- Python is **not** a spreadsheet. There is no grid, and nothing recalculates by itself
+- Python is **not** intelligent. It does exactly what you write, including the mistakes
+- Python is **not** fast to write at the beginning. It becomes fast when a task has to be done twice
+
+The value of code is **reproducibility**: the same lines, run on next month's file, give next month's answer in one second.
+
+We do **not** learn programming: no loops, no functions of our own. Today, plain Python; from Lecture 7, **pandas**, for tables.
+
+## Language vs Interface
+
+**Python** is the language; you write and run it in an **interface**. Python is like a car's engine, the interface is like its dashboard.
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+**Python: the engine**
+
+![](./figures/dd/car_motor.jpeg){fig-align="center" style="max-height:250px;"}
+
+Does the work. You never look at it directly.
+
 :::
 
-## Python, but Only pandas
+::: {#second-column}
 
-We do **not** learn programming: no loops, no functions of our own. We learn **pandas**, the Python library for tables, where everything you clicked in Tableau has its line:
+**The interface: the dashboard**
 
-::: {style="font-size:0.6em; line-height:1.3;"}
+![](./figures/dd/car_dashboard.jpeg){fig-align="center" style="max-height:250px;"}
 
-| In Tableau | In pandas | Lecture |
-|---|---|---|
-| Connect to a text file | `pd.read_csv("insta-data.csv")` | 6 |
-| The Abc, # and calendar icons | `insta.info()` | 6 |
-| The Filters shelf | `insta[insta["format"] == "reel"]` | 6 |
-| A calculated field | `insta["rate"] = insta["likes"] / insta["reach"]` | 7 |
-| A dimension on Rows, `SUM` of a measure | `insta.groupby("format")["reach"].sum()` | 7 |
-| A relationship, or a join | `pd.merge(posts, ads, on="post_id", how="left")` | 7 |
-| Show Me | `insta["format"].value_counts().plot(kind="bar")` | 8 |
+Where you type, where you see results and errors.
 
 :::
-
-Lecture 9 puts it all to work on the data of Loomrow's website, exported from Google Analytics 4.
+::::
 
 # 2. Google Colab
 
 ## Google Colab
 
-In your browser:
+:::: {layout="[1.6,1]"}
+::: {#first-column}
+
+Our interface is **Google Colab**. In your browser:
 
 1. Go to <https://colab.research.google.com>
-2. Sign in with a Google account: your DCU one works
+2. Sign in: your DCU Google account works
 3. **File** → **New notebook in Drive**
 
-. . .
+**Nothing to install**: Python runs on Google's computers, from any laptop.
 
-**Nothing to install.** Python and pandas run on Google's computers, not on your laptop.
+:::
 
-Your notebook is a `.ipynb` file saved in your Google Drive, in a folder called **Colab Notebooks**. Rename it from its title, top left.
+::: {#second-column}
+
+![](https://hutchdatascience.org/Intro_to_Python/images/colab.png){fig-align="center" style="max-height:300px;"}
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: Fred Hutch Data Science Lab, Introduction to Python [{{< fa link >}}](https://hutchdatascience.org/Intro_to_Python/)
+:::
+
+:::
+::::
+
+Your notebook is a `.ipynb` file in **Colab Notebooks**, a folder of your Google Drive. Rename it from its title, top left.
 
 ## A Notebook Is Made of Cells
 
@@ -117,8 +159,6 @@ Add one with **+ Text**.
 :::
 ::::
 
-. . .
-
 A notebook is a **report and an analysis at the same time**. A notebook with forty code cells and no text is not an analysis: it is a transcript.
 
 ## Run a Cell
@@ -129,6 +169,7 @@ A notebook is a **report and an analysis at the same time**. A notebook with for
 | Run the cell, stay on it | <kbd>Ctrl</kbd> + <kbd>Enter</kbd> | <kbd>⌘ Cmd</kbd> + <kbd>↩ Return</kbd> |
 | Insert a code cell below | <kbd>Ctrl</kbd> + <kbd>M</kbd>, then <kbd>B</kbd> | <kbd>⌘ Cmd</kbd> + <kbd>M</kbd>, then <kbd>B</kbd> |
 | Turn the cell into text | <kbd>Ctrl</kbd> + <kbd>M</kbd>, then <kbd>M</kbd> | <kbd>⌘ Cmd</kbd> + <kbd>M</kbd>, then <kbd>M</kbd> |
+| Undo | <kbd>Ctrl</kbd> + <kbd>Z</kbd> | <kbd>⌘ Cmd</kbd> + <kbd>Z</kbd> |
 
 Or click the {{< fa circle-play >}} button at the left of the cell.
 
@@ -136,362 +177,379 @@ Or click the {{< fa circle-play >}} button at the left of the cell.
 
 The first cell you run connects the notebook to a **runtime**: a computer at Google that holds your Python session.
 
-- Everything you create lives there: tables, results, uploaded files
+- Everything you create lives there: results, tables, uploaded files
 - Left idle for too long, or after 12 hours at most, the runtime is stopped and all of it is gone. Your **code** is safe in the notebook; your **results** are not
 - Cells run **in the order you run them**, not in the order they appear
 
-. . .
-
 **Runtime** → **Restart session and run all**: if the notebook runs from top to bottom, it works. If it fails, it never did.
 
-## Get Loomrow into Colab
-
-Your file is on your laptop; Python runs at Google. Upload the file to the runtime:
-
-1. From Loop, download `insta-data.csv`
-2. In Colab, click the {{< fa folder >}} **Files** icon in the left sidebar
-3. Drag the file into the panel, or use its upload button
-4. It appears in the list: pandas can now read it by its name
-
-. . .
-
-[{{< fa triangle-exclamation >}}]{style="color:#e34948;"} **Uploaded files are deleted with the runtime.** Next session, upload them again.
-
-## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B" .smaller}
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
 ### Your first notebook
 
-1. Open Colab and create a new notebook, named `STA1000 Lecture 6`
-2. Add a text cell: `# Loomrow`, and one sentence on what the file contains
-3. Upload `insta-data.csv`
-4. In a code cell, run the three lines below. How many rows and columns does Colab report under the table?
-
-```{.python}
-import pandas as pd
-insta = pd.read_csv("insta-data.csv")
-insta
-```
+1. Open <https://colab.research.google.com>, signed in with your DCU account
+2. **File** → **New notebook in Drive**
+3. Click its name, top left, and type `STA1000 Lecture 6`
+4. In the code cell, type `print("Hello, my name is Aoife")`, with your name
+5. Run it: {{< fa brands windows >}} <kbd>Shift</kbd> + <kbd>Enter</kbd> / {{< fa brands apple >}} <kbd>⇧ Shift</kbd> + <kbd>↩ Return</kbd>
+6. Click **+ Text**, top left, and type `# My first notebook`
+7. **Runtime** → **Restart session and run all**
 
 ::: {#timer6_1 .timer seconds="300" starton="interaction"}
 :::
 
-# 3. Open a Table with pandas
+# 3. Your First Python Code
 
-## Load pandas
+## print()
+
+`print()` displays something under the cell.
 
 ```{python}
-import pandas as pd
+print("Hello, Loomrow!")
 ```
 
-- `import` loads a library into the session: once per session, in the first cell
-- `as pd` gives it a short name. Everybody uses `pd`: every example online and every AI answer assumes it
+Everything between the quotes is text, called a **string**. The brackets belong to `print`, which is a **function**: a name followed by brackets, that does something with what is inside them.
 
-. . .
+```{python}
+print("Loomrow posted", 431, "times")
+```
 
-Then every pandas command starts with `pd.` or with the name of a table.
+## Python as a Calculator
 
-## Read the File
+A code cell also shows the value of its **last line**, without `print()`:
+
+```{python}
+76928.88 / 24345.78
+```
+
+The revenue of Loomrow's ads divided by what they cost: €3.16 of revenue for each euro spent, the answer to Lecture 5's dual axis.
+
+But only the last line:
+
+```{python}
+1 + 1
+10 + 10
+```
+
+`+`, `-`, `*` and `/` as on a calculator; brackets first, as in maths: `(2 + 3) * 4` is 20.
+
+## Comments
+
+Anything after a `#` is ignored by Python.
+
+```{python}
+# revenue per euro spent on Meta ads, all campaigns
+76928.88 / 24345.78
+```
+
+Comments are written for **the person reading the code in six months**, who is almost always you.
+
+Write comments explaining *why*, not *what*. `# divide` is useless. `# revenue per euro spent on Meta ads, all campaigns` is gold.
+
+## Storing a Result
+
+A result you do not store disappears.
+
+```{python}
+spend = 24345.78
+revenue = 76928.88
+roas = revenue / spend
+print(roas)
+```
+
+`spend`, `revenue` and `roas` are **variables**. The `=` sign does not mean equality: it means **"take what is on the right, and give it this name"**. Read it right to left.
+
+## Round a Result
+
+```{python}
+print(round(roas, 2))
+print(round(roas))
+```
+
+`round(value, digits)` is a function with two things inside its brackets, separated by a comma: what to round, and to how many decimals. Without the second, it rounds to a whole number.
+
+A variable can be used anywhere its value could be:
+
+```{python}
+print("Revenue per euro spent:", round(roas, 2))
+```
+
+## Naming Rules
+
+Python **requires**:
+
+- Letters, digits and underscores only: no spaces, no dashes
+- No digit first: `2025_spend` fails, `spend_2025` works
+- **Case sensitive**: `Spend`, `spend` and `SPEND` are three different names
+
+**Convention**: `snake_case`, short but descriptive, no accents.
 
 ```{.python}
-insta = pd.read_csv("insta-data.csv")
+x1 = 24345.78          # what is this?
+spend_eur = 24345.78   # ah.
 ```
 
-- `pd.read_csv()` reads a CSV file into a table, which pandas calls a **DataFrame**
-- `insta =` stores that table under a name of your choice. From now on, `insta` **is** the table
-- The name of the file goes **between quotes**, exactly as it is spelt in the Files panel
+Naming is not decoration. It is most of what makes code readable.
 
-. . .
+## Order Matters, Twice
 
-Nothing is shown: `=` stores, it does not display. To see the table, run its name.
+1. Python reads a cell **top to bottom**
+2. Colab runs cells **in the order you click them**, not top to bottom
 
-## Show the Table
-
-```{python}
-insta
-```
-
-Colab shows the first and last rows, and the size underneath.
-
-## Rows, Columns, Names
-
-```{python}
-insta.shape
-```
-
-```{python}
-insta.head(3)
-```
-
-- `.shape`: the number of rows, then of columns
-- `.head()`: the first 5 rows, or as many as you ask for. `.tail()`: the last ones
-- `.columns`: the names of the columns
-
-## The Type of Each Column
-
-:::: {layout="[1.1,1]"}
-::: {#first-column}
+This is the number one cause of "but it worked five minutes ago".
 
 ```{.python}
-insta.info()
+# Cell 3, run first
+print(revenue)     # NameError: name 'revenue' is not defined
+
+# Cell 1, run second
+revenue = 76928.88
 ```
 
-```
- #   Column           Non-Null Count  Dtype
----  ------           --------------  -----
- 0   post_id          431 non-null    object
- 1   posted_at        431 non-null    object
- 2   format           431 non-null    object
- ...
- 5   campaign         206 non-null    object
- 6   is_paid          431 non-null    bool
- ...
- 10  reach            431 non-null    int64
- ...
- 23  spend_eur        431 non-null    float64
-```
-
-:::
-
-::: {#second-column}
-
-::: {style="font-size:0.75em; line-height:1.3;"}
-
-| pandas | Tableau |
-|---|---|
-| `object`: text | Abc |
-| `int64`: whole numbers | # |
-| `float64`: decimals | # |
-| `bool`: True or False | T\|F |
-| `datetime64`: dates | calendar |
-
-Newer versions of pandas write `str` for text.
-
-**Non-Null Count**: `campaign` has 206 values out of 431. The 225 others are **missing**: posts outside any campaign.
-
-:::
-
-:::
-::::
-
-## Fix the Dates
-
-In Lecture 5, Tableau recognised `posted_at` as a date. pandas reads it as text, `object`, and one line converts it:
-
-```{python}
-insta["posted_at"] = pd.to_datetime(insta["posted_at"])
-insta["posted_at"].head(3)
-```
-
-`insta["posted_at"] =` on the left **replaces** the column with what is on the right. Lecture 7 uses the dates.
-
-## One Column
-
-```{python}
-insta["reach"]
-```
-
-- The name of the table, square brackets, and the name of the column in quotes
-- Spelt **exactly** as in the file: `insta["Reach"]` fails, the column is `reach`
-- One column is a **Series**: a list of values with the row numbers on its left
-
-## The Key Figures of a Column
-
-```{python}
-insta["reach"].describe()
-```
-
-Lecture 3's key figures in one line. The mean (9,788) is almost twice the median (5,184): a few huge posts pull it up, starting with LR0184 and its 535,086 accounts.
-
-. . .
-
-One at a time: `.mean()`, `.median()`, `.sum()`, `.min()`, `.max()`. A cell shows only its **last** result: to see several, wrap each in `print()`.
-
-## Count the Categories
-
-```{python}
-insta["format"].value_counts()
-```
-
-```{python}
-insta["format"].value_counts(normalize=True)
-```
-
-`normalize=True` turns the counts into proportions, Lecture 3's composition: 47% of the posts are reels.
+The small number in `[ ]` to the left of each cell tells you the order in which cells were really run.
 
 ## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
-### A first look at Loomrow
+### A small calculation
 
-1. How many rows and columns? With `.info()`: which columns hold text, numbers, and True or False?
-2. The mean and the median of `likes`: which is larger, and why?
-3. The share of posts in each `product_line`
-4. The total of `spend_eur` and of `attributed_revenue_eur`: how many euros of revenue for each euro spent?
-
-::: {#timer6_2 .timer seconds="360" starton="interaction"}
-:::
-
-## Solution {.smaller}
-
-```{python}
-print(insta.shape)
-print(insta["likes"].mean())
-print(insta["likes"].median())
-print(insta["product_line"].value_counts(normalize=True))
-print(insta["attributed_revenue_eur"].sum() / insta["spend_eur"].sum())
-```
-
-`.info()`: 5 text columns, 19 numbers, `is_paid` True or False, `posted_at` a date once converted. Mean 463 against median 278 likes: the same skew as reach. And €3.16 of revenue for each euro, the answer to Lecture 5's dual-axis exercise.
-
-# 4. Select, Filter, Sort
-
-## Several Columns
-
-```{python}
-insta[["post_id", "format", "reach"]]
-```
-
-**Two** pairs of square brackets: the outer pair selects, the inner pair makes a list of names. One pair gives one column; two pairs give a table.
-
-## Filter the Rows
-
-```{python}
-reels = insta[insta["format"] == "reel"]
-reels.shape
-```
-
-- `insta["format"] == "reel"` is True or False for every row; `insta[...]` keeps the rows where it is True
-- The **Filters** shelf of Tableau, written down
-- `==` compares, `=` stores: `insta["format"] = "reel"` would replace every format with "reel"
-
-. . .
-
-The other comparisons: `!=` (different), `>`, `>=`, `<`, `<=`.
-
-## Two Conditions at Once
-
-```{python}
-insta[(insta["format"] == "reel") & (insta["reach"] > 50000)]
-```
-
-- `&` keeps the rows where **both** conditions are True; `|` where **either** is
-- Each condition in its **own brackets**. Without them, Python reads `"reel" & insta["reach"]` first, and fails
-
-## Sort the Rows
-
-```{python}
-top = insta.sort_values("reach", ascending=False)
-top[["post_id", "posted_at", "format", "reach"]].head(5)
-```
-
-`ascending=False` puts the largest first. Lecture 3's reel, LR0184, tops the list with a reach almost four times the next one.
-
-## Keep a Result, Save a Result
+LR0184, the reel of 21 August 2025: 8,316 likes, comments, saves and shares, for 535,086 accounts reached. Type it in **one** code cell, and run it:
 
 ```{.python}
-paid = insta[insta["is_paid"] == True]
-paid.to_csv("paid-posts.csv", index=False)
+# engagement rate of LR0184
+engagements = 8316
+reach = 535086
+rate = engagements / reach * 100
+print(round(rate, 1))
 ```
 
-- `paid =` keeps the result under a new name. `insta` is unchanged: nothing you filter or sort is lost
-- `.to_csv()` writes the table as a file in the Files panel: {{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click on it → **Download**
-- `index=False` stops pandas writing its row numbers as an extra column
+What does it print, and is it high or low for a post?
 
-## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
-
-### Question the posts
-
-1. The 5 posts with the largest reach: their `post_id`, `format` and `product_line`
-2. How many posts are paid, and what is their median `reach`?
-3. Reels with a reach above 50,000: how many, and in which product lines?
-4. The paid Knitwear posts: how many, and how much was spent on them? Save them as `paid-knitwear.csv`, and download the file
-
-::: {#timer6_3 .timer seconds="420" starton="interaction"}
+::: {#timer6_2 .timer seconds="300" starton="interaction"}
 :::
 
 ## Solution
 
 ```{python}
-top = insta.sort_values("reach", ascending=False)
-print(top[["post_id", "format", "product_line"]].head(5))
-paid = insta[insta["is_paid"] == True]
-print(paid.shape, paid["reach"].median())
-big_reels = insta[(insta["format"] == "reel") & (insta["reach"] > 50000)]
-print(big_reels["product_line"].value_counts())
-knit = insta[(insta["product_line"] == "Knitwear") & (insta["is_paid"] == True)]
-print(knit.shape, knit["spend_eur"].sum().round(2))
+# engagement rate of LR0184
+engagements = 8316
+reach = 535086
+rate = engagements / reach * 100
+print(round(rate, 1))
 ```
 
-## Solution (continued)
+8,316 engagements, but only **1.6%** of the 535,086 accounts reached: **low**, as the median Loomrow post engages 5.9%. A viral post is seen by many people who never react to it.
+
+# 4. Every Value Has a Type
+
+## What Type Is It?
+
+`type()` tells you what kind of value you are holding.
+
+```{python}
+print(type(431))
+print(type(24345.78))
+print(type("reel"))
+print(type(True))
+```
+
+## The Four Basic Types
+
+| Type | Name | Example | Used for | In Tableau |
+|:--|:--|:--|:--|:--|
+| `int` | integer | `431` | counts: posts, reach, likes | # |
+| `float` | decimal | `24345.78` | euros, rates | # |
+| `str` | string | `"reel"` | text, categories | Abc |
+| `bool` | boolean | `True` | yes or no | T\|F |
+
+Lecture 7 meets them again, as the types of the 26 columns of `insta-data.csv`.
+
+## Type Decides What Works
+
+```{python}
+2 + 3
+```
+
+```{python}
+"2" + "3"
+```
+
+```{python}
+#| error: true
+2 + "3"
+```
+
+Same operator `+`, three different behaviours. **Read the type before blaming the operator.**
+
+## Numbers That Are Not Numbers
+
+```{python}
+reach_text = "5184"
+print(type(reach_text))
+```
+
+Between quotes, `"5184"` is text, not a number: `reach_text + 1` fails. Convert it first:
+
+```{python}
+print(int(reach_text) + 1)
+print(float("24345.78"))
+```
+
+`int()` gives a whole number, `float()` a decimal. A column that looks numeric but is stored as text is the most common surprise when a file is read: Lecture 7 shows how to spot it.
+
+## True or False
+
+A **comparison** gives a boolean, `True` or `False`:
+
+```{python}
+reach = 535086
+print(reach > 100000)
+print(reach == 5184)
+```
+
+Text can be compared too, and **case matters**:
+
+```{python}
+post_format = "reel"
+print(post_format == "reel")
+print(post_format == "Reel")
+```
+
+[{{< fa triangle-exclamation >}}]{style="color:#e34948;"} **`=` stores, `==` compares.** Mixing them up happens to everyone.
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### Text or number?
+
+Copied from the Instagram app, LR0184's reach arrives between quotes. Type each block in its own code cell, and run it:
 
 ```{.python}
-knit.to_csv("paid-knitwear.csv", index=False)
+# 1. the reach, as copied: what type is it?
+reach_text = "535086"
+type(reach_text)
+
+# 2. more accounts than 100 typical posts, of 5,184 each?
+reach_text > 100 * 5184
+
+# 3. the same question, once the text is a number
+reach = int(reach_text)
+reach > 100 * 5184
 ```
 
-Then **Files** → {{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click on `paid-knitwear.csv` → **Download**.
+Block 2 fails **on purpose**: why?
 
-. . .
+::: {#timer6_3 .timer seconds="300" starton="interaction"}
+:::
 
-- 127 paid posts, with a median reach of 5,585: barely more than the 5,184 of all posts
-- Three reels above 50,000: two Accessories, one Knitwear. Only one of the three was paid
-- 27 paid Knitwear posts, €5,092.52 of spend
+## Solution
+
+| Block | Result | Why |
+|:--------|:---|:---------|
+| 1. `type(reach_text)` | `str` | between quotes, a number is text |
+| 2. `reach_text > 100 * 5184` | `TypeError` | text cannot be compared with a number |
+| 3. `reach > 100 * 5184` | `True` | `int()` made it a number: 535,086 is more than 518,400 |
+
+**LR0184 alone reached more accounts than 103 typical posts.** Numbers copied or exported as text are common: check the type first.
 
 # 5. When It Breaks
 
-## Read the Last Line
+## Errors Are Normal
 
-Python stops at the first problem, and prints a **traceback**: the lines it went through, then the error.
+- Beginners think an error means they failed
+- Professionals see thirty errors before lunch
+- An error is Python **telling you exactly where it stopped**
 
+The one skill that separates people who learn to code from people who give up is **reading the error message**.
+
+## Anatomy of an Error
+
+```{python}
+#| error: true
+print("Loomrow posted " + 431 + " times")
 ```
-KeyError                                  Traceback (most recent call last)
-...
-KeyError: 'Reach'
+
+Read it **bottom up**:
+
+- Last line: the **type** of error, and a description
+- Above it: the line of your code that caused it, with an arrow
+- `TypeError` here means: you cannot add text and a number. `print("Loomrow posted", 431, "times")` works
+
+## The Errors You Will Meet This Month
+
+```{python}
+#| error: true
+print("hello)
 ```
 
-. . .
+`SyntaxError`: a quote or a bracket is not closed. Look at the line mentioned, and at the one before.
 
-Skip the middle. **The last line names the problem**: here, there is no column called `Reach`. The column is `reach`.
+```{python}
+#| error: true
+print(revenu)
+```
 
-## Five Errors You Will Meet Today {.smaller}
+`NameError`: the name does not exist. Almost always a typo, or a cell you did not run.
 
-| The last line says | What happened | The fix |
-|---|---|---|
-| `NameError: name 'insta' is not defined` | The cell that creates `insta` was not run, or the runtime restarted | Run the cells from the top |
-| `KeyError: 'Reach'` | No column with that exact name | Copy the name from `insta.columns` |
-| `FileNotFoundError: ... 'insta_data.csv'` | The file is not in the Files panel, or the name differs | Upload it again; copy its name |
-| `SyntaxError: ... Maybe you meant '==' instead of '='?` | A bracket, a quote, or a `=` for `==` | Python often suggests the fix: read it |
-| `TypeError: Cannot perform 'rand_' with a dtyped [int64] array ...` | Two conditions joined by `&` without their brackets | One pair of brackets around each condition |
+## The Errors You Will Meet This Month
 
-## Ask, Then Check
+```{python}
+#| error: true
+print("5" * "3")
+```
 
-Colab has an AI assistant built in, Gemini, if your account offers it; any chatbot does the same job.
+`TypeError`: the operation makes no sense for these kinds of value.
 
-- Ask it to **explain** an error, or a line you do not understand
-- Lecture 1's policy holds: use it, say so, and you are responsible for every number you submit
-- In these lectures, ask it to explain rather than to write: a line you cannot read is a line you cannot check
+```{python}
+#| error: true
+Print("hello")
+```
 
-. . .
+`NameError` again, and the reason matters: **Python is case sensitive**. `Print`, `print` and `PRINT` are three different names.
 
-Lecture 10 hands it the keyboard, once you can tell when it is wrong.
+## How to Solve an Error
+
+1. Read the **last line** of the message
+2. Look at the line it points to, and the one above
+3. Check the obvious: capital letters, quotes, brackets, commas
+4. Copy the error message into a search engine or an AI assistant
+5. Ask a neighbour, then ask me
+
+Steps 1 to 3 solve most errors in this module, and they take twenty seconds.
+
+**Until Lecture 10, type the code yourself**, and ask an AI assistant to **explain**, not to write: a line you cannot read is a line you cannot check.
 
 ## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
 ### Break it, fix it
 
-Each line has one mistake. Run **each line in its own cell**, read the last line of the error, and fix it:
+This cell should print what each of Meta's 833 purchases cost, but it holds **three** mistakes:
 
 ```{.python}
-insta = pd.read_csv("insta_data.csv")
-insta["Reach"].median()
-insta[insta["format"] = "image"]
-insta[insta["format"] == "reel" & insta["reach"] > 50000]
+Purchases = 833
+ad_spend = 24345.78
+cost = ad_spend / purchases
+print("Cost per purchase: " + cost)
+Print(round(cost, 2))
 ```
 
-::: {.fragment}
-The fixes: `"insta-data.csv"` with a hyphen; `"reach"` in lower case; `==` to compare; brackets around each condition.
-:::
+1. Type it in one code cell, as it is, and run it
+2. Read the **last line** of the error
+3. Fix that one mistake, and run it again
+4. Repeat until the cost prints twice
 
 ::: {#timer6_4 .timer seconds="300" starton="interaction"}
 :::
+
+## Solution
+
+```{python}
+purchases = 833                       # was Purchases, then used as purchases
+ad_spend = 24345.78
+cost = ad_spend / purchases
+print("Cost per purchase:", cost)     # was "Cost per purchase: " + cost
+print(round(cost, 2))                 # was Print
+```
+
+€29.23 of ad spend for each purchase. Three errors, three lessons: a name must be spelt the same way every time, text and numbers do not add up, and `Print` is not `print`. Stuck on an error? Paste it into an AI assistant and ask it to explain it in one sentence.
 
 ## {background="#43464B"}
 

@@ -67,6 +67,7 @@ wide, 12 frames a second, 128 colours.
 |---|---|---|
 | `tableau_dual_axis.gif` | "Line and Area Charts" (Dual Axis) | `tableau_dual_axis.gif` (26.7 MB), stopped at frame 885, before the screen-recording dock appears |
 | `tableau_sheet_tooltip.gif` | "Tooltip Advanced" | `tableau_sheet_tooltip.gif` (54.2 MB), frame 950 to the end: Insert, Sheets, then hover |
+| `tableau_show_filter_menu.png` | "Highlighter, Step by Step" (since 27 October 2026) | frame 280 of `tableau_sheet_tooltip.gif`, the top of the pill menu: Show Filter, Show Highlighter |
 | `tableau_linecharts.png` | "Line and Area Charts" (resources) | `tableau_linecharts.png`, unchanged |
 | `tableau_alias_1.png`, `tableau_alias_2.png` | "Variable Alias" | unchanged |
 | `dashboard_types.png` | "Dashboard Types" | unchanged; from Dashboard Design Patterns |
@@ -84,7 +85,6 @@ No longer used by lecture 5 since 13 October 2026, kept for now:
 | `tableau_map.gif` | "Mapping with Tableau" | `tableau_sheet_tooltip.gif` (54.2 MB), frames 420 to 961: Location, Show Me, filled map |
 | `tableau_data_icons.png` | "Space and Time Variables" | frame 150 of `tableau_dual_axis.gif`, the Data pane |
 | `tableau_date_menu.png` | "Date Parts or Date Values?" | frame 280 of `tableau_sheet_tooltip.gif`, the date pill menu |
-| `tableau_show_filter_menu.png` | "Filter and Highlighter Menus" | the same frame, top of the menu |
 | `tableau_tooltip_editor.png` | "Tooltips" | frame 995 of `tableau_sheet_tooltip.gif`, the Edit Tooltip dialog |
 | `tableau_publish_as.png` | "Publish" | crop of `tableau_public.png` |
 | `tableau_alias_dialog.png` | "Aliases" | crop of `tableau_alias_2.png` |
@@ -93,3 +93,13 @@ No longer used by lecture 5 since 13 October 2026, kept for now:
 Compression, with the frame range of each GIF:
 
     ffmpeg -i in.gif -vf "trim=start_frame=A:end_frame=B,setpts=PTS-STARTPTS,fps=12,scale=1050:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=128:stats_mode=diff[p];[s1][p]paletteuse=dither=none:diff_mode=rectangle" out.gif
+
+## Used by lecture 6
+
+Since 27 October 2026, for "Language vs Interface", taken from BAA1118's lecture 1, where
+the two pictures stay remote.
+
+| File | Where | Made from |
+|---|---|---|
+| `car_motor.jpeg` | "Language vs Interface" | `car_motor.jpeg`, resized from 3008 to 1600 px wide (1.4 MB to about 0.3 MB) |
+| `car_dashboard.jpeg` | "Language vs Interface" | the lecture 5 copy above |

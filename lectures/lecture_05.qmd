@@ -159,15 +159,18 @@ More details about Tableau and time series figures, among other resources found 
 
 ## Live Example: Loomrow Over Time {.center .concept}
 
-## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B" .smaller}
 
 ### Loomrow over time
 
-With `insta-data.csv`:
+Open `insta-data.csv` in Tableau Public (**Create a Viz** → **Upload from computer**):
 
-1. Check that `posted_at` has a calendar icon
-2. `reach` by month: which month peaks? Which Lecture 3 post explains it?
-3. `spend_eur` and `attributed_revenue_eur` by month on a synchronised dual axis: how much revenue per euro spent?
+1. On **Sheet 1**: `posted_at` on **Columns**, then its menu → the second **Month** (the one with a year)
+2. `reach` on **Rows**
+3. New sheet: `posted_at` on **Columns**, then its menu → the second **Month** again
+4. `spend_eur` on **Rows**, then `attributed_revenue_eur` next to it
+5. Menu of `attributed_revenue_eur` → **Dual Axis**
+6. Menu of the right axis → **Synchronise Axis**
 
 ::: {#timer5_1 .timer seconds="300" starton="interaction"}
 :::
@@ -249,16 +252,18 @@ A symbol map (left) and a filled map (right)
 
 ## Live Example: Mapping Loomrow's Ads {.center .concept}
 
-## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B" .smaller}
 
 ### Map Loomrow's ads
 
-From Loop, download `ads-by-country.csv`, then with `insta-data.csv`:
+From Loop, download `ads-by-country.csv`, then in your workbook with `insta-data.csv`:
 
-1. Relate the two files on `post_id`, and check the totals
-2. `country` should have a globe icon: a symbol map of `purchases`. Where do the sales come from?
-3. A filled map of the return on ad spend, `SUM([Purchase Value Eur]) / SUM([Amount Spent Eur])`: where does a euro go furthest?
-4. Belgium and Italy: how many purchases behind them?
+1. On the **Data Source** page: **+** beside **Connections** → **Upload from computer** → `ads-by-country.csv`
+2. Drag `ads-by-country.csv` next to the `insta-data.csv` box: the link reads `Post Id` = `Post Id`
+3. If `country` has no globe icon in the Data pane: its menu → **Geographic Role** → **Country/Region**
+4. New sheet: `country` on **Columns**, **Show Me** → symbol map, then `purchases` on **Size**
+5. **Analysis** → **Create Calculated Field**: name it `ROAS`, type `SUM([Purchase Value Eur]) / SUM([Amount Spent Eur])`, then **OK**
+6. New sheet: `country` on **Columns**, **Show Me** → filled map, then `ROAS` on **Colour**
 
 ::: {#timer5_2 .timer seconds="420" starton="interaction"}
 :::
@@ -331,15 +336,17 @@ An alias renames one category; a **group** merges several categories into one: t
 Source: Group Your Data, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/sortgroup_groups_creating.htm)
 :::
 
-## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B" .smaller}
 
 ### Rename and group
 
-With `insta-data.csv`:
+With `insta-data.csv`, in the Data pane:
 
-1. Alias `is_paid`: **False** as Organic, **True** as Paid
-2. Group the campaigns into **Launches** and **Sales**
-3. `SUM([Attributed Revenue Eur]) / SUM([Spend Eur])` by campaign group: which group returns more per euro spent?
+1. Menu of `is_paid` → **Aliases...**: type Organic for **False** and Paid for **True**, then **OK**
+2. Menu of `campaign` → **Create** → **Group...**
+3. Select SS25_Launch, AW25_Preorder and SS26_Launch ({{< fa brands windows >}} <kbd>Ctrl</kbd> or {{< fa brands apple >}} <kbd>⌘ Cmd</kbd> + click), click **Group**, and name it Launches
+4. The same with Summer_Sale_25, Black_Friday_25 and Deadstock_Drop_26: name it Sales, then **OK**
+5. New sheet: `campaign (group)` on **Columns**, `reach` on **Rows**, `is_paid` on **Colour** (**Null** is the posts with no campaign)
 
 ::: {#timer5_3 .timer seconds="300" starton="interaction"}
 :::
@@ -497,51 +504,56 @@ Two ways to put more in a tooltip:
 
 ![](./figures/dd/tableau_sheet_tooltip.gif){fig-align="center" style="max-height:380px;"}
 
-## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B" .smaller}
 
 ### Labels and tooltips
 
 On your sheet of `reach` by month:
 
-1. Label the highest month, and annotate it with the post that explains it
-2. Rewrite the tooltip as a sentence, with the number of posts
-3. Insert a sheet in the tooltip: `reach` by `format` for the month under the cursor
+1. Click **Label** in the Marks card, tick **Show mark labels**, then **Min/Max**
+2. Menu of the highest point → **Annotate** → **Mark...** → **OK**
+3. `post_id` on **Tooltip**, then its menu → **Measure** → **Count (Distinct)**
+4. Click **Tooltip**: keep the three fields in `< >`, delete their names, and type around them `In <MONTH(Posted At)>, reach was <SUM(Reach)> accounts from <CNTD(Post Id)> posts`
+5. New sheet: `format` on **Columns**, `reach` on **Rows**
+6. Back on the monthly sheet: **Tooltip** → **Insert** → **Sheets** → the new sheet
 
 ::: {#timer5_5 .timer seconds="360" starton="interaction"}
 :::
 
 ## Filters and Highlighters {.center .concept}
 
-## Local Filters
+## Filter or Highlight? {.smaller}
 
-A **filter** displays only specific data. Drag a variable onto the **Filters** shelf, then select what to keep: categories for a categorical variable, values for a continuous one.
+![](./figures/loomrow/viz_filter_highlight.png){fig-align="center" style="max-height:320px;"}
 
-![](https://help.tableau.com/current/pro/desktop/en-us/Img/filtering-drag.gif){fig-align="center" style="max-height:320px;"}
+| | Filter | Highlighter |
+|------------------------|------------------------------|----------------------------------------------|
+| What you do not select | **removed** from the figure | **kept**, but dimmed |
+| Use it to | focus on the selection | compare the selection with the rest |
+| In Tableau | drag the variable onto **Filters** | menu of the variable → **Show Highlighter** |
 
-::: {style="font-size:0.5em;text-align:center;"}
-Source: Filter Data from Your Views, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/filtering.htm)
-:::
+Alone, 507,491 accounts say little; next to the other themes, sustainability is clearly the lowest.
 
-## Types of Filters {.smaller}
+## Filter, Step by Step {.smaller}
 
-:::: {layout="[1.35,1]"}
+:::: {layout="[1.6,1]"}
 ::: {#first-column}
 
-The filter dialog depends on the variable:
+To keep only sustainability in `reach` by `theme`:
 
-- A **Dimension** (categories) has four tabs:
-    - **General**: tick the categories to keep
-    - **Wildcard**: the names that contain, start or end with a text
-    - **Condition**: the categories whose measure meets a rule, e.g., a `SUM([Reach])` of at least 10,000
-    - **Top**: the top or bottom *N*, e.g., the 10 posts with the highest `SUM([Reach])`
-- A **Measure** keeps a range of values: at least, at most, or between two values
-- A **Date** keeps a range of dates, **relative dates** (e.g., the last 3 months), or date parts (e.g., the years 2025 and 2026)
+1. Drag `theme` from the Data pane onto **Filters**
+2. In the dialog, tick only sustainability, then **OK**: the other themes leave the figure
+3. A filter menu appears beside the figure, for the readers (in the desktop app: menu of `theme` on **Filters** ({{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click) → **Show Filter**)
+4. Drop-down arrow of the filter menu → its style, e.g., **Single Value (list)** or **Multiple Values (dropdown)**
+5. To filter several sheets at once: menu of `theme` on **Filters** → **Apply to Worksheets** → **All Using This Data Source**
+
+Other options in the dialog: the **Top** tab (e.g., the 10 posts with the highest `reach`), or a range for a measure or a date.
 
 :::
 
 ::: {#second-column}
 
-![](https://help.tableau.com/current/pro/desktop/en-us/Img/filtering-drag1.png){fig-align="center" style="max-height:360px;"}
+![](https://help.tableau.com/current/pro/desktop/en-us/Img/filtering-drag.gif){fig-align="center" style="max-height:380px;"}
 
 :::
 ::::
@@ -550,104 +562,44 @@ The filter dialog depends on the variable:
 Source: Filter Data from Your Views, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/filtering.htm)
 :::
 
-## Local Filter Menu {.smaller}
-
-A **filter menu** (a *filter card* in Tableau Help) lets the readers make their own selection.
-
-:::: {layout="[1.5,1]"}
-::: {#first-column}
-
-**Add it**:
-
-1. Click **Analysis** in the top toolbar → **Filters** → the variable the readers choose from
-2. Customise the menu from its drop-down arrow
-
-[{{< fa circle-arrow-right >}}]{style="color:#2a78d6;"} Note: the same result comes from the **Filters** shelf: open the menu of the variable → **Show Filter**.
-
-**Choose its style**:
-
-- **Single value**: a list, a drop-down or a slider
-- **Multiple values**: a list or a drop-down
-- **Range**: a slider, for measures and dates
-
-Tick **Only Relevant Values** to hide the values that the other filters exclude.
-
-:::
-
-::: {#second-column}
-
-![](https://help.tableau.com/current/pro/desktop/en-us/Img/show_filter2.gif){fig-align="center" style="max-height:400px;"}
-
-:::
-::::
-
-::: {style="font-size:0.5em;text-align:center;"}
-Source: Filter Data from Your Views, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/filtering.htm)
-:::
-
-## One Filter, Several Sheets {.smaller}
-
-By default, a filter only changes its own sheet. On a dashboard, the readers expect one filter menu to change all the figures.
+## Highlighter, Step by Step {.smaller}
 
 :::: {layout="[1.1,1]"}
 ::: {#first-column}
 
-On the **Filters** shelf, open the menu of the variable → **Apply to Worksheets**:
+To show sustainability among all the themes in `reach` by `theme`:
 
-- **All Using Related Data Sources**: every sheet using `insta-data.csv` or `ads-by-country.csv`, related on `post_id`
-- **All Using This Data Source**: every sheet using the same data source
-- **Selected Worksheets...**: the sheets you tick
-- **Only This Worksheet**: the default
-
-A filter shared by several sheets gets an icon on the Filters shelf.
+1. Menu of `theme` on **Rows** ({{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click) → **Show Highlighter**, just below **Show Filter**
+2. A highlighter menu appears beside the figure: pick sustainability in it, or type its first letters
+3. Its bar stays in colour and the other themes are dimmed: none leaves the figure
+4. On a dashboard, the same highlighter works on every sheet that uses `theme`
 
 :::
 
 ::: {#second-column}
 
-![](https://help.tableau.com/current/pro/desktop/en-us/Img/shared_filters4.png){fig-align="center" style="max-height:320px;"}
+![](./figures/dd/tableau_show_filter_menu.png){fig-align="center" style="max-height:180px;"}
+
+![](https://cdnl.tblsft.com/sites/default/files/blog/third_highlighter.gif){fig-align="center" style="max-height:260px;"}
 
 :::
 ::::
 
 ::: {style="font-size:0.5em;text-align:center;"}
-Source: Apply Filters to Multiple Worksheets, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/filtering_global.htm)
+Sources: Highlight Data Points in Context, Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desktop/en-us/actions_highlight_highlighter.htm) and Tableau [{{< fa link >}}](https://www.tableau.com/blog/check-out-new-highlighter-tableau-10-54969)
 :::
 
-## Local Highlighter Menu {.smaller}
-
-A **highlighter menu** lets the readers focus the figures on some categories. Unlike a filter, it keeps all the data in the figure: the categories not selected are only dimmed.
-
-:::: {layout="[1,1.2]"}
-::: {#first-column}
-
-**Add it**:
-
-1. Click **Analysis** in the top toolbar → **Highlighters** → the variable the readers highlight from
-2. Customise the menu from its drop-down arrow (fewer options than a filter menu)
-
-On a dashboard, the highlighter menu applies to all the figures that use the highlighted variable.
-
-:::
-
-::: {#second-column}
-
-![](https://cdnl.tblsft.com/sites/default/files/blog/third_highlighter.gif){fig-align="center" style="max-height:300px;"}
-
-:::
-::::
-
-::: {style="font-size:0.5em;text-align:center;"}
-Source: Quickly Find Marks in Context with Tableau 10's New Highlighter, Tableau [{{< fa link >}}](https://www.tableau.com/blog/check-out-new-highlighter-tableau-10-54969)
-:::
-
-## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B" .smaller}
 
 ### Filter and highlight
 
-1. A filter menu on `format` (multiple values, drop-down) on your monthly sheet, applied to all the sheets using `insta-data.csv`
-2. A bar chart of the 10 posts with the highest `reach` (a Top filter on `post_id`): which formats and themes?
-3. `reach` by `theme`: a filter on `theme`, then a highlighter. Select customer in each: where does it rank?
+1. On your monthly sheet: `format` on **Filters**, click **All**, then **OK**: a filter menu appears (in the desktop app: menu of `format` on **Filters** → **Show Filter**)
+2. Drop-down arrow of the filter menu → **Multiple Values (dropdown)**
+3. Menu of `format` on **Filters** → **Apply to Worksheets** → **All Using This Data Source**
+4. New sheet: `post_id` on **Rows**, `reach` on **Columns**
+5. Drag `post_id` from the Data pane onto **Filters** → **Top** tab → **By field**: Top 10 by Reach, then **OK**
+6. New sheet: `theme` on **Rows**, `reach` on **Columns**
+7. Menu of `theme` on **Rows** → **Show Highlighter**, then select customer in it
 
 ::: {#timer5_6 .timer seconds="420" starton="interaction"}
 :::
@@ -1187,14 +1139,14 @@ Source: Tableau Help [{{< fa link >}}](https://help.tableau.com/current/pro/desk
 
 ## Global Filter and Highlight Actions {.smaller}
 
-With the default settings, an action changes all the figures of the dashboard when the reader hovers over a figure, clicks on it, or selects a value from a menu.
+The same difference as on a sheet, for every figure of the dashboard: the reader hovers over a figure, clicks on it, or picks a value from a menu.
 
 :::: {layout="[1,1]"}
 ::: {#first-column}
 
-- **Highlight actions** are **the easiest way to make a dashboard smart**: with **Hover** as the trigger, the figures react together as the cursor moves.
+- **Highlight action**: the other marks are **dimmed**, as with a highlighter. With **Hover** as the trigger, it is **the easiest way to make a dashboard smart**: the figures react together as the cursor moves.
 
-- **Filter actions** are useful too, but **confusing with Hover or Select** as the trigger, as the figures keep changing: trigger them from a **Menu** instead.
+- **Filter action**: the other marks are **removed**, as with a filter. It is **confusing with Hover or Select** as the trigger, as the figures keep changing: run it from a **Menu** instead.
 
 :::
 
@@ -1241,11 +1193,13 @@ Source: Actions, Tableau Help [{{< fa link >}}](https://help.tableau.com/current
 
 ### Your Loomrow dashboard
 
-One dashboard, fixed size 1200 × 800 px, to answer: **which format should Loomrow post more of, and why?**
-
-1. Four sheets: percent of posts by `format`, box plots of `reach` by `format`, `reach` by month, return on ad spend by `country`
-2. A title and a story: introduction, analysis, conclusion
-3. A **Highlight** action on Hover, and a **Filter** action on Menu from the map
+1. Click the **New Dashboard** icon, at the bottom
+2. In **Size**, on the left, keep **Fixed size** and type 1200 × 800
+3. Drag four sheets onto the dashboard: `reach` by month, the filled map, and two others
+4. From **Objects**, drag **Text** to the top, and type a title
+5. Drag another **Text** under the figures, and write the story: introduction, analysis, conclusion
+6. **Dashboard** → **Actions** → **Add Action** → **Highlight**: run on **Hover**, then **OK**
+7. **Add Action** → **Filter**: tick only the map in **Source Sheets**, run on **Menu**, then **OK** twice
 
 Start now, finish at home.
 

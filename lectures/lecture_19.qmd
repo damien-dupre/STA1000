@@ -423,5 +423,5 @@ this lecture, and it generalises well past A/B tests.
 Regression, as a way of asking which levers move the number when you cannot run
 the experiment.
 
-**Prepare**: bring your joined traffic-and-spend table, like Lecture 9's GA4
-and Meta merge. We model it.
+**Prepare**: bring a table of your conversions and spend by week and channel,
+merged with `pd.merge` and checked as in Lecture 8. We model it.

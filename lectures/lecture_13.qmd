@@ -344,8 +344,8 @@ as four separate channels.
 
 **Write your conventions in a spreadsheet before your first campaign.** All
 lowercase, no spaces, a fixed vocabulary for medium. This spreadsheet is the
-join key: Lecture 9's merge only worked once both campaign names were in lower
-case.
+join key: a merge of GA4 and Meta Ads data only works once both write the
+campaign names the same way, in lower case.
 
 ## What Not to Tag
 

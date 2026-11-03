@@ -1,5 +1,5 @@
 ---
-title: "Lecture 7: Python II - Calculate, Group and Merge"
+title: "Lecture 7: Python II - Tables with pandas"
 subtitle: STA1000 - Data Analytics and Metrics
 jupyter: python3
 filters:
@@ -8,44 +8,364 @@ filters:
 
 ```{python}
 #| include: false
-# The slides read the repository copies of the data; students read the files they
+# The slides read the repository copy of the data; students read the file they
 # uploaded to Colab, which is the code shown on the slides.
 import pandas as pd
 pd.set_option("display.max_columns", 7)
-pd.set_option("display.max_rows", 12)
+pd.set_option("display.max_rows", 8)
 pd.set_option("display.width", 80)
 insta = pd.read_csv("../data/insta-data.csv")
-insta["posted_at"] = pd.to_datetime(insta["posted_at"])
-posts = pd.read_csv("../data/merge/insta-posts.csv")
-ads = pd.read_csv("../data/merge/meta-ads.csv")
-countries = pd.read_csv("../data/maps/ads-by-country.csv")
 ```
 
 ## Previously ...
 
-- In Lecture 6 you opened `insta-data.csv` in Colab, read the type of each column, and filtered and sorted its rows with pandas.
+- In Lecture 6 you wrote your first lines of Python in Colab: variables, types, comparisons, and errors read from their last line.
 
 **Today, three questions:**
 
-1. How do you **calculate** a new column, and use the **dates**?
-2. How do you **group** the rows, to compare formats, months or campaigns?
-3. How do you **merge** two files, and check that nothing went wrong?
+1. How do you **open** a table with pandas, and **look** at it?
+2. How do you **select** columns, **filter** rows and **sort** them?
+3. How do you **add** a column, and **save** the result?
+
+# 1. Open a Table with pandas
+
+## From Spreadsheet to DataFrame
+
+![](./figures/external/ubc_spreadsheet_dataframe.png){fig-align="center" style="max-height:260px;"}
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: UBC Master of Data Science, Programming in Python for Data Science [{{< fa link >}}](https://prog-learn.mds.ubc.ca/)
+:::
+
+pandas calls a table a **DataFrame**: a spreadsheet with one row per observation, one column per variable, a type for each column, and no hidden formulas.
+
+## pandas
+
+**pandas** is the Python library for tables. `import pandas as pd` loads it under the short name `pd`, which every example online and every AI answer assumes. Everything you clicked in Tableau has its line:
+
+::: {style="font-size:0.6em; line-height:1.3;"}
+
+| In Tableau | In pandas | When |
+|---|---|---|
+| Connect to a text file | `pd.read_csv("insta-data.csv")` | Today |
+| The Abc, # and calendar icons | `insta.info()` | Today |
+| The Filters shelf | `insta[insta["format"] == "reel"]` | Today |
+| A calculated field | `insta["rate"] = insta["likes"] / insta["reach"]` | Today |
+| A dimension on Rows, `SUM` of a measure | `insta.groupby("format")["reach"].sum()` | Lecture 8 |
+| A relationship, or a join | `pd.merge(posts, ads, on="post_id", how="left")` | Lecture 8 |
+| Show Me | `insta["format"].value_counts().plot(kind="bar")` | Lecture 9 |
+
+:::
+
+Every pandas command starts with `pd.` or with the name of a table, and works on **whole columns at once**.
 
 ## Today's Notebook
 
-A new notebook, `STA1000 Lecture 7`. From Loop, upload four files: `insta-data.csv`, `insta-posts.csv`, `meta-ads.csv` and `ads-by-country.csv`. Then, in the first cell:
+A new notebook, `STA1000 Lecture 7`. Python runs on Google's computer, and your file is on your laptop: the file has to be **uploaded to the runtime** first.
+
+1. From Loop, download `insta-data.csv`
+2. In Colab, click the {{< fa folder >}} **Files** icon in the left sidebar
+3. Drag the file into the panel, or use its upload button
+4. It appears in the list: Python can now read it by its name
+
+[{{< fa triangle-exclamation >}}]{style="color:#e34948;"} **Uploaded files are deleted with the runtime.** Next session, upload them again.
+
+## Read the File
+
+In the first cell:
 
 ```{.python}
 import pandas as pd
 insta = pd.read_csv("insta-data.csv")
-insta["posted_at"] = pd.to_datetime(insta["posted_at"])
 ```
 
-. . .
+- `pd.read_csv()` reads a CSV file into a DataFrame
+- `insta =` stores that table under a name of your choice. From now on, `insta` **is** the table
+- The name of the file goes **between quotes**, exactly as it is spelt in the Files panel
 
-The first cell of every notebook does the same three things: load pandas, read the file, fix the types. **Runtime** → **Restart session and run all** should always bring you back here.
+Nothing is shown: `=` stores, it does not display. To see the table, run its name.
 
-# 1. Calculate
+## Show the Table
+
+```{python}
+insta
+```
+
+The 431 posts of Lectures 2 to 5, in Python: Colab shows the first and last rows, and the size underneath. The first cell of every notebook loads pandas and reads the file: **Runtime** → **Restart session and run all** should always bring you back here.
+
+## When the File Is Not Found
+
+```
+FileNotFoundError: [Errno 2] No such file or directory: 'insta_data.csv'
+```
+
+The last line means exactly what it says. Four checks:
+
+1. Is the file in the **Files** panel? Upload it again after every restart
+2. Is the name spelt **exactly**? Here the file is `insta-data.csv`, with a hyphen
+3. Is the **extension** there? Windows and macOS hide it, Python does not: `insta-data` is not `insta-data.csv`
+4. Colab runs on Linux, where **capitals matter**: `Insta-data.csv` is another file
+
+Better than checking: {{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click on the file in the Files panel → **Copy path**, and paste it between the quotes.
+
+## Rows, Columns, Names
+
+```{python}
+insta.shape
+```
+
+```{python}
+insta.head(3)
+```
+
+- `.shape`: the number of rows, then of columns
+- `.head()`: the first 5 rows, or as many as you ask for. `.tail()`: the last ones
+- `.columns`: the names of the columns
+
+## The Type of Each Column
+
+:::: {layout="[1.1,1]"}
+::: {#first-column}
+
+```{.python}
+insta.info()
+```
+
+```
+ #   Column           Non-Null Count  Dtype
+---  ------           --------------  -----
+ 0   post_id          431 non-null    object
+ 1   posted_at        431 non-null    object
+ 2   format           431 non-null    object
+ ...
+ 5   campaign         206 non-null    object
+ 6   is_paid          431 non-null    bool
+ ...
+ 10  reach            431 non-null    int64
+ ...
+ 23  spend_eur        431 non-null    float64
+```
+
+:::
+
+::: {#second-column}
+
+::: {style="font-size:0.75em; line-height:1.3;"}
+
+| pandas | Lecture 6 | Tableau |
+|---|---|---|
+| `object`: text | `str` | Abc |
+| `int64`: whole numbers | `int` | # |
+| `float64`: decimals | `float` | # |
+| `bool`: True or False | `bool` | T\|F |
+| `datetime64`: dates | | calendar |
+
+Newer versions of pandas write `str` for text.
+
+**Non-Null Count**: `campaign` has 206 values out of 431. The 225 others are **missing**: Lecture 8 comes back to them.
+
+:::
+
+:::
+::::
+
+## One Column
+
+```{python}
+insta["reach"]
+```
+
+- The name of the table, square brackets, and the name of the column in quotes
+- Spelt **exactly** as in the file: `insta["Reach"]` fails, the column is `reach`
+- One column is a **Series**: its values, with the row numbers on their left
+
+## The Key Figures of a Column
+
+```{python}
+insta["reach"].describe()
+```
+
+Lecture 3's key figures in one line. The mean (9,788) is almost twice the median (5,184): a few huge posts pull it up, starting with LR0184 and its 535,086 accounts.
+
+One at a time: `.mean()`, `.median()`, `.sum()`, `.min()`, `.max()`. A cell shows only its **last** result: to see several, wrap each in `print()`.
+
+## Count the Categories
+
+```{python}
+insta["format"].value_counts()
+```
+
+```{python}
+insta["format"].value_counts(normalize=True)
+```
+
+`normalize=True` turns the counts into proportions, Lecture 3's composition: 47% of the posts are reels.
+
+## The Five Lines You Always Run
+
+```{.python}
+insta.head()                      # what does a row look like?
+insta.shape                       # how big is the table?
+insta.info()                      # the type of each column, and what is missing
+insta["reach"].describe()         # the key figures of a number
+insta["format"].value_counts()    # the categories of a text column
+```
+
+**Never analyse a table you have not looked at.** Most analytical errors are a wrong assumption about the data, made in the first five minutes.
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### A first look at Loomrow
+
+Start from your first cell, which reads the file. Then type each block in its own code cell, and run it:
+
+```{.python}
+# 1. rows and columns
+insta.shape
+
+# 2. the type of each column, in the Dtype column
+insta.info()
+
+# 3. the mean and the median of the likes
+print(insta["likes"].mean())
+print(insta["likes"].median())
+
+# 4. the share of the posts in each product line
+insta["product_line"].value_counts(normalize=True)
+
+# 5. the revenue for each euro spent on ads
+insta["attributed_revenue_eur"].sum() / insta["spend_eur"].sum()
+```
+
+::: {#timer7_1 .timer seconds="360" starton="interaction"}
+:::
+
+## Solution
+
+```{python}
+print(insta.shape)
+print(insta["likes"].mean())
+print(insta["likes"].median())
+```
+
+`.info()`: 6 text columns, `posted_at` among them until Lecture 8 turns it into a date; 19 numbers; and `is_paid`, True or False. Mean 463 against median 278 likes: a few huge posts pull the mean up, the same skew as reach.
+
+## Solution (continued)
+
+```{python}
+print(insta["product_line"].value_counts(normalize=True))
+print(insta["attributed_revenue_eur"].sum() / insta["spend_eur"].sum())
+```
+
+The five product lines share the posts almost equally, 18% to 21% each. And €3.16 of revenue for each euro spent, as you computed by hand in Lecture 6.
+
+# 2. Select, Filter, Sort
+
+## Several Columns
+
+```{python}
+insta[["post_id", "format", "reach"]]
+```
+
+- `["post_id", "format", "reach"]` is a **list**: several values between square brackets, separated by commas
+- The outer pair of brackets selects. **One** pair gives one column; **two** pairs, a list inside, give a table
+
+## Comparison Operators
+
+| Operator | Meaning |
+|:--|:--|
+| `==` | equal to |
+| `!=` | not equal to |
+| `>` `<` | greater than, less than |
+| `>=` `<=` | greater or equal, less or equal |
+
+[{{< fa triangle-exclamation >}}]{style="color:#e34948;"} **`=` stores, `==` compares.** Mixing them up happens to everyone.
+
+Lecture 6 compared one value at a time. On a column, pandas compares every row at once: one `True` or `False` per post.
+
+## Filter the Rows
+
+```{python}
+reels = insta[insta["format"] == "reel"]
+reels.shape
+```
+
+- `insta["format"] == "reel"` is Lecture 6's comparison, made for every row: True or False. `insta[...]` keeps the rows where it is True
+- The **Filters** shelf of Tableau, written down
+- `==` compares, `=` stores: `insta["format"] = "reel"` would replace every format with "reel"
+
+## What `&` Does
+
+![](./figures/external/ubc_filter_and.png){fig-align="center" style="max-height:360px;"}
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: UBC Master of Data Science, Programming in Python for Data Science [{{< fa link >}}](https://prog-learn.mds.ubc.ca/)
+:::
+
+Each condition keeps some rows; `&` keeps only the rows **both** conditions keep.
+
+## Two Conditions at Once
+
+```{python}
+insta[(insta["format"] == "reel") & (insta["reach"] > 50000)]
+```
+
+- `&` keeps the rows where **both** conditions are True; `|` where **either** is
+- Each condition in its **own brackets**. Without them, Python reads `"reel" & insta["reach"]` first, and fails
+
+## Sort the Rows
+
+```{python}
+top = insta.sort_values("reach", ascending=False)
+top[["post_id", "posted_at", "format", "reach"]].head(5)
+```
+
+`ascending=False` puts the largest first. Lecture 3's reel, LR0184, tops the list with a reach almost four times the next one.
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### Question the posts
+
+Type each block in its own code cell, and run it:
+
+```{.python}
+# 1. the five posts with the largest reach
+top = insta.sort_values("reach", ascending=False)
+top[["post_id", "format", "product_line"]].head(5)
+
+# 2. the number of paid posts, and their median reach
+paid = insta[insta["is_paid"] == True]
+print(paid.shape)
+print(paid["reach"].median())
+
+# 3. the reels that reached more than 50,000 accounts, by product line
+big_reels = insta[(insta["format"] == "reel") & (insta["reach"] > 50000)]
+big_reels["product_line"].value_counts()
+```
+
+::: {#timer7_2 .timer seconds="420" starton="interaction"}
+:::
+
+## Solution
+
+```{python}
+top = insta.sort_values("reach", ascending=False)
+print(top[["post_id", "format", "product_line"]].head(5))
+paid = insta[insta["is_paid"] == True]
+print(paid.shape, paid["reach"].median())
+big_reels = insta[(insta["format"] == "reel") & (insta["reach"] > 50000)]
+print(big_reels["product_line"].value_counts())
+```
+
+## Solution (continued)
+
+- Accessories has two of the five largest posts, both reels: LR0184 and LR0402
+- 127 paid posts, with a median reach of 5,585: barely more than the 5,184 of all posts
+- Three reels above 50,000: two Accessories, one Knitwear. Only one of the three was paid
+
+A filter keeps a **copy**: `insta` still holds all 431 posts. Nothing you filter or sort is lost.
+
+# 3. Add a Column, Save a Table
 
 ## A New Column
 
@@ -60,290 +380,45 @@ insta[["post_id", "likes", "comments", "saves", "shares", "engagements"]].head(3
 ## A Rate
 
 ```{python}
-insta["engagement_rate"] = insta["engagements"] / insta["reach"]
+insta["engagement_rate"] = insta["engagements"] / insta["reach"] * 100
 insta[["post_id", "format", "engagements", "reach", "engagement_rate"]].head(3)
 ```
 
-`+`, `-`, `*` and `/` work between columns, or with a number: `insta["reach"] / 1000` gives the reach in thousands.
+`+`, `-`, `*` and `/` work between columns, or with a number: `* 100` gives a percentage, and `insta["reach"] / 1000` gives the reach in thousands.
 
-## Average of the Rates, or Rate of the Totals?
+## Keep a Result, Save a Result
 
-```{python}
-print(insta["engagement_rate"].mean())
-print(insta["engagements"].sum() / insta["reach"].sum())
+```{.python}
+paid = insta[insta["is_paid"] == True]
+paid.to_csv("paid-posts.csv", index=False)
 ```
 
-Lecture 4's row level against aggregate, in two lines:
-
-- The **average of the rates**, 6.4%, gives each of the 431 posts the same weight
-- The **rate of the totals**, 5.7%, gives each account reached the same weight
-
-. . .
-
-"Loomrow's engagement rate" is the second: **divide the totals**, never average the rates.
-
-## Date Parts and Date Values
-
-```{python}
-insta["year"] = insta["posted_at"].dt.year
-insta["weekday"] = insta["posted_at"].dt.day_name()
-insta["month"] = insta["posted_at"].dt.to_period("M")
-insta[["posted_at", "year", "weekday", "month"]].head(3)
-```
-
-`.dt` opens the date toolbox of a date column. As in Lecture 5:
-
-- **Date parts**: `.dt.year`, `.dt.month`, `.dt.day_name()`: "Monday" means every Monday
-- **Date values**: `.dt.to_period("M")` means that month only, 2025-01; `"Q"` for quarters, `"W"` for weeks
+- `paid =` keeps the result under a new name. `insta` is unchanged
+- `.to_csv()` writes the table as a file in the Files panel: {{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click on it → **Download**
+- `index=False` stops pandas writing its row numbers as an extra column
 
 ## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
 ### Calculated fields
 
-1. Add `engagements` and `engagement_rate` as above. Which 3 posts have the highest rate, and what is their reach?
-2. Add `follow_rate`: `follows_from_post` over `reach`. Compare the average of the rates with the rate of the totals
-3. Add `weekday`: on which day does Loomrow post most?
-4. Add `month`: which three months had the most posts?
+Type each block in its own code cell, and run it:
 
-::: {#timer7_1 .timer seconds="420" starton="interaction"}
-:::
+```{.python}
+# 1. two new columns
+insta["engagements"] = insta["likes"] + insta["comments"] + insta["saves"] + insta["shares"]
+insta["engagement_rate"] = insta["engagements"] / insta["reach"] * 100
 
-## Solution
-
-```{python}
+# 2. the three posts with the highest engagement rate
 top = insta.sort_values("engagement_rate", ascending=False)
 top[["post_id", "format", "reach", "engagement_rate"]].head(3)
-```
 
-The top rates come from tiny posts: 403 accounts reached, 616, 2,912. A rate needs its denominator next to it.
-
-```{python}
-insta["follow_rate"] = insta["follows_from_post"] / insta["reach"]
-print(insta["follow_rate"].mean())
-print(insta["follows_from_post"].sum() / insta["reach"].sum())
-```
-
-## Solution (continued)
-
-```{python}
-insta["weekday"].value_counts().head(3)
-```
-
-```{python}
-insta["month"].value_counts().head(3)
-```
-
-Mondays, by a whisker. And March 2025, the SS25 launch, has the most posts.
-
-# 2. Group
-
-## Split, Apply, Combine
-
-```{python}
-insta.groupby("format")["reach"].median()
-```
-
-Read it left to right:
-
-1. `.groupby("format")`: **split** the rows by format, as when `format` goes on Rows in Tableau
-2. `["reach"]`: the measure to compute
-3. `.median()`: the aggregation, applied to each group, and **combined** into one result. Or `.sum()`, `.mean()`, `.count()`
-
-## Several Measures at Once
-
-```{python}
-by_format = insta.groupby("format")[["reach", "engagements", "spend_eur"]].sum()
-by_format
-```
-
-Two pairs of brackets again, for a list of columns. The result is a table with one row per format, and the formats as row names.
-
-## A Rate per Group: Divide the Totals
-
-```{python}
-by_format["engagement_rate"] = by_format["engagements"] / by_format["reach"]
-by_format
-```
-
-Group the counts first, then divide: the rate of the totals, per format. Reels reach the most accounts but have the lowest rate: 4.0%, against 8.4% for carousels.
-
-## Several Figures per Group
-
-```{python}
-insta.groupby("format")["reach"].agg(["count", "mean", "median"])
-```
-
-`.agg()` takes a list of aggregations. `count` is the number of posts behind each figure: always show it next to a mean, and the mean next to the median.
-
-## Two Dimensions: a Pivot Table
-
-```{python}
-insta.pivot_table(index="format", columns="is_paid", values="reach", aggfunc="sum")
-```
-
-- `index`: the rows; `columns`: the columns; `values`: the measure; `aggfunc`: the aggregation
-- Tableau's crosstab, with `format` on Rows and `is_paid` on Columns. An Excel pivot table, written down
-
-## Over Time
-
-```{python}
-monthly = insta.groupby("month")["reach"].sum()
-monthly.sort_values(ascending=False).head(3)
-```
-
-Group by a date value, and each month becomes a row: Lecture 5's line chart, as a table. August 2025 is the month of the viral reel. Lecture 8 draws the line.
-
-## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
-
-### Group the posts
-
-1. The median `reach` by `product_line`: which line reaches furthest?
-2. Total `reach` and `engagements` by `theme`, then the engagement rate of each theme: which engages most, and which least?
-3. Paid posts only: total `spend_eur` and `attributed_revenue_eur` by `campaign`, then the revenue per euro spent (`roas`) of each campaign
-4. Total `reach` by `year`: does 2026 reach fewer accounts than 2025?
-
-::: {#timer7_2 .timer seconds="480" starton="interaction"}
-:::
-
-## Solution
-
-```{python}
-insta.groupby("product_line")["reach"].median().sort_values(ascending=False).head(2)
-```
-
-```{python}
-by_theme = insta.groupby("theme")[["reach", "engagements"]].sum()
-by_theme["engagement_rate"] = by_theme["engagements"] / by_theme["reach"]
-by_theme.sort_values("engagement_rate", ascending=False)
-```
-
-**Outerwear** reaches furthest. **Customer** posts engage most; **behind the scenes** least, dragged down by LR0184.
-
-## Solution (continued) {.smaller}
-
-```{python}
+# 3. the paid posts, four of their columns, saved as a file
 paid = insta[insta["is_paid"] == True]
-by_campaign = paid.groupby("campaign")[["spend_eur", "attributed_revenue_eur"]].sum()
-by_campaign["roas"] = by_campaign["attributed_revenue_eur"] / by_campaign["spend_eur"]
-by_campaign.sort_values("roas", ascending=False).round(2)
+paid = paid[["post_id", "format", "spend_eur", "attributed_revenue_eur"]]
+paid.to_csv("paid-posts.csv", index=False)
 ```
 
-```{python}
-insta.groupby("year")["reach"].sum()
-```
-
-**ROAS**, the return on ad spend: €6.97 a euro at Black Friday. And 2026 has **6 months** of data: compare the same months (Lecture 5).
-
-# 3. Merge
-
-## Two Files, One Key
-
-Lecture 4 split the Loomrow data in two, as it arrives from two platforms:
-
-```{.python}
-posts = pd.read_csv("insta-posts.csv")
-ads = pd.read_csv("meta-ads.csv")
-```
-
-```{python}
-print(posts.shape, ads.shape)
-ads.head(3)
-```
-
-`insta-posts.csv` has the 431 posts, from Instagram; `meta-ads.csv` the 127 boosted posts, from Meta Ads Manager. **The key** they share: `post_id`.
-
-## pd.merge()
-
-```{python}
-both = pd.merge(posts, ads, on="post_id", how="left")
-both.shape
-```
-
-- `pd.merge(left, right, ...)`: the two tables, in that order
-- `on="post_id"`: the key, a column present in both
-- `how="left"`: keep every row of the left table, matched or not
-
-The ad columns are added at the end: 23 + 3 = 26 columns, `insta-data.csv` again.
-
-## Which Rows Survive?
-
-:::: {layout="[1,1]"}
-::: {#first-column}
-
-| `how=` | Keeps | Rows |
-|---|---|---|
-| `"inner"` | the keys in **both** | 127 |
-| `"left"` | every row on the **left** | 431 |
-| `"right"` | every row on the **right** | 127 |
-| `"outer"` | every key, from **either** | 431 |
-
-:::
-
-::: {#second-column}
-
-Lecture 4's join types, with the same counts.
-
-`"left"` is almost always the one: keep all your observations, and add information where it exists.
-
-`"inner"`, the default when `how` is left out, drops the 304 organic posts **without a word**.
-
-:::
-::::
-
-## Missing Values After a Merge
-
-A post with no ad has nothing to match in `meta-ads.csv`: its ad columns are **missing**, `NaN`.
-
-```{python}
-print(both["spend_eur"].isna().sum())
-both["spend_eur"] = both["spend_eur"].fillna(0)
-print(both["spend_eur"].sum().round(2))
-```
-
-- `.isna().sum()` counts the missing values: 304, the organic posts
-- `.fillna(0)` replaces them with 0. Right here, because no ad means €0 spent. Wrong for a missing price or a missing age: decide, and say so
-
-## Check Every Merge: Rows and a Total
-
-Before and after each merge, two checks:
-
-1. **The number of rows**: did it change, and should it have?
-2. **A total you know**: €24,345.78 of spend, as in Meta Ads Manager
-
-. . .
-
-```{.python}
-countries = pd.read_csv("ads-by-country.csv")
-```
-
-```{python}
-wrong = pd.merge(insta, countries, on="post_id")
-print(countries.shape, wrong.shape)
-print(wrong["spend_eur"].sum())
-```
-
-`ads-by-country.csv` has **one row per post and country**: each paid post is repeated once per country, and so is its `spend_eur`. Lecture 5's €106,899.36.
-
-## Group First, Then Merge
-
-The question was the spend by country: it needs no merge at all.
-
-```{python}
-by_country = countries.groupby("country")[["amount_spent_eur", "purchase_value_eur"]].sum()
-by_country["roas"] = by_country["purchase_value_eur"] / by_country["amount_spent_eur"]
-by_country.sort_values("amount_spent_eur", ascending=False).head(4).round(2)
-```
-
-When the merge is needed, put the **detailed** table on the left, and bring in the descriptions from the other one: `pd.merge(countries, insta[["post_id", "campaign"]], on="post_id", how="left")` keeps 551 rows.
-
-## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
-
-### Rebuild the Loomrow file
-
-1. Merge `insta-posts.csv` and `meta-ads.csv` with `how="left"`. Check the rows, and the number of missing `spend_eur`
-2. The same with `how="inner"`: how many rows, and which posts are gone?
-3. Fill the missing values of the three ad columns with 0, then check the totals: €24,345.78 spent, €76,928.88 of revenue
-4. Save the result as `insta-rebuilt.csv`, and download it
+Then download `paid-posts.csv` from the **Files** panel.
 
 ::: {#timer7_3 .timer seconds="420" starton="interaction"}
 :::
@@ -351,59 +426,76 @@ When the merge is needed, put the **detailed** table on the left, and bring in t
 ## Solution
 
 ```{python}
-both = pd.merge(posts, ads, on="post_id", how="left")
-print(both.shape, both["spend_eur"].isna().sum())
-print(pd.merge(posts, ads, on="post_id", how="inner").shape)
-ad_columns = ["spend_eur", "attributed_purchases", "attributed_revenue_eur"]
-both[ad_columns] = both[ad_columns].fillna(0)
-print(both[ad_columns].sum())
+top = insta.sort_values("engagement_rate", ascending=False)
+print(top[["post_id", "format", "reach", "engagement_rate"]].head(3))
+paid = insta[insta["is_paid"] == True]
+paid = paid[["post_id", "format", "spend_eur", "attributed_revenue_eur"]]
 ```
 
 ```{.python}
-both.to_csv("insta-rebuilt.csv", index=False)
+paid.to_csv("paid-posts.csv", index=False)
 ```
 
-The inner merge keeps only the 127 boosted posts: the 304 organic ones are gone.
+The top two rates come from tiny posts: 403 and 616 accounts reached. **A rate needs its denominator next to it**: Lecture 8 comes back to it.
 
-## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B" .smaller}
+# 4. When It Breaks
 
-### Where should Loomrow advertise?
+## Read the Last Line
 
-With `ads-by-country.csv`:
+Lecture 6's rule holds for tables: Python stops at the first problem, and the **last line** of the error names it.
 
-1. Total `amount_spent_eur`, `purchases` and `purchase_value_eur` by `country`, sorted by spend
-2. The return on ad spend, `roas`, of each country
-3. Bring in the `campaign` of each post from `insta-data.csv`, with a merge that keeps the 551 rows
-4. A pivot table of the spend, with countries as rows and campaigns as columns: which campaign went furthest into Europe?
+```
+KeyError                                  Traceback (most recent call last)
+...
+KeyError: 'Reach'
+```
 
-::: {#timer7_4 .timer seconds="480" starton="interaction"}
+Skip the middle. Here, there is no column called `Reach`. The column is `reach`.
+
+## Five Errors You Will Meet Today {.smaller}
+
+| The last line says | What happened | The fix |
+|---|---|---|
+| `NameError: name 'insta' is not defined` | The cell that creates `insta` was not run, or the runtime restarted | Run the cells from the top |
+| `KeyError: 'Reach'` | No column with that exact name | Copy the name from `insta.columns` |
+| `FileNotFoundError: ... 'insta_data.csv'` | The file is not in the Files panel, or the name differs | Upload it again; copy its name |
+| `SyntaxError: ... Maybe you meant '==' instead of '='?` | A bracket, a quote, or a `=` for `==` | Python often suggests the fix: read it |
+| `TypeError: Cannot perform 'rand_' with a dtyped [int64] array ...` | Two conditions joined by `&` without their brackets | One pair of brackets around each condition |
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### Break it, fix it
+
+Each line holds **one** mistake. Type each line in its own code cell, exactly as it is:
+
+```{.python}
+insta = pd.read_csv("insta_data.csv")
+insta["Reach"].median()
+insta[insta["format"] = "image"]
+insta[insta["format"] == "reel" & insta["reach"] > 50000]
+```
+
+1. Run each cell, and read the **last line** of its error
+2. Fix the mistake, and run it again until it works
+
+::: {#timer7_4 .timer seconds="300" starton="interaction"}
 :::
 
-## Solution {.smaller}
+## Solution
 
-```{python}
-columns = ["amount_spent_eur", "purchases", "purchase_value_eur"]
-by_country = countries.groupby("country")[columns].sum()
-by_country["roas"] = by_country["purchase_value_eur"] / by_country["amount_spent_eur"]
-by_country.sort_values("amount_spent_eur", ascending=False).round(2)
+| Line | Error | The fix |
+|:--|:--|:--|
+| 1 | `FileNotFoundError` | a hyphen: `"insta-data.csv"` |
+| 2 | `KeyError` | lower case: `"reach"` |
+| 3 | `SyntaxError` | `==` to compare |
+| 4 | `TypeError` | brackets around each condition |
+
+```{.python}
+insta = pd.read_csv("insta-data.csv")
+insta["reach"].median()
+insta[insta["format"] == "image"]
+insta[(insta["format"] == "reel") & (insta["reach"] > 50000)]
 ```
-
-Ireland: 54% of the spend, €4.06 a euro. The decision is the **United Kingdom**: a fifth of the budget, at €1.92. Belgium's €3.55 rests on 15 purchases, Italy's €0.65 on 2.
-
-## Solution (continued) {.smaller}
-
-```{python}
-with_campaign = pd.merge(countries, insta[["post_id", "campaign"]], on="post_id", how="left")
-print(with_campaign.shape)
-```
-
-```{python}
-spend = with_campaign.pivot_table(index="country", columns="campaign",
-                                  values="amount_spent_eur", aggfunc="sum")
-spend.round(0)
-```
-
-A blank cell, `NaN`, is a country the campaign never reached. **Black Friday** reached 8 countries; SS25 Launch only Ireland and the United Kingdom.
 
 ## {background="#43464B"}
 

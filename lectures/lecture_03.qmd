@@ -184,7 +184,9 @@ In Tableau, **categorical = Dimension** and **continuous = Measure**.
 
 ## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
-### Which family of figures?
+### Find the family of figures
+
+Write **Composition**, **Distribution**, **Comparison** or **Relationship**
 
 | Variable(s) in `insta-data.csv` | Family |
 |---|---|
@@ -399,17 +401,18 @@ Tableau does not draw every distribution figure:
 - A Measure on **Rows** is a **SUM** by default: open its menu → **Measure** → **Average**. 
 - Alternatively, the same menu offers **Median** if needed.
 
-## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B" .smaller}
 
 ### Composition and distribution in Tableau
 
-With `insta-data.csv`, one worksheet each:
+Open `insta-data.csv` in Tableau Public (**Create a Viz** → **Upload from computer**). For a new sheet, click the **New Worksheet** icon at the bottom.
 
-1. Posts per `format`: count, then percent of total
-2. A pie chart of `is_paid`
-3. A histogram of `reach`: where are most posts?
-4. A box plot of `reach`, `post_id` on Detail: which post is the highest dot?
-5. `reach` as an **Average**, then as a **Median**: which would you report?
+1. On **Sheet 1**: `format` on **Columns**, `insta-data.csv (Count)` on **Rows**
+2. Menu of the count pill → **Quick Table Calculation** → **Percent of Total**
+3. New sheet: `is_paid` on **Columns**, `insta-data.csv (Count)` on **Rows**, then **Show Me** → pie chart
+4. New sheet: `reach` on **Rows**, then **Show Me** → histogram
+5. New sheet: `reach` on **Rows**, `post_id` on **Detail**, then **Show Me** → box-and-whisker plot
+6. New sheet: `reach` on **Rows**, then its menu → **Measure** → **Average**; then the same menu → **Measure** → **Median**
 
 ::: {#timer3_2 .timer seconds="360" starton="interaction"}
 :::
@@ -485,16 +488,18 @@ The scatterplot is the best way to show the relationship between **2 Measures**,
 
 Two Measures on **Columns** and **Rows**, each switched to **Dimension**. **Analytics** pane → **Trend Line** → Linear. A Dimension on **Colour** gives one line per group: hover a line to read its R² and p-value.
 
-## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B" .smaller}
 
 ### Comparison and relationship in Tableau
 
-1. Number of posts per `format`, with `is_paid` on **Colour**
-2. Box plots of `reach` by `format`: which format has the highest median?
-3. Average `reach` by `format`: which format wins now, and why?
-4. A scatterplot of `impressions` against `likes` with a trend line, then `format` on **Colour**: which format earns the most likes per impression?
+For a new sheet, click the **New Worksheet** icon at the bottom.
 
-Save the workbook to your Tableau Public profile: Lecture 5 turns these sheets into a dashboard.
+1. New sheet: `format` on **Columns**, `insta-data.csv (Count)` on **Rows**, `is_paid` on **Colour**
+2. New sheet: `reach` on **Rows**, `post_id` on **Detail**, **Show Me** → box-and-whisker plot, then `format` on **Columns**
+3. New sheet: `format` on **Columns**, `reach` on **Rows**, then the menu of `reach` → **Measure** → **Average**
+4. New sheet: `impressions` on **Columns**, `likes` on **Rows**, then each pill's menu → **Dimension**
+5. In the **Analytics** pane, drag **Trend Line** into the view and drop it on **Linear**; back in the **Data** pane, `format` on **Colour**
+6. Click **Publish As...**, top right, name the workbook, and click **Publish**
 
 ::: {#timer3_3 .timer seconds="360" starton="interaction"}
 :::

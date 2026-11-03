@@ -291,9 +291,13 @@ Label the lines directly: a legend sends the eye back and forth, here in a diffe
 
 ## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
-### What's wrong here?
+### Spot the problem in each chart
 
-For each of the next charts find what is wrong
+For each of the next charts:
+
+1. Look at the chart for 30 seconds
+2. Name the principles it breaks, from 1 to 5
+3. Compare with the answer that appears on the slide
 
 ## What's Wrong Here? {.smaller}
 
@@ -421,7 +425,7 @@ Source: Mistakes, we've drawn a few, The Economist on Medium [{{< fa link >}}](h
 
 ## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B" .smaller}
 
-### Ask an AI what's wrong
+### Ask an AI to critique a chart
 
 :::: {layout="[1,1]"}
 ::: {#first-column}
@@ -432,9 +436,11 @@ Source: Mistakes, we've drawn a few, The Economist on Medium [{{< fa link >}}](h
 
 ::: {#second-column}
 
-1. Copy this chart: {{< fa brands windows >}} <kbd>⊞ Win</kbd> + <kbd>⇧ Shift</kbd> + <kbd>S</kbd> or {{< fa brands apple >}} <kbd>⌘ Cmd</kbd> + <kbd>⌃ Control</kbd> + <kbd>⇧ Shift</kbd> + <kbd>4</kbd>
-2. Paste it into an AI assistant and ask: *"What is wrong with this chart?"*
-3. Compare with your own answer: what did it find that you missed? What did it miss? Did it invent a fault?
+1. Copy this chart: {{< fa brands windows >}} <kbd>⊞ Win</kbd> + <kbd>⇧ Shift</kbd> + <kbd>S</kbd> or {{< fa brands apple >}} <kbd>⌘ Cmd</kbd> + <kbd>⌃ Control</kbd> + <kbd>⇧ Shift</kbd> + <kbd>4</kbd>, then drag over the chart
+2. Open an AI assistant (Copilot, ChatGPT, Gemini ...)
+3. Paste the chart: {{< fa brands windows >}} <kbd>Ctrl</kbd> + <kbd>V</kbd> or {{< fa brands apple >}} <kbd>⌘ Cmd</kbd> + <kbd>V</kbd>
+4. Type *List the problems in this chart*, and send it
+5. Read its answer: the next slide gives ours
 
 :::
 ::::
@@ -596,7 +602,7 @@ gives you the **rate of the totals**: **5.7%**, which is almost always what you 
 
 ### Pivot and calculate
 
-Open `insta-data.csv` in a new Tableau workbook.
+New workbook: **Create a Viz** → **Upload from computer** → `insta-data.csv`.
 
 :::: {layout="[1,1]"}
 ::: {#first-column}
@@ -605,9 +611,7 @@ Open `insta-data.csv` in a new Tableau workbook.
 
 1. Select `reach_followers` and `reach_non_followers`: {{< fa brands windows >}} <kbd>Ctrl</kbd> + click or {{< fa brands apple >}} <kbd>⌘ Cmd</kbd> + click
 2. Click the drop-down arrow of one of them → **Pivot**
-3. Rename **Pivot Field Names** as `audience` and **Pivot Field Values** as `audience_reach`
-
-Check: the table now has 862 rows, two per post.
+3. Menu of **Pivot Field Names** → **Rename**: `audience`; the same for **Pivot Field Values**: `audience_reach`
 
 :::
 
@@ -615,9 +619,9 @@ Check: the table now has 862 rows, two per post.
 
 **On Sheet 1**
 
-4. **Analysis** → **Create Calculated Field**: `Engagements`, with `[Likes] + [Comments] + [Saves] + [Shares]`
-5. A second one: `Engagement Rate`, with `SUM([Engagements]) / SUM([Reach])`
-6. `format` on **Columns**, `Engagement Rate` on **Rows**: **which format has the highest rate, and which the lowest?**
+4. **Analysis** → **Create Calculated Field**: name it `Engagements`, type `[Likes] + [Comments] + [Saves] + [Shares]`, then **OK**
+5. The same for `Engagement Rate`: `SUM([Engagements]) / SUM([Reach])`
+6. `format` on **Columns**, `Engagement Rate` on **Rows**
 
 :::
 ::::
@@ -781,22 +785,22 @@ Download `insta-posts.csv` and `meta-ads.csv` from Loop.
 :::: {layout="[1,1]"}
 ::: {#first-column}
 
-**A relationship**, in a new workbook
+**A relationship**
 
-1. Open `insta-posts.csv`, then the plus sign beside **Connections** → **Text file** → `meta-ads.csv`
-2. Drag `meta-ads.csv` next to the `insta-posts.csv` box: check `Post Id` = `Post Id`
-3. Sheet 1: `insta-posts.csv (Count)` and `spend_eur` on **Text**: **how many posts, and how much was spent?**
-4. Calculated field `ROAS`: `SUM([Attributed Revenue Eur]) / SUM([Spend Eur])`, then `format` on **Columns** and `ROAS` on **Rows**: **which format returns the most per euro?**
+1. **Create a Viz**, and upload `insta-posts.csv`
+2. **+** beside **Connections**, and upload `meta-ads.csv`
+3. Drag `meta-ads.csv` next to the `insta-posts.csv` box: the link reads `Post Id` = `Post Id`
+4. On **Sheet 1**: `format` on **Columns**, `spend_eur` on **Rows**
 
 :::
 
 ::: {#second-column}
 
-**A join**, after **File** → **New**
+**A join**, back on the **Data Source** page
 
-5. Open `insta-posts.csv`, **double-click** its box, and drag `meta-ads.csv` into the window that opens
-6. Click the two circles between the tables: the join is **Inner**, on `Post Id`
-7. Count the posts as in step 3: **how many now? Which posts have gone, and why?**
+5. Menu of the `meta-ads.csv` box → **Remove**
+6. **Double-click** the `insta-posts.csv` box, and drag `meta-ads.csv` from the left panel into it
+7. Click the two circles between the tables → **Left**
 
 :::
 ::::

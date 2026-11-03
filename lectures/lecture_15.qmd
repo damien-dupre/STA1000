@@ -15,7 +15,7 @@ Now we look at what has actually arrived.
 
 By the end of this lecture you will be able to:
 
-- Export your GA4 data and read it with pandas, as in Lecture 9
+- Export your GA4 data and read it with pandas, as in Lecture 11
 - State the **grain** of a table before you build anything on it
 - Distinguish dimensions from measures, and say why the distinction is not cosmetic
 - Interrogate the **provenance** of a dataset you did not collect yourself
@@ -187,8 +187,8 @@ mean on your own site, depending on the grain of the numerator and denominator.
 ## Dimensions and Measures, in GA4 Columns {.smaller}
 
 Lecture 2 split every column into **dimensions** (categorical, they slice) and
-**measures** (continuous, they aggregate). Lecture 9 showed the consequences on
-Loomrow's export; now it is your own.
+**measures** (continuous, they aggregate). Lecture 8 showed the consequences on
+Loomrow's posts, with the average of the rates; now it is your own export.
 
 :::: {layout="[1,1]"}
 ::: {#first-column}
@@ -261,7 +261,7 @@ A factor of three, from one plausible-looking `.mean()`.
 
 ::: {.callout-note appearance="minimal"}
 The fix is to export a numerator and a denominator and divide them in pandas,
-as in Lecture 9, never to export the ratio. What does that mean for the export you set up in
+as in Lecture 8, never to export the ratio. What does that mean for the export you set up in
 part 2?
 :::
 
@@ -281,7 +281,7 @@ part 2?
 
 ## Exercise {background="#43464B"}
 
-Read your own export in Colab, as in Lecture 9, and build:
+Read your own export in Colab, as in Lecture 11, and build:
 
 1. Sessions over time
 2. Sessions by device category, **with counts shown beside every rate**

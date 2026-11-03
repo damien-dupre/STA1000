@@ -5,8 +5,9 @@ subtitle: STA1000 - Data Analytics and Metrics
 
 ## Previously ...
 
-Five lectures of Python. All of it assumed the data was real, and Lecture 9
-found bots, a payment page and a link in bio that were not what they seemed.
+Four lectures of Python, then an agent. All of it assumed the data was real.
+Today, Loomrow's website data: bots, a payment page and a link in bio that are
+not what they seem.
 
 ## Learning Outcomes
 
@@ -203,9 +204,35 @@ module opened with in Lecture 1.
 
 # 3. Practice
 
+## Read Loomrow's GA4 Export {.smaller}
+
+`ga4-export.csv`, on Loop: the sessions of Loomrow's website, 1 January 2025 to
+24 June 2026, one row per day, source, campaign, device and country. Three changes
+from the way you read `insta-data.csv`:
+
+```{.python}
+import pandas as pd
+ga4 = pd.read_csv("ga4-export.csv", comment="#")
+ga4 = ga4.rename(columns={"Date": "date", "Session default channel group": "channel",
+                          "Session source / medium": "source_medium",
+                          "Device category": "device", "Country": "country",
+                          "Sessions": "sessions", "Ecommerce purchases": "purchases",
+                          "Purchase revenue": "revenue"})
+ga4["date"] = pd.to_datetime(ga4["date"], format="%Y%m%d")
+```
+
+- `comment="#"`: GA4 writes notes above the table, on lines that start with `#`.
+  Without it, `ParserError`
+- `.rename()` with a **dictionary**, `{"old name": "new name"}`: GA4's names have
+  spaces and capitals
+- `format="%Y%m%d"`: GA4 writes its dates as `20250101`. Without it, every date
+  becomes 1 January 1970, **with no warning**
+
+The check: 25,242 rows and 177,124 sessions.
+
 ## Exercise {background="#43464B"}
 
-On Loomrow's GA4 export from Lecture 9:
+On Loomrow's GA4 export:
 
 1. Find the bot traffic and the PayPal sessions, and write the rule for each
 2. Write the cleaning steps as pandas lines, from the raw export to a clean table
