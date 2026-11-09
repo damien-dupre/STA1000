@@ -245,7 +245,16 @@ insta["format"].value_counts(normalize=True)
 
 `normalize=True` turns the counts into proportions, Lecture 3's composition: 47% of the posts are reels.
 
-## The Five Lines You Always Run
+## The Lines You Always Run
+
+```{.python}
+# first cell: run it first, and again after every restart
+import pandas as pd
+insta = pd.read_csv("insta-data.csv")
+insta["posted_at"] = pd.to_datetime(insta["posted_at"])
+```
+
+Then, each in a new cell below it:
 
 ```{.python}
 insta.head()                      # what does a row look like?
@@ -261,7 +270,7 @@ insta["format"].value_counts()    # the categories of a text column
 
 ### A first look
 
-Replace each `____` with the missing word, then run the cell:
+In a new cell, replace each `____` with the missing word, and run it:
 
 1. The number of rows and columns, with `.shape`
 2. The mean and the median of the likes, with `.mean()` and `.median()`
@@ -328,7 +337,7 @@ ads.head(3)
 
 ### Select and rename
 
-Replace each `____` with the missing word, then run the cell. Column names go in quotes, like `"format"`:
+In a new cell, replace each `____` with the missing word, and run it. Column names go in quotes, like `"format"`:
 
 1. Keep only `post_id`, `product_line` and `attributed_purchases`, in a new table called `small`
 2. In `small`, rename `attributed_purchases` to `purchases`
@@ -416,8 +425,8 @@ print(len(big_reels), len(reels_or_big))
 
 ```{python}
 two_lines = insta[insta["product_line"].isin(["Denim", "Knitwear"])]
-small_posts = insta[insta["reach"].between(1000, 2000)]
-print(len(two_lines), len(small_posts))
+low_reach = insta[insta["reach"].between(1000, 2000)]
+print(len(two_lines), len(low_reach))
 ```
 
 - `isin([...])` keeps the rows whose value is **any** of a list: 171 Denim or Knitwear posts
@@ -427,30 +436,30 @@ print(len(two_lines), len(small_posts))
 ## Sorting Rows
 
 ```{python}
-top = insta.sort_values("reach", ascending=False)
-top[["post_id", "posted_at", "format", "reach"]].head(3)
+by_reach = insta.sort_values("reach", ascending=False)
+by_reach[["post_id", "posted_at", "format", "reach"]].head(3)
 ```
 
 - `sort_values("reach")` puts the smallest first; with `ascending=False`, the largest
 - After a sort, `.head(3)` gives the top three: Lecture 3's reel, LR0184, first, with almost four times the reach of the next one
-- `top` holds the same 431 posts in another order: a filter or a sort makes a **copy**, and `insta` is unchanged
+- `by_reach` holds the same 431 posts in another order: a filter or a sort makes a **copy**, and `insta` is unchanged
 
 ## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
-### Filter
+### Filter and sort
 
-Replace each `____` with the missing word, then run the cell:
+In a new cell, replace each `____` with the missing word, and run it:
 
 1. Keep the paid posts, in a table called `paid`: `is_paid` is `True`
 2. From `paid`, keep the rows where `"format"` is `"carousel"`, in `paid_carousels`
-3. Sort them by reach, the largest first
+3. Sort `paid_carousels` by reach, the largest first
 
 ```{.python}
 paid = insta[insta["is_paid"] == ____]
 paid_carousels = paid[paid[____] == "carousel"]
 print(len(paid), len(paid_carousels))
-top = paid_carousels.sort_values("reach", ascending=____)
-top[["post_id", "product_line", "reach"]].head(3)
+paid_carousels = paid_carousels.sort_values("reach", ascending=____)
+paid_carousels[["post_id", "product_line", "reach"]].head(3)
 ```
 
 ::: {style="max-width:80%;"}
@@ -466,11 +475,11 @@ You should see `127 45`, then LR0342, a Dresses carousel, first, with 45,649 acc
 paid = insta[insta["is_paid"] == True]
 paid_carousels = paid[paid["format"] == "carousel"]
 print(len(paid), len(paid_carousels))
-top = paid_carousels.sort_values("reach", ascending=False)
-top[["post_id", "product_line", "reach"]].head(3)
+paid_carousels = paid_carousels.sort_values("reach", ascending=False)
+paid_carousels[["post_id", "product_line", "reach"]].head(3)
 ```
 
-`True` and `False` take no quotes: like numbers, they are values, not text.
+`True` and `False` take no quotes: like numbers, they are values, not text. With `"True"`, no row matches: the cell prints `0 0`, without an error.
 
 # 4. Creating Columns and Saving Tables
 
@@ -508,23 +517,23 @@ paid.to_csv("paid-posts.csv", index=False)
 
 ## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
-### New columns
+### Create and save
 
-Replace each `____` with the missing word, then run the cell:
+In a new cell, replace each `____` with the missing word, and run it. Names of columns and files go in quotes:
 
 1. A column `non_followers_pct`: `reach_non_followers` as a % of `reach`
-2. The posts with the highest share first, with `.sort_values()`
-3. The sorted table saved as `non-followers.csv`: download it afterwards
+2. In `by_non_followers`, the posts sorted by `non_followers_pct`, the highest first
+3. `by_non_followers` saved as `non-followers.csv`: download it afterwards
 
 ```{.python}
 insta["non_followers_pct"] = insta[____] / insta["reach"] * 100
-top = insta.sort_values(____, ascending=False)
-top.to_csv(____, index=False)
-top[["post_id", "format", "non_followers_pct"]].head(3).round(1)
+by_non_followers = insta.sort_values(____, ascending=False)
+by_non_followers.to_csv(____, index=False)
+by_non_followers[["post_id", "format", "non_followers_pct"]].head(3).round(1)
 ```
 
 ::: {style="max-width:80%;"}
-You should see three reels, LR0184, LR0267 and LR0402, each above 95%.
+You should see three reels above 95%, LR0184 first.
 :::
 
 ::: {#timer7_4 .timer seconds="300" starton="interaction"}
@@ -534,17 +543,17 @@ You should see three reels, LR0184, LR0267 and LR0402, each above 95%.
 
 ```{.python}
 insta["non_followers_pct"] = insta["reach_non_followers"] / insta["reach"] * 100
-top = insta.sort_values("non_followers_pct", ascending=False)
-top.to_csv("non-followers.csv", index=False)
-top[["post_id", "format", "non_followers_pct"]].head(3).round(1)
+by_non_followers = insta.sort_values("non_followers_pct", ascending=False)
+by_non_followers.to_csv("non-followers.csv", index=False)
+by_non_followers[["post_id", "format", "non_followers_pct"]].head(3).round(1)
 ```
 
 ```{python}
 #| echo: false
 # The same lines as above, without writing the file during the render
 insta["non_followers_pct"] = insta["reach_non_followers"] / insta["reach"] * 100
-top = insta.sort_values("non_followers_pct", ascending=False)
-top[["post_id", "format", "non_followers_pct"]].head(3).round(1)
+by_non_followers = insta.sort_values("non_followers_pct", ascending=False)
+by_non_followers[["post_id", "format", "non_followers_pct"]].head(3).round(1)
 ```
 
 The three posts that travelled furthest beyond the followers are the three reels above 50,000 accounts: reels are shown to people who do not follow Loomrow yet.
