@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<script src="lecture_07_files/libs/clipboard/clipboard.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="lecture_07_files/libs/clipboard/clipboard.min.js"></script>
 <script src="lecture_07_files/libs/quarto-html/tabby.min.js"></script>
 <script src="lecture_07_files/libs/quarto-html/popper.min.js"></script>
 <script src="lecture_07_files/libs/quarto-html/tippy.umd.min.js"></script>
@@ -14,7 +14,7 @@
   <meta name="generator" content="quarto-1.8.25">
 
   <meta name="author" content="Damien Dupré">
-  <title>Lecture 7: Dashboard Build</title>
+  <title>Lecture 7: Python II - Tables with pandas</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -32,8 +32,74 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="lecture_07_files/libs/revealjs/dist/theme/quarto-8ff52f0e31ad5c532cba6b018e3cb49b.css">
+  <link rel="stylesheet" href="lecture_07_files/libs/revealjs/dist/theme/quarto-158af071109d29c7035ba1450a51c90c.css">
   <link href="lecture_07_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="lecture_07_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="lecture_07_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -125,13 +191,16 @@
       margin-right: 0; 
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+  
+  <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 </head>
 <body class="quarto-light">
   <div class="reveal">
     <div class="slides">
 
 <section id="title-slide" data-background-iframe="colored-particles/index.html" class="quarto-title-block center">
-  <h1 class="title">Lecture 7: Dashboard Build</h1>
+  <h1 class="title">Lecture 7: Python II - Tables with pandas</h1>
   <p class="subtitle">STA1000 - Data Analytics and Metrics</p>
 
 <div class="quarto-title-authors">
@@ -145,556 +214,1310 @@ Damien Dupré
 </section>
 <section id="previously" class="slide level2">
 <h2>Previously …</h2>
-<p>Five lectures in Tableau. You have the four families of figure, calculated fields, segments, and the design principles a stakeholder view has to meet.</p>
-<div class="fragment">
-<p>Today you assemble them into the client deliverable, which is also <strong>Assignment 1</strong>.</p>
-</div>
-</section>
-<section id="learning-outcomes" class="slide level2">
-<h2>Learning Outcomes</h2>
-<p>By the end of this lecture you will be able to:</p>
 <ul>
-<li>Design a dashboard around a decision rather than around available data</li>
-<li>Structure a dashboard as title, story and visualisations</li>
-<li>Add interactivity with filter and highlight actions, and useful tooltips</li>
-<li>Publish to Tableau Public and hand the result to somebody else</li>
+<li>In Lecture 6 you wrote your first lines of Python in Colab: variables, types, comparisons, and errors read from their last line.</li>
+</ul>
+<p><strong>Today, three questions:</strong></p>
+<ol type="1">
+<li>How do you <strong>open</strong> a table, and take a <strong>first look</strong> at it?</li>
+<li>How do you keep only the <strong>columns</strong> and the <strong>rows</strong> a question needs, and <strong>sort</strong> them?</li>
+<li>How do you <strong>create</strong> a column, and <strong>save</strong> the result?</li>
+</ol>
+</section>
+<section id="pandas-and-dataframes" class="slide level2">
+<h2>pandas and DataFrames</h2>
+<p><strong>pandas</strong> is Python’s library for tables, and a table in pandas is a <strong>DataFrame</strong>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/external/ubc_spreadsheet_dataframe.png" class="quarto-figure quarto-figure-center" style="max-height:190px;"></p>
+</figure>
+</div>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: UBC Master of Data Science, Programming in Python for Data Science <a href="https://prog-learn.mds.ubc.ca/"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
+<ul>
+<li>Named columns, and rows labelled by an <strong>index</strong></li>
+<li>One column on its own: a <strong>Series</strong></li>
+<li>Every pandas command works on <strong>whole columns at once</strong></li>
 </ul>
 </section>
-<section>
-<section id="design-first" class="title-slide slide level1 center">
-<h1>1. Design First</h1>
-
-</section>
-<section id="start-with-the-decision" class="slide level2">
-<h2>Start With the Decision</h2>
-<p>Open a blank page, not Tableau. Write one sentence:</p>
-<blockquote>
-<p><em>This dashboard exists so that ______ can decide ______.</em></p>
-</blockquote>
-<div class="fragment">
-<p>If you cannot finish the sentence, you are not ready to build. Everything that follows is judged against it: a view that cannot change that decision does not go on the page.</p>
-<div class="callout callout-note no-icon callout-style-simple">
-<div class="callout-body">
-<div class="callout-content">
-<p>This is Lecture 1’s test, applied to a whole page rather than a single number.</p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="dashboards-are-not-all-the-same-thing" class="slide level2 smaller">
-<h2>Dashboards Are Not All the Same Thing</h2>
-<p>Three broad types, and they are built differently:</p>
+<section id="five-operations" class="slide level2">
+<h2>Five Operations</h2>
+<p>Almost every data question needs only five operations, and you have done all five in Tableau:</p>
+<div style="font-size:0.7em; line-height:1.3;">
 <table class="caption-top">
 <colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
+<col style="width: 13%">
+<col style="width: 18%">
+<col style="width: 22%">
+<col style="width: 46%">
 </colgroup>
 <thead>
 <tr class="header">
-<th>Type</th>
-<th>Purpose</th>
-<th>Design consequence</th>
+<th style="text-align: left;">Operation</th>
+<th style="text-align: left;">What it does</th>
+<th style="text-align: left;">In Tableau</th>
+<th style="text-align: left;">In pandas</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><strong>Monitoring</strong></td>
-<td>Is anything wrong right now?</td>
-<td>Few numbers, large, with thresholds</td>
+<td style="text-align: left;"><strong>Selection</strong></td>
+<td style="text-align: left;">keeps columns</td>
+<td style="text-align: left;">the fields you drag in</td>
+<td style="text-align: left;"><code>insta[["format", "reach"]]</code></td>
 </tr>
 <tr class="even">
-<td><strong>Analytic</strong></td>
-<td>Why did this happen?</td>
-<td>Filters, breakdowns, detail on demand</td>
+<td style="text-align: left;"><strong>Reduction</strong></td>
+<td style="text-align: left;">keeps rows</td>
+<td style="text-align: left;">the Filters shelf</td>
+<td style="text-align: left;"><code>insta[insta["format"] == "reel"]</code></td>
 </tr>
 <tr class="odd">
-<td><strong>Communication</strong></td>
-<td>Here is what we found</td>
-<td>Narrative order, written story, fixed conclusion</td>
+<td style="text-align: left;"><strong>Extension</strong></td>
+<td style="text-align: left;">adds a column</td>
+<td style="text-align: left;">a calculated field</td>
+<td style="text-align: left;"><code>insta["rate"] = insta["likes"] / insta["reach"]</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Aggregation</strong></td>
+<td style="text-align: left;">a row per group</td>
+<td style="text-align: left;"><code>SUM</code> by a dimension</td>
+<td style="text-align: left;"><code>insta.groupby("format")["reach"].sum()</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Combination</strong></td>
+<td style="text-align: left;">joins two tables</td>
+<td style="text-align: left;">a relationship or a join</td>
+<td style="text-align: left;"><code>pd.merge(posts, ads, on="post_id", how="left")</code></td>
 </tr>
 </tbody>
 </table>
-<div class="fragment">
-<p><strong>Assignment 1 is a communication dashboard.</strong> It is read once, by somebody who was not in the room, and it has to end somewhere.</p>
-<p><em>See <a href="https://dashboarddesignpatterns.github.io/">Dashboard Design Patterns</a> for the full taxonomy.</em></p>
 </div>
+<p>Today, a first look at the table, then the first three operations, one section each. Lecture 8 does the last two, and Lecture 9 draws the results.</p>
 </section>
-<section id="the-four-step-build" class="slide level2 smaller">
-<h2>The Four-Step Build</h2>
-<p>The order matters, and almost everybody gets it wrong by polishing too early.</p>
+<section id="todays-notebook" class="slide level2">
+<h2>Today’s Notebook</h2>
+<p>A new notebook, <code>STA1000 Lecture 7</code>. Python runs on Google’s computer, and your file is on your laptop: the file has to be <strong>uploaded to the runtime</strong> first.</p>
 <ol type="1">
-<li><strong>Basic figures.</strong> Build many worksheets, all on default settings. Do not style anything</li>
-<li><strong>Basic dashboard.</strong> Assemble the ones that survive, with the title, text and images in place, and no design work at all</li>
-<li><strong>Improve the figures.</strong> Now go back into each worksheet: colour, size, shape, titles, captions, axes, tooltips</li>
-<li><strong>Improve the dashboard.</strong> Background, fonts, layout, containers, actions</li>
+<li>From Loop, download <code>insta-data.csv</code></li>
+<li>In Colab, click the <i class="fa-solid fa-folder" aria-label="folder"></i> <strong>Files</strong> icon in the left sidebar</li>
+<li>Drag the file into the panel, or use its upload button</li>
+<li>It appears in the list: Python can now read it by its name</li>
 </ol>
-<div class="fragment">
-<p><strong>Steps 1 and 2 decide whether the dashboard is any good.</strong> Steps 3 and 4 decide whether it looks it. Doing them in the other order wastes a weekend.</p>
-</div>
+<p><span style="color:#e34948;"><i class="fa-solid fa-triangle-exclamation" aria-label="triangle-exclamation"></i></span> <strong>Uploaded files are deleted with the runtime.</strong> Next session, upload them again.</p>
 </section>
-<section id="the-sketch" class="slide level2">
-<h2>The Sketch</h2>
-<p>Five minutes, pen and paper, before step 2.</p>
+<section>
+<section id="a-first-look" class="title-slide slide level1 center">
+<h1>1. A First Look</h1>
+
+</section>
+<section id="loading-pandas" class="slide level2">
+<h2>Loading pandas</h2>
+<p>In the first cell of every notebook:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a><span class="im">import</span> pandas <span class="im">as</span> pd</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
-<li>What is the <strong>first</strong> thing the reader’s eye lands on?</li>
-<li>What is above the fold, and what needs scrolling?</li>
-<li>Which views are the argument, and which are the evidence?</li>
+<li><code>import</code> loads a <strong>library</strong>, ready-made code for one job: here, tables. Colab has pandas installed already</li>
+<li><code>as pd</code> gives it a short name: every pandas command then starts with <code>pd.</code>, as in <code>pd.read_csv()</code>. Use exactly <code>pd</code>: every example online assumes it</li>
 </ul>
-<div class="fragment">
-<p><strong>Reading order follows the decision</strong>, not the order you happened to build things in.</p>
+<div style="font-size:0.8em;">
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">You see</th>
+<th style="text-align: left;">Why</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>ModuleNotFoundError: No module named 'panda'</code></td>
+<td style="text-align: left;">a typo: <code>pandas</code>, with an s</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>NameError: name 'pd' is not defined</code></td>
+<td style="text-align: left;">the first cell has not run since the session started: run it</td>
+</tr>
+</tbody>
+</table>
 </div>
 </section>
-<section id="layout-conventions" class="slide level2">
-<h2>Layout Conventions</h2>
-<p>Most communication dashboards that work look similar, because Western readers scan the same way:</p>
+<section id="reading-a-csv-file" class="slide level2">
+<h2>Reading a CSV File</h2>
+<p>A <strong>CSV</strong> file is a table written as text (Lecture 2): names on the first line, one row per line, commas between the values. The start of <code>insta-data.csv</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a href=""></a>post_id,posted_at,format,product_line,theme,campaign,is_paid,...</span>
+<span id="cb2-2"><a href=""></a>LR0001,2025-01-08 20:00:00,reel,Knitwear,styling,,False,...</span>
+<span id="cb2-3"><a href=""></a>LR0002,2025-01-08 12:00:00,reel,Knitwear,customer,,False,...</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a>insta <span class="op">=</span> pd.read_csv(<span class="st">"insta-data.csv"</span>)    <span class="co"># first cell, after the import</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
-<li><strong>Headline numbers top-left</strong>: the finding, in figures</li>
-<li><strong>The trend beneath them</strong>: how it got there</li>
-<li><strong>Breakdowns below</strong>: who and what is driving it</li>
-<li><strong>Detail last</strong>, or on demand through a filter</li>
+<li><code>pd.read_csv()</code> reads the text into a <strong>DataFrame</strong>, with a type for each column. The file’s name goes <strong>between quotes</strong>, spelt as in the Files panel</li>
+<li><code>insta =</code> stores the table under a name of your choice. Nothing is shown: <code>=</code> stores, it does not display</li>
+<li>Semicolon files: <code>pd.read_csv("file.csv", sep=";")</code>. Excel files: <code>pd.read_excel("file.xlsx")</code></li>
 </ul>
-<div class="fragment">
-<p>Convention is not a lack of imagination. It is how the reader finds the argument without being taught your layout first.</p>
-</div>
 </section>
-<section id="a-dashboard-that-answers-one-question" class="slide level2 smaller">
-<h2>A Dashboard That Answers One Question</h2>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="./figures/external/qd_dashboard_customer_churn.png" height="340"></p>
-<figcaption>Source: <a href="https://github.com/posit-conf-2024/quarto-dashboards">Quarto Dashboards, posit::conf(2024)</a></figcaption>
-</figure>
-</div>
-<p><em>Three numbers at the top, the reasons underneath, the detail last. You can say what decision it supports in one sentence.</em></p>
+<section id="when-the-file-is-not-found" class="slide level2">
+<h2>When the File Is Not Found</h2>
+<pre><code>FileNotFoundError: [Errno 2] No such file or directory: 'insta_data.csv'</code></pre>
+<p>The last line means exactly what it says. Four checks:</p>
+<ol type="1">
+<li>Is the file in the <strong>Files</strong> panel? A new runtime starts empty: upload it again</li>
+<li>Is the name spelt <strong>exactly</strong>? Here the file is <code>insta-data.csv</code>, with a hyphen</li>
+<li>Is the <strong>extension</strong> there? Windows and macOS hide it, Python does not: <code>insta-data</code> is not <code>insta-data.csv</code></li>
+<li>Colab runs on Linux, where <strong>capitals matter</strong>: <code>Insta-data.csv</code> is another file</li>
+</ol>
+<p>Better than checking: <i class="fa-brands fa-windows" aria-label="windows"></i> right-click / <i class="fa-brands fa-apple" aria-label="apple"></i> <kbd>⌃ Control</kbd> + click on the file in the Files panel → <strong>Copy path</strong>, and paste it between the quotes.</p>
 </section>
-<section id="two-more-for-comparison" class="slide level2 smaller">
-<h2>Two More, For Comparison</h2>
-<div class="quarto-layout-panel" data-layout="[1,1]">
+<section id="the-loomrow-dataset" class="slide level2">
+<h2>The Loomrow Dataset</h2>
+<p>Each row is <strong>a post</strong> on Loomrow’s Instagram account, January 2025 to June 2026: its <code>format</code>, <code>theme</code>, <code>reach</code>, <code>likes</code>, <code>saves</code>, ad spend and revenue.</p>
+<div id="de360a70" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href=""></a>insta.head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe caption-top" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">post_id</th>
+<th data-quarto-table-cell-role="th">posted_at</th>
+<th data-quarto-table-cell-role="th">format</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">spend_eur</th>
+<th data-quarto-table-cell-role="th">attributed_purchases</th>
+<th data-quarto-table-cell-role="th">attributed_revenue_eur</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>LR0001</td>
+<td>2025-01-08 20:00:00</td>
+<td>reel</td>
+<td>...</td>
+<td>0.0</td>
+<td>0</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>LR0002</td>
+<td>2025-01-08 12:00:00</td>
+<td>reel</td>
+<td>...</td>
+<td>0.0</td>
+<td>0</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>LR0003</td>
+<td>2025-01-09 09:00:00</td>
+<td>carousel</td>
+<td>...</td>
+<td>0.0</td>
+<td>0</td>
+<td>0.0</td>
+</tr>
+</tbody>
+</table>
+
+<p>3 rows × 26 columns</p>
+</div>
+</div>
+</div>
+<ul>
+<li><code>.head(3)</code>: the first 3 rows; <code>.tail(3)</code>: the last 3; <code>insta</code> alone: the first and last five, and the size</li>
+<li><strong>Runtime</strong> → <strong>Restart session and run all</strong> reruns the first cell, and brings you back here</li>
+</ul>
+</section>
+<section id="rows-and-columns" class="slide level2">
+<h2>Rows and Columns</h2>
+<div id="9e40316d" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href=""></a>insta.shape</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>(431, 26)</code></pre>
+</div>
+</div>
+<div id="aad91ffc" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href=""></a>insta.columns</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>Index(['post_id', 'posted_at', 'format', 'product_line', 'theme', 'campaign',
+       'is_paid', 'caption_length', 'hashtag_count', 'followers_at_post',
+       'reach', 'impressions', 'reach_followers', 'reach_non_followers',
+       'engagements_followers', 'engagements_non_followers', 'likes',
+       'comments', 'saves', 'shares', 'profile_visits', 'link_clicks',
+       'follows_from_post', 'spend_eur', 'attributed_purchases',
+       'attributed_revenue_eur'],
+      dtype='object')</code></pre>
+</div>
+</div>
+<ul>
+<li><code>.shape</code> gives the number of rows, then of columns: a value, so no round brackets</li>
+<li><code>.columns</code> gives the 26 names: copy a name from here rather than typing it from memory</li>
+</ul>
+</section>
+<section id="the-type-of-each-column" class="slide level2">
+<h2>The Type of Each Column</h2>
+<div class="quarto-layout-panel" data-layout="[1.1,1]">
 <div class="quarto-layout-row">
-<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><strong>Focused</strong></p>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="./figures/external/qd_dashboard_stock_explorer.png" class="quarto-figure quarto-figure-center"></p>
-</figure>
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 52.4%;justify-content: flex-start;">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href=""></a>insta.info()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<pre><code> #   Column           Non-Null Count  Dtype
+---  ------           --------------  -----
+ 0   post_id          431 non-null    object
+ 1   posted_at        431 non-null    object
+ 2   format           431 non-null    object
+ ...
+ 5   campaign         206 non-null    object
+ 6   is_paid          431 non-null    bool
+ ...
+ 10  reach            431 non-null    int64
+ ...
+ 23  spend_eur        431 non-null    float64</code></pre>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 47.6%;justify-content: center;">
+<div style="font-size:0.75em; line-height:1.3;">
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th style="text-align: left;">pandas</th>
+<th style="text-align: left;">Lecture 6</th>
+<th style="text-align: left;">Tableau</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>object</code>: text</td>
+<td style="text-align: left;"><code>str</code></td>
+<td style="text-align: left;">Abc</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>int64</code>: whole numbers</td>
+<td style="text-align: left;"><code>int</code></td>
+<td style="text-align: left;">#</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>float64</code>: decimals</td>
+<td style="text-align: left;"><code>float</code></td>
+<td style="text-align: left;">#</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>bool</code>: True or False</td>
+<td style="text-align: left;"><code>bool</code></td>
+<td style="text-align: left;">T|F</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>datetime64</code>: dates</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">calendar</td>
+</tr>
+</tbody>
+</table>
+<p>Newer versions of pandas write <code>str</code> for text.</p>
+<p><strong>Spot the text</strong>: numbers should be <code>int64</code> or <code>float64</code>. <code>posted_at</code> holds dates as text: the next slide converts it.</p>
+<p><strong>Non-Null Count</strong>: <code>campaign</code> has 206 values out of 431; the 225 others are <strong>missing</strong>.</p>
 </div>
 </div>
-<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<p><strong>Dense</strong></p>
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="./figures/external/qd_dashboard_housing_market.png" class="quarto-figure quarto-figure-center"></p>
-</figure>
 </div>
 </div>
-</div>
-</div>
-<div style="font-size:0.55em;text-align:center;">
-<p>Source: <a href="https://github.com/posit-conf-2024/quarto-dashboards">Quarto Dashboards, posit::conf(2024)</a></p>
-</div>
-<p><em>Both are competent. Only one of them can be read from the back of a room.</em></p>
 </section>
-<section id="what-to-leave-out" class="slide level2">
-<h2>What to Leave Out</h2>
-<!-- Speaker notes: students will want to show everything they built over the
-     block. The discipline of removal is the assessed skill, and it is the one
-     they resist hardest. -->
-<p>Every chart must earn its place by changing a decision. The usual offenders:</p>
+<section id="fix-the-dates" class="slide level2">
+<h2>Fix the Dates</h2>
+<p>In Lecture 5, Tableau recognised <code>posted_at</code> as a date. pandas reads it as text, and one line converts it:</p>
+<div id="16b8e998" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href=""></a>insta[<span class="st">"posted_at"</span>] <span class="op">=</span> pd.to_datetime(insta[<span class="st">"posted_at"</span>])</span>
+<span id="cb12-2"><a href=""></a>insta[<span class="st">"posted_at"</span>].head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>0   2025-01-08 20:00:00
+1   2025-01-08 12:00:00
+2   2025-01-09 09:00:00
+Name: posted_at, dtype: datetime64[ns]</code></pre>
+</div>
+</div>
 <ul>
-<li>A view that duplicates another in a different shape</li>
-<li>A count that nobody would act on</li>
-<li>A breakdown with four posts in a category</li>
-<li>Anything included because it was hard to build</li>
+<li><code>insta["posted_at"] =</code> on the left <strong>replaces</strong> the column with what is on the right</li>
+<li>Add the first line to your <strong>first cell</strong>, which fixes the types, and run that cell again: Lecture 8 groups the posts by month</li>
 </ul>
-<div class="fragment">
-<p><strong>A dashboard is what is left after the removals.</strong> Assignment 1 is marked on storytelling, and a story with seven endings has none.</p>
-</div>
 </section>
-<section id="ten-rules-worth-taping-to-the-wall" class="slide level2 smaller">
-<h2>Ten Rules Worth Taping to the Wall</h2>
+<section id="missing-values" class="slide level2">
+<h2>Missing Values</h2>
+<div id="f66f90ba" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href=""></a>insta[<span class="st">"campaign"</span>].value_counts(dropna<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<pre><code>campaign
+NaN                  225
+SS25_Launch           50
+AW25_Preorder         39
+SS26_Launch           38
+Summer_Sale_25        36
+Deadstock_Drop_26     31
+Black_Friday_25       12
+Name: count, dtype: int64</code></pre>
+</div>
+</div>
+<ul>
+<li><code>NaN</code> marks a missing value: 225 posts went out outside any campaign</li>
+<li><code>insta["campaign"].isna().sum()</code> counts them: <code>.isna()</code> is True where a value is missing, and <code>.sum()</code> counts the True</li>
+<li><strong>Missing does not mean wrong.</strong> Here it means “no campaign”. Find out what it means before you drop or fill it</li>
+</ul>
+</section>
+<section id="the-key-figures-of-a-column" class="slide level2">
+<h2>The Key Figures of a Column</h2>
+<div id="4cc3b04a" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href=""></a>insta[<span class="st">"reach"</span>].describe()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>count       431.000000
+mean       9787.928074
+std       27747.990577
+min         361.000000
+25%        2465.500000
+50%        5184.000000
+75%       10149.500000
+max      535086.000000
+Name: reach, dtype: float64</code></pre>
+</div>
+</div>
+<p>Lecture 3’s key figures in one line. The mean (9,788) is almost twice the median (5,184): a few huge posts pull it up, starting with LR0184 and its 535,086 accounts.</p>
+<p>One at a time: <code>.mean()</code>, <code>.median()</code>, <code>.sum()</code>, <code>.min()</code>, <code>.max()</code>. A cell shows only its <strong>last</strong> result: to see several, wrap each in <code>print()</code>.</p>
+</section>
+<section id="count-the-categories" class="slide level2">
+<h2>Count the Categories</h2>
+<div id="e6a68966" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href=""></a>insta[<span class="st">"format"</span>].value_counts()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>format
+reel        203
+carousel    144
+image        84
+Name: count, dtype: int64</code></pre>
+</div>
+</div>
+<div id="1d938e68" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href=""></a>insta[<span class="st">"format"</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>format
+reel        0.470998
+carousel    0.334107
+image       0.194896
+Name: proportion, dtype: float64</code></pre>
+</div>
+</div>
+<p><code>normalize=True</code> turns the counts into proportions, Lecture 3’s composition: 47% of the posts are reels.</p>
+</section>
+<section id="the-five-lines-you-always-run" class="slide level2">
+<h2>The Five Lines You Always Run</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href=""></a>insta.head()                      <span class="co"># what does a row look like?</span></span>
+<span id="cb22-2"><a href=""></a>insta.shape                       <span class="co"># how big is the table?</span></span>
+<span id="cb22-3"><a href=""></a>insta.info()                      <span class="co"># the type of each column, and what is missing</span></span>
+<span id="cb22-4"><a href=""></a>insta[<span class="st">"reach"</span>].describe()         <span class="co"># the key figures of a number</span></span>
+<span id="cb22-5"><a href=""></a>insta[<span class="st">"format"</span>].value_counts()    <span class="co"># the categories of a text column</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Never analyse a table you have not looked at.</strong> Most analytical errors are a wrong assumption about the data, made in the first five minutes.</p>
+</section>
+<section id="your-turn" class="slide level2" data-background="#43464B">
+<h2><i class="fa-solid fa-screwdriver-wrench" aria-label="screwdriver-wrench"></i> Your Turn!</h2>
+<h3 id="a-first-look-1">A first look</h3>
+<p>Replace each <code>____</code> with the missing word, then run the cell:</p>
+<ol type="1">
+<li>The number of rows and columns, with <code>.shape</code></li>
+<li>The mean and the median of the likes, with <code>.mean()</code> and <code>.median()</code></li>
+<li>The share of the posts in each product line, with <code>normalize=True</code></li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href=""></a><span class="bu">print</span>(insta.____)</span>
+<span id="cb23-2"><a href=""></a><span class="bu">print</span>(insta[<span class="st">"likes"</span>].____(), insta[<span class="st">"likes"</span>].____())</span>
+<span id="cb23-3"><a href=""></a><span class="bu">print</span>(insta[<span class="st">"product_line"</span>].value_counts(normalize<span class="op">=</span>____))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div style="max-width:80%;">
+<p>You should see <code>(431, 26)</code>, then <code>462.97...</code> and <code>278.0</code>. Then the five product lines, each with 0.18 to 0.21 of the posts.</p>
+</div>
+                    <div id="timer7_1"></div>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            initializeTimer("timer7_1", 300, "interaction");
+                        });
+                    </script>
+                
+</section>
+<section id="solution" class="slide level2">
+<h2>Solution</h2>
+<div id="836bed69" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href=""></a><span class="bu">print</span>(insta.shape)</span>
+<span id="cb24-2"><a href=""></a><span class="bu">print</span>(insta[<span class="st">"likes"</span>].mean(), insta[<span class="st">"likes"</span>].median())</span>
+<span id="cb24-3"><a href=""></a><span class="bu">print</span>(insta[<span class="st">"product_line"</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(431, 26)
+462.97447795823666 278.0
+product_line
+Outerwear      0.213457
+Dresses        0.208817
+Denim          0.199536
+Knitwear       0.197216
+Accessories    0.180974
+Name: proportion, dtype: float64</code></pre>
+</div>
+</div>
+<p>A mean of 463 likes against a median of 278: a few big posts pull the mean up, as they do for the reach. Each product line has about a fifth of the posts.</p>
+</section></section>
+<section>
+<section id="selecting-columns" class="title-slide slide level1 center">
+<h1>2. Selecting Columns</h1>
+
+</section>
+<section id="one-column" class="slide level2">
+<h2>One Column</h2>
+<div id="8cf16a7d" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href=""></a>insta[<span class="st">"reach"</span>].head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>0      735
+1     2647
+2    10393
+Name: reach, dtype: int64</code></pre>
+</div>
+</div>
+<ul>
+<li>The name of the table, square brackets, and the name of the column in quotes</li>
+<li>Spelt <strong>exactly</strong> as in the file: <code>insta["Reach"]</code> fails, the column is <code>reach</code></li>
+<li>One column is a <strong>Series</strong>: its values, with the row numbers on their left</li>
+</ul>
+</section>
+<section id="several-columns" class="slide level2">
+<h2>Several Columns</h2>
+<div id="36bca83d" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href=""></a>insta[[<span class="st">"post_id"</span>, <span class="st">"format"</span>, <span class="st">"reach"</span>]].head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe caption-top" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">post_id</th>
+<th data-quarto-table-cell-role="th">format</th>
+<th data-quarto-table-cell-role="th">reach</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>LR0001</td>
+<td>reel</td>
+<td>735</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>LR0002</td>
+<td>reel</td>
+<td>2647</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>LR0003</td>
+<td>carousel</td>
+<td>10393</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<ul>
+<li><code>["post_id", "format", "reach"]</code> is a <strong>list</strong>: several values between square brackets, separated by commas</li>
+<li>The outer pair of brackets selects. <strong>One</strong> pair gives one column; <strong>two</strong> pairs, a list inside, give a table, a <strong>DataFrame</strong></li>
+<li>Keep only the columns a question needs: <code>insta</code> has 26</li>
+</ul>
+</section>
+<section id="renaming-columns" class="slide level2">
+<h2>Renaming Columns</h2>
+<div id="9a1e9034" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href=""></a>ads <span class="op">=</span> insta[[<span class="st">"post_id"</span>, <span class="st">"spend_eur"</span>, <span class="st">"attributed_revenue_eur"</span>]]</span>
+<span id="cb29-2"><a href=""></a>ads <span class="op">=</span> ads.rename(columns<span class="op">=</span>{<span class="st">"spend_eur"</span>: <span class="st">"spend"</span>, <span class="st">"attributed_revenue_eur"</span>: <span class="st">"revenue"</span>})</span>
+<span id="cb29-3"><a href=""></a>ads.head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe caption-top" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">post_id</th>
+<th data-quarto-table-cell-role="th">spend</th>
+<th data-quarto-table-cell-role="th">revenue</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>LR0001</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>LR0002</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>LR0003</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<ul>
+<li><code>rename()</code> takes pairs between curly brackets, <code>{old name: new name}</code>, separated by commas</li>
+<li>It <strong>returns</strong> a new table: without <code>ads =</code> in front, nothing changes</li>
+<li>Only <code>ads</code> changed: <code>insta</code> keeps its own names</li>
+</ul>
+</section>
+<section id="your-turn-1" class="slide level2" data-background="#43464B">
+<h2><i class="fa-solid fa-screwdriver-wrench" aria-label="screwdriver-wrench"></i> Your Turn!</h2>
+<h3 id="select-and-rename">Select and rename</h3>
+<p>Replace each <code>____</code> with the missing word, then run the cell. Column names go in quotes, like <code>"format"</code>:</p>
+<ol type="1">
+<li>Keep only <code>post_id</code>, <code>product_line</code> and <code>attributed_purchases</code>, in a new table called <code>small</code></li>
+<li>In <code>small</code>, rename <code>attributed_purchases</code> to <code>purchases</code></li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href=""></a>small <span class="op">=</span> insta[[____, <span class="st">"product_line"</span>, ____]]</span>
+<span id="cb30-2"><a href=""></a>small <span class="op">=</span> small.rename(columns<span class="op">=</span>{____: <span class="st">"purchases"</span>})</span>
+<span id="cb30-3"><a href=""></a>small.head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div style="max-width:80%;">
+<p>You should see three columns, <code>post_id</code>, <code>product_line</code> and <code>purchases</code>, and LR0001, a Knitwear post, with 0 purchases.</p>
+</div>
+                    <div id="timer7_2"></div>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            initializeTimer("timer7_2", 300, "interaction");
+                        });
+                    </script>
+                
+</section>
+<section id="solution-1" class="slide level2">
+<h2>Solution</h2>
+<div id="d86982d8" class="cell" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href=""></a>small <span class="op">=</span> insta[[<span class="st">"post_id"</span>, <span class="st">"product_line"</span>, <span class="st">"attributed_purchases"</span>]]</span>
+<span id="cb31-2"><a href=""></a>small <span class="op">=</span> small.rename(columns<span class="op">=</span>{<span class="st">"attributed_purchases"</span>: <span class="st">"purchases"</span>})</span>
+<span id="cb31-3"><a href=""></a>small.head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe caption-top" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">post_id</th>
+<th data-quarto-table-cell-role="th">product_line</th>
+<th data-quarto-table-cell-role="th">purchases</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>LR0001</td>
+<td>Knitwear</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>LR0002</td>
+<td>Knitwear</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>LR0003</td>
+<td>Accessories</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>The first posts are organic, so no purchases: Loomrow’s first ad ran with LR0040. <code>insta</code> still has its 26 columns, under their own names.</p>
+</section></section>
+<section>
+<section id="filtering-and-sorting-rows" class="title-slide slide level1 center">
+<h1>3. Filtering and Sorting Rows</h1>
+
+</section>
+<section id="filtering-rows" class="slide level2">
+<h2>Filtering Rows</h2>
+<div id="e329f279" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href=""></a>insta[insta[<span class="st">"format"</span>] <span class="op">==</span> <span class="st">"reel"</span>].head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe caption-top" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">post_id</th>
+<th data-quarto-table-cell-role="th">posted_at</th>
+<th data-quarto-table-cell-role="th">format</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">spend_eur</th>
+<th data-quarto-table-cell-role="th">attributed_purchases</th>
+<th data-quarto-table-cell-role="th">attributed_revenue_eur</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>LR0001</td>
+<td>2025-01-08 20:00:00</td>
+<td>reel</td>
+<td>...</td>
+<td>0.0</td>
+<td>0</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>LR0002</td>
+<td>2025-01-08 12:00:00</td>
+<td>reel</td>
+<td>...</td>
+<td>0.0</td>
+<td>0</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">6</th>
+<td>LR0007</td>
+<td>2025-01-18 17:00:00</td>
+<td>reel</td>
+<td>...</td>
+<td>0.0</td>
+<td>0</td>
+<td>0.0</td>
+</tr>
+</tbody>
+</table>
+
+<p>3 rows × 26 columns</p>
+</div>
+</div>
+</div>
+<ul>
+<li><code>insta["format"] == "reel"</code> gives <code>True</code> or <code>False</code> for every row; the square brackets around it keep the rows that are <code>True</code></li>
+<li>The numbers on the left are the <strong>index</strong>: each row keeps its label, here 0, 1 and 6</li>
+<li>Text goes in quotes, <code>"reel"</code>; numbers do not: <code>insta["reach"] &gt; 50000</code></li>
+</ul>
+</section>
+<section id="comparisons" class="slide level2">
+<h2>Comparisons</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Operator</th>
+<th style="text-align: left;">Means</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>==</code></td>
+<td style="text-align: left;">exactly equal</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>!=</code></td>
+<td style="text-align: left;">not equal</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>&gt;</code> and <code>&gt;=</code></td>
+<td style="text-align: left;">greater than, greater than or equal</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>&lt;</code> and <code>&lt;=</code></td>
+<td style="text-align: left;">less than, less than or equal</td>
+</tr>
+</tbody>
+</table>
+<p>The easiest mistake to make is one <code>=</code> instead of two:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href=""></a>insta[insta[<span class="st">"format"</span>] <span class="op">=</span> <span class="st">"reel"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<pre><code>SyntaxError: cannot assign to subscript here. Maybe you meant '==' instead of '='?</code></pre>
+<p><code>=</code> stores a value, <code>==</code> compares two. Python stops, and suggests the fix.</p>
+</section>
+<section id="what-does" class="slide level2">
+<h2>What <code>&amp;</code> Does</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/external/ubc_filter_and.png" class="quarto-figure quarto-figure-center" style="max-height:360px;"></p>
+</figure>
+</div>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: UBC Master of Data Science, Programming in Python for Data Science <a href="https://prog-learn.mds.ubc.ca/"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
+<p>Each condition keeps some rows; <code>&amp;</code> keeps only the rows <strong>both</strong> conditions keep.</p>
+</section>
+<section id="two-conditions-at-once" class="slide level2">
+<h2>Two Conditions at Once</h2>
+<div id="a0ceebbf" class="cell" data-execution_count="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href=""></a>big_reels <span class="op">=</span> insta[(insta[<span class="st">"format"</span>] <span class="op">==</span> <span class="st">"reel"</span>) <span class="op">&amp;</span> (insta[<span class="st">"reach"</span>] <span class="op">&gt;</span> <span class="dv">50000</span>)]</span>
+<span id="cb35-2"><a href=""></a>reels_or_big <span class="op">=</span> insta[(insta[<span class="st">"format"</span>] <span class="op">==</span> <span class="st">"reel"</span>) <span class="op">|</span> (insta[<span class="st">"reach"</span>] <span class="op">&gt;</span> <span class="dv">50000</span>)]</span>
+<span id="cb35-3"><a href=""></a><span class="bu">print</span>(<span class="bu">len</span>(big_reels), <span class="bu">len</span>(reels_or_big))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>3 206</code></pre>
+</div>
+</div>
+<ul>
+<li><code>&amp;</code> keeps the rows where <strong>both</strong> conditions are True: 3 reels above 50,000 accounts</li>
+<li><code>|</code> keeps the rows where <strong>either</strong> is: the 203 reels, plus the 3 other posts above 50,000</li>
+<li>Each condition in its <strong>own round brackets</strong>: without them, Python reads <code>"reel" &amp; insta["reach"]</code> first, and fails. The words <code>and</code> and <code>or</code> do not work on columns</li>
+<li><code>len()</code> of a table counts its rows</li>
+</ul>
+</section>
+<section id="several-values-at-once" class="slide level2">
+<h2>Several Values at Once</h2>
+<div id="6af520b7" class="cell" data-execution_count="17">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href=""></a>two_lines <span class="op">=</span> insta[insta[<span class="st">"product_line"</span>].isin([<span class="st">"Denim"</span>, <span class="st">"Knitwear"</span>])]</span>
+<span id="cb37-2"><a href=""></a>small_posts <span class="op">=</span> insta[insta[<span class="st">"reach"</span>].between(<span class="dv">1000</span>, <span class="dv">2000</span>)]</span>
+<span id="cb37-3"><a href=""></a><span class="bu">print</span>(<span class="bu">len</span>(two_lines), <span class="bu">len</span>(small_posts))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>171 54</code></pre>
+</div>
+</div>
+<ul>
+<li><code>isin([...])</code> keeps the rows whose value is <strong>any</strong> of a list: 171 Denim or Knitwear posts</li>
+<li><code>between(a, b)</code> keeps the values from a to b, both included: 54 posts reached 1,000 to 2,000 accounts</li>
+<li>Each replaces a chain of conditions: <code>between(1000, 2000)</code> is <code>(insta["reach"] &gt;= 1000) &amp; (insta["reach"] &lt;= 2000)</code></li>
+</ul>
+</section>
+<section id="sorting-rows" class="slide level2">
+<h2>Sorting Rows</h2>
+<div id="43de0e74" class="cell" data-execution_count="18">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href=""></a>top <span class="op">=</span> insta.sort_values(<span class="st">"reach"</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb39-2"><a href=""></a>top[[<span class="st">"post_id"</span>, <span class="st">"posted_at"</span>, <span class="st">"format"</span>, <span class="st">"reach"</span>]].head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe caption-top" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">post_id</th>
+<th data-quarto-table-cell-role="th">posted_at</th>
+<th data-quarto-table-cell-role="th">format</th>
+<th data-quarto-table-cell-role="th">reach</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">183</th>
+<td>LR0184</td>
+<td>2025-08-21 09:00:00</td>
+<td>reel</td>
+<td>535086</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">401</th>
+<td>LR0402</td>
+<td>2026-05-20 13:00:00</td>
+<td>reel</td>
+<td>142218</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">320</th>
+<td>LR0321</td>
+<td>2026-02-10 17:00:00</td>
+<td>carousel</td>
+<td>81482</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<ul>
+<li><code>sort_values("reach")</code> puts the smallest first; with <code>ascending=False</code>, the largest</li>
+<li>After a sort, <code>.head(3)</code> gives the top three: Lecture 3’s reel, LR0184, first, with almost four times the reach of the next one</li>
+<li><code>top</code> holds the same 431 posts in another order: a filter or a sort makes a <strong>copy</strong>, and <code>insta</code> is unchanged</li>
+</ul>
+</section>
+<section id="your-turn-2" class="slide level2" data-background="#43464B">
+<h2><i class="fa-solid fa-screwdriver-wrench" aria-label="screwdriver-wrench"></i> Your Turn!</h2>
+<h3 id="filter">Filter</h3>
+<p>Replace each <code>____</code> with the missing word, then run the cell:</p>
+<ol type="1">
+<li>Keep the paid posts, in a table called <code>paid</code>: <code>is_paid</code> is <code>True</code></li>
+<li>From <code>paid</code>, keep the rows where <code>"format"</code> is <code>"carousel"</code>, in <code>paid_carousels</code></li>
+<li>Sort them by reach, the largest first</li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb40"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href=""></a>paid <span class="op">=</span> insta[insta[<span class="st">"is_paid"</span>] <span class="op">==</span> ____]</span>
+<span id="cb40-2"><a href=""></a>paid_carousels <span class="op">=</span> paid[paid[____] <span class="op">==</span> <span class="st">"carousel"</span>]</span>
+<span id="cb40-3"><a href=""></a><span class="bu">print</span>(<span class="bu">len</span>(paid), <span class="bu">len</span>(paid_carousels))</span>
+<span id="cb40-4"><a href=""></a>top <span class="op">=</span> paid_carousels.sort_values(<span class="st">"reach"</span>, ascending<span class="op">=</span>____)</span>
+<span id="cb40-5"><a href=""></a>top[[<span class="st">"post_id"</span>, <span class="st">"product_line"</span>, <span class="st">"reach"</span>]].head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div style="max-width:80%;">
+<p>You should see <code>127 45</code>, then LR0342, a Dresses carousel, first, with 45,649 accounts.</p>
+</div>
+                    <div id="timer7_3"></div>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            initializeTimer("timer7_3", 300, "interaction");
+                        });
+                    </script>
+                
+</section>
+<section id="solution-2" class="slide level2">
+<h2>Solution</h2>
+<div id="0700318a" class="cell" data-execution_count="19">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href=""></a>paid <span class="op">=</span> insta[insta[<span class="st">"is_paid"</span>] <span class="op">==</span> <span class="va">True</span>]</span>
+<span id="cb41-2"><a href=""></a>paid_carousels <span class="op">=</span> paid[paid[<span class="st">"format"</span>] <span class="op">==</span> <span class="st">"carousel"</span>]</span>
+<span id="cb41-3"><a href=""></a><span class="bu">print</span>(<span class="bu">len</span>(paid), <span class="bu">len</span>(paid_carousels))</span>
+<span id="cb41-4"><a href=""></a>top <span class="op">=</span> paid_carousels.sort_values(<span class="st">"reach"</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb41-5"><a href=""></a>top[[<span class="st">"post_id"</span>, <span class="st">"product_line"</span>, <span class="st">"reach"</span>]].head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>127 45</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe caption-top" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">post_id</th>
+<th data-quarto-table-cell-role="th">product_line</th>
+<th data-quarto-table-cell-role="th">reach</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">341</th>
+<td>LR0342</td>
+<td>Dresses</td>
+<td>45649</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">398</th>
+<td>LR0399</td>
+<td>Dresses</td>
+<td>31776</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">414</th>
+<td>LR0415</td>
+<td>Accessories</td>
+<td>29087</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p><code>True</code> and <code>False</code> take no quotes: like numbers, they are values, not text.</p>
+</section></section>
+<section>
+<section id="creating-columns-and-saving-tables" class="title-slide slide level1 center">
+<h1>4. Creating Columns and Saving Tables</h1>
+
+</section>
+<section id="a-new-column" class="slide level2">
+<h2>A New Column</h2>
+<div id="8f9e90d6" class="cell" data-execution_count="20">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href=""></a>insta[<span class="st">"engagements"</span>] <span class="op">=</span> insta[<span class="st">"likes"</span>] <span class="op">+</span> insta[<span class="st">"comments"</span>] <span class="op">+</span> insta[<span class="st">"saves"</span>] <span class="op">+</span> insta[<span class="st">"shares"</span>]</span>
+<span id="cb43-2"><a href=""></a>insta[[<span class="st">"post_id"</span>, <span class="st">"likes"</span>, <span class="st">"comments"</span>, <span class="st">"saves"</span>, <span class="st">"shares"</span>, <span class="st">"engagements"</span>]].head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe caption-top" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">post_id</th>
+<th data-quarto-table-cell-role="th">likes</th>
+<th data-quarto-table-cell-role="th">comments</th>
+<th data-quarto-table-cell-role="th">saves</th>
+<th data-quarto-table-cell-role="th">shares</th>
+<th data-quarto-table-cell-role="th">engagements</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>LR0001</td>
+<td>38</td>
+<td>0</td>
+<td>5</td>
+<td>2</td>
+<td>45</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>LR0002</td>
+<td>100</td>
+<td>2</td>
+<td>15</td>
+<td>5</td>
+<td>122</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>LR0003</td>
+<td>674</td>
+<td>14</td>
+<td>88</td>
+<td>41</td>
+<td>817</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<ul>
+<li>A <strong>calculated field</strong>, as in Tableau: the formula runs on <strong>every row at once</strong>, with no loop</li>
+<li>A new name on the left creates a column, at the end of the table; an existing name replaces it</li>
+</ul>
+</section>
+<section id="a-rate-rounded-for-the-reader" class="slide level2">
+<h2>A Rate, Rounded for the Reader</h2>
+<div id="d8d9d5e5" class="cell" data-execution_count="21">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href=""></a>insta[<span class="st">"engagement_rate"</span>] <span class="op">=</span> insta[<span class="st">"engagements"</span>] <span class="op">/</span> insta[<span class="st">"reach"</span>] <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb44-2"><a href=""></a>insta[[<span class="st">"post_id"</span>, <span class="st">"engagements"</span>, <span class="st">"reach"</span>, <span class="st">"engagement_rate"</span>]].head(<span class="dv">3</span>).<span class="bu">round</span>(<span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe caption-top" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">post_id</th>
+<th data-quarto-table-cell-role="th">engagements</th>
+<th data-quarto-table-cell-role="th">reach</th>
+<th data-quarto-table-cell-role="th">engagement_rate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>LR0001</td>
+<td>45</td>
+<td>735</td>
+<td>6.1</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>LR0002</td>
+<td>122</td>
+<td>2647</td>
+<td>4.6</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>LR0003</td>
+<td>817</td>
+<td>10393</td>
+<td>7.9</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<ul>
+<li><code>+</code>, <code>-</code>, <code>*</code> and <code>/</code> work between columns, or with a number: <code>* 100</code> gives a percentage</li>
+<li><code>.round(1)</code> rounds what you show, to one decimal, as Lecture 6’s <code>round(x, 1)</code> rounds one number</li>
+<li><code>insta</code> keeps every digit, for the calculations that come next</li>
+</ul>
+</section>
+<section id="saving-a-table" class="slide level2">
+<h2>Saving a Table</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb45"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href=""></a>paid <span class="op">=</span> insta[insta[<span class="st">"is_paid"</span>] <span class="op">==</span> <span class="va">True</span>]</span>
+<span id="cb45-2"><a href=""></a>paid.to_csv(<span class="st">"paid-posts.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
+<li><code>.to_csv()</code> writes the table as a file in the <strong>Files</strong> panel: <i class="fa-brands fa-windows" aria-label="windows"></i> right-click / <i class="fa-brands fa-apple" aria-label="apple"></i> <kbd>⌃ Control</kbd> + click on it → <strong>Download</strong></li>
+<li><code>index=False</code> stops pandas writing its row numbers as an extra column</li>
+<li>Like an uploaded file, a saved file is deleted with the runtime: download it before you leave</li>
+</ul>
+</section>
+<section id="your-turn-3" class="slide level2" data-background="#43464B">
+<h2><i class="fa-solid fa-screwdriver-wrench" aria-label="screwdriver-wrench"></i> Your Turn!</h2>
+<h3 id="new-columns">New columns</h3>
+<p>Replace each <code>____</code> with the missing word, then run the cell:</p>
+<ol type="1">
+<li>A column <code>non_followers_pct</code>: <code>reach_non_followers</code> as a % of <code>reach</code></li>
+<li>The posts with the highest share first, with <code>.sort_values()</code></li>
+<li>The sorted table saved as <code>non-followers.csv</code>: download it afterwards</li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb46"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href=""></a>insta[<span class="st">"non_followers_pct"</span>] <span class="op">=</span> insta[____] <span class="op">/</span> insta[<span class="st">"reach"</span>] <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb46-2"><a href=""></a>top <span class="op">=</span> insta.sort_values(____, ascending<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb46-3"><a href=""></a>top.to_csv(____, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb46-4"><a href=""></a>top[[<span class="st">"post_id"</span>, <span class="st">"format"</span>, <span class="st">"non_followers_pct"</span>]].head(<span class="dv">3</span>).<span class="bu">round</span>(<span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div style="max-width:80%;">
+<p>You should see three reels, LR0184, LR0267 and LR0402, each above 95%.</p>
+</div>
+                    <div id="timer7_4"></div>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            initializeTimer("timer7_4", 300, "interaction");
+                        });
+                    </script>
+                
+</section>
+<section id="solution-3" class="slide level2">
+<h2>Solution</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb47"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href=""></a>insta[<span class="st">"non_followers_pct"</span>] <span class="op">=</span> insta[<span class="st">"reach_non_followers"</span>] <span class="op">/</span> insta[<span class="st">"reach"</span>] <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb47-2"><a href=""></a>top <span class="op">=</span> insta.sort_values(<span class="st">"non_followers_pct"</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb47-3"><a href=""></a>top.to_csv(<span class="st">"non-followers.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb47-4"><a href=""></a>top[[<span class="st">"post_id"</span>, <span class="st">"format"</span>, <span class="st">"non_followers_pct"</span>]].head(<span class="dv">3</span>).<span class="bu">round</span>(<span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="0d1ce403" class="cell" data-execution_count="22">
+<div class="cell-output cell-output-display" data-execution_count="22">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe caption-top" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">post_id</th>
+<th data-quarto-table-cell-role="th">format</th>
+<th data-quarto-table-cell-role="th">non_followers_pct</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">183</th>
+<td>LR0184</td>
+<td>reel</td>
+<td>99.6</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">266</th>
+<td>LR0267</td>
+<td>reel</td>
+<td>96.2</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">401</th>
+<td>LR0402</td>
+<td>reel</td>
+<td>95.8</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>The three posts that travelled furthest beyond the followers are the three reels above 50,000 accounts: reels are shown to people who do not follow Loomrow yet.</p>
+</section>
+<section id="when-pandas-stops" class="slide level2 smaller">
+<h2>When pandas Stops</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 43%">
+<col style="width: 29%">
+<col style="width: 27%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">You see</th>
+<th style="text-align: left;">Why</th>
+<th style="text-align: left;">Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>FileNotFoundError: ... 'insta_data.csv'</code></td>
+<td style="text-align: left;">the file is missing, or misspelt</td>
+<td style="text-align: left;">upload it; copy its path</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>NameError: name 'insta' is not defined</code></td>
+<td style="text-align: left;"><code>insta</code> was never created</td>
+<td style="text-align: left;">run the cells from the top</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>KeyError: 'Reach'</code></td>
+<td style="text-align: left;">no column has that exact name</td>
+<td style="text-align: left;">copy it from <code>insta.columns</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>SyntaxError: ... Maybe you meant '=='</code></td>
+<td style="text-align: left;">one <code>=</code> inside a filter</td>
+<td style="text-align: left;"><code>==</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>TypeError: Cannot perform 'rand_' ...</code></td>
+<td style="text-align: left;"><code>&amp;</code> without the brackets</td>
+<td style="text-align: left;"><code>(...) &amp; (...)</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>ValueError: The truth value of a Series ...</code></td>
+<td style="text-align: left;"><code>and</code> or <code>or</code> on columns</td>
+<td style="text-align: left;"><code>&amp;</code> or <code>|</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">no error, but nothing changed</td>
+<td style="text-align: left;"><code>rename()</code> returns a new table</td>
+<td style="text-align: left;"><code>small = small.rename(...)</code></td>
+</tr>
+</tbody>
+</table>
+<p>Read an error from its <strong>last line</strong>: it names the problem, and often the fix.</p>
+</section>
+<section id="section" class="slide level2" data-background="#43464B">
+<h2></h2>
+<style>img.circle {border-radius:50%;}</style>
 <div class="quarto-layout-panel" data-layout="[1,1]">
 <div class="quarto-layout-row">
 <div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<ol type="1">
-<li>Do not overwhelm the viewer</li>
-<li>Avoid visual clutter</li>
-<li>Do not add data because you have it</li>
-<li>Be consistent: one palette, one date format, one number format</li>
-<li>Make interaction visible; a filter nobody notices does not exist</li>
-</ol>
+<p><img class="circle" src="https://github.com/damien-dupre.png"></p>
 </div>
 <div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<ol start="6" type="1">
-<li>Manage complexity: progressive detail, not everything at once</li>
-<li>Group related charts together</li>
-<li>Avoid saying the same thing twice</li>
-<li>Context beats completeness</li>
-<li>Iterate. Nobody’s first layout is their last</li>
-</ol>
+<p><strong>Thanks for your attention and don’t hesitate to ask if you have any questions!</strong></p>
+<p><a href="https://datasci.social/@damien_dupre"><i class="fa-brands fa-mastodon" aria-label="mastodon"></i> <span class="citation" data-cites="damien_dupre">@damien_dupre</span></a></p>
+<p><a href="https://github.com/damien-dupre"><i class="fa-brands fa-github" aria-label="github"></i> <span class="citation" data-cites="damien-dupre">@damien-dupre</span></a></p>
+<p><a href="https://damien-dupre.github.io"><i class="fa-solid fa-link" aria-label="link"></i> https://damien-dupre.github.io</a></p>
+<p><a href="mailto:damien.dupre@dcu.ie"><i class="fa-solid fa-paper-plane" aria-label="paper-plane"></i> damien.dupre@dcu.ie</a></p>
 </div>
 </div>
 </div>
-</section></section>
-<section>
-<section id="the-three-key-elements" class="title-slide slide level1 center">
-<h1>2. The Three Key Elements</h1>
 
-</section>
-<section id="title-story-visualisations" class="slide level2">
-<h2>Title, Story, Visualisations</h2>
-<p>Every dashboard in this module carries three things. Images, buttons and menus are optional; these are not.</p>
-<ol type="1">
-<li>A <strong>title</strong> that pinpoints the problem</li>
-<li>A written <strong>story</strong>: introduction, analysis, conclusion</li>
-<li><strong>Multiple visualisations</strong>, in a deliberate order</li>
-</ol>
-<div class="fragment">
-<p>Most student dashboards have the third and neither of the others, and lose marks on Overall Story for exactly that reason.</p>
-</div>
-</section>
-<section id="the-title-does-the-work" class="slide level2 smaller">
-<h2>The Title Does the Work</h2>
-<p>A title states the problem, asks a question, or is simply memorable enough to be read. Real examples from Tableau Public:</p>
-<ul>
-<li><em>Healthcare Crisis in Rural America</em> — names the problem</li>
-<li><em>#CollegeGameday: Can My Family Out-Pick the Pundits?</em> — asks a question</li>
-<li><em>NBA Lords of the Rings</em> — catchy enough that you look</li>
-</ul>
-<div class="fragment">
-<p>What a title is not: <code>Dashboard 1</code>, <code>Instagram Analysis</code>, or <code>Loomrow Data</code>. Those name the contents. <strong>Name the finding.</strong></p>
-</div>
-</section>
-<section id="the-story" class="slide level2 smaller">
-<h2>The Story</h2>
-<div class="quarto-layout-panel" data-layout="[1,1]">
-<div class="quarto-layout-row">
-<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<p><strong>Introduction</strong></p>
-<p>The context. Who is Loomrow, what do they sell, what were they asking?</p>
-<p><strong>Analysis</strong></p>
-<p>Walk the reader through the visualisations, extracting the point of each. Link them: by time, by geography, by logic, by increasing complexity.</p>
-</div>
-<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<p><strong>Conclusion</strong></p>
-<p>Summarise, then <strong>recommend</strong>. What should they do on Monday?</p>
-<p>A conclusion that only summarises has stopped one step short of the job.</p>
-</div>
-</div>
-</div>
-<div class="fragment">
-<p>Three short paragraphs of text on the dashboard itself. Not a separate document, and not spoken over it.</p>
-</div>
-</section>
-<section id="the-visualisations" class="slide level2">
-<h2>The Visualisations</h2>
-<ol type="1">
-<li>Place them in an order that matches the story, not the order you built them</li>
-<li>Make sure each one has been through step 3: styled, titled, captioned</li>
-<li>Add a caption where the finding is not obvious from the chart alone</li>
-<li>Wire up the global interactive features, which is the next section</li>
-</ol>
-</section>
-<section id="exercise" class="slide level2" data-background="#43464B">
-<h2>Exercise</h2>
-<p>For the Loomrow dashboard you are going to submit:</p>
-<ol type="1">
-<li>Write the decision sentence</li>
-<li>Write a title that names the finding, not the contents</li>
-<li>Sketch the layout on paper: what is above the fold, and in what order</li>
-</ol>
-<p>Swap with the person beside you. <strong>Can they say what your dashboard is for without you explaining it?</strong></p>
-                    <div id="timer1"></div>
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function () {
-                            initializeTimer("timer1", 600, "slide");
-                        });
-                    </script>
-                
-</section></section>
-<section>
-<section id="interactivity" class="title-slide slide level1 center">
-<h1>3. Interactivity</h1>
-
-</section>
-<section id="local-filters-and-highlighters" class="slide level2">
-<h2>Local Filters and Highlighters</h2>
-<p>On a single worksheet, <i class="fa-brands fa-windows" aria-label="windows"></i> right-click / <i class="fa-brands fa-apple" aria-label="apple"></i> <kbd>⌃ Control</kbd> + click a field and choose <strong>Show Filter</strong> to put a control beside the view.</p>
-<div class="fragment">
-<ul>
-<li>A <strong>filter</strong> removes rows. The chart is recalculated on what is left</li>
-<li>A <strong>highlighter</strong> keeps every row and dims the ones you did not pick</li>
-</ul>
-</div>
-<div class="fragment">
-<p><strong>The difference matters for percentages.</strong> Filter to reels and the rates recompute among reels; highlight reels and the rates still include everything else.</p>
-</div>
-</section>
-<section id="dashboard-actions" class="slide level2 smaller">
-<h2>Dashboard Actions</h2>
-<p>The control that turns four charts into one dashboard. <strong>Dashboard → Actions → Add Action</strong>:</p>
-<table class="caption-top">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Action</th>
-<th>What it does</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>Filter</strong></td>
-<td>Selecting a mark in one view filters every other view</td>
-</tr>
-<tr class="even">
-<td><strong>Highlight</strong></td>
-<td>Selecting a mark dims the non-matching marks everywhere</td>
-</tr>
-<tr class="odd">
-<td><strong>Go to URL</strong></td>
-<td>A mark becomes a link out</td>
-</tr>
-<tr class="even">
-<td><strong>Parameter / Set</strong></td>
-<td>A selection changes a calculation</td>
-</tr>
-</tbody>
-</table>
-<div class="fragment">
-<p>Set the trigger (<code>Hover</code>, <code>Select</code>, <code>Menu</code>) deliberately. <strong>Hover actions on a dense chart are unusable</strong>; select is almost always the right answer.</p>
-</div>
-</section>
-<section id="tooltips" class="slide level2">
-<h2>Tooltips</h2>
-<p>The Marks card’s <strong>Tooltip</strong> button. What appears there is a design decision, not a default.</p>
-<ul>
-<li>Remove the fields the reader does not need</li>
-<li>Write it as a <strong>sentence</strong>: <em>“Reels in March reached 41,300 accounts across 18 posts”</em></li>
-<li>Include the <strong>sample size</strong>. A tooltip is where an honest <code>n</code> fits without cluttering the chart</li>
-<li>Advanced: embed another worksheet in the tooltip, so hovering shows a small chart</li>
-</ul>
-</section>
-<section id="alias-format-and-the-small-things" class="slide level2">
-<h2>Alias, Format, and the Small Things</h2>
-<ul>
-<li><strong>Aliases</strong>: <i class="fa-brands fa-windows" aria-label="windows"></i> right-click / <i class="fa-brands fa-apple" aria-label="apple"></i> <kbd>⌃ Control</kbd> + click a dimension member to rename it for display. <code>behind the scenes</code> becomes <code>Behind the scenes</code> without editing the data</li>
-<li><strong>Number format</strong>: set it once on the field, not per view</li>
-<li><strong>Dates</strong>: Tableau’s date hierarchy (<code>Year &gt; Quarter &gt; Month &gt; Day</code>) gives you drilldown for free. Use <code>Week</code> for portfolio-scale data</li>
-<li><strong>Device layouts</strong>: build the desktop version, then check the phone layout. Your marker may open it on a phone</li>
-</ul>
-</section>
-<section id="live-demo" class="slide level2" data-background="#43464B">
-<h2>Live Demo</h2>
-<!-- Speaker notes: about twelve minutes. Build it badly first, on purpose, then
-     apply steps 3 and 4 in front of them. The contrast is the lesson. -->
-<ol type="1">
-<li>Four default worksheets dropped on a dashboard, ugly and unstyled</li>
-<li>Add the title, the three story paragraphs, a logo</li>
-<li>Back into each worksheet: colour, axis titles, number format, tooltip sentences</li>
-<li>Back on the dashboard: containers, background, one filter action and one highlight action</li>
-<li>Open the phone layout, and fix what breaks</li>
-</ol>
-</section></section>
-<section>
-<section id="publishing-and-handover" class="title-slide slide level1 center">
-<h1>4. Publishing and Handover</h1>
-
-</section>
-<section id="publishing-to-tableau-public" class="slide level2">
-<h2>Publishing to Tableau Public</h2>
-<p><strong>File → Save to Tableau Public As…</strong>, and the workbook uploads to your profile.</p>
-<div class="fragment">
-<div class="callout callout-note no-icon callout-style-simple">
-<div class="callout-body">
-<div class="callout-content">
-<p><strong>Everything you publish is public.</strong> Do not upload anything confidential, and check what is in the data before you press it. This is a real habit, not a classroom rule.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="fragment">
-<p>Publishing is also saving. Publish at the end of every working session, and rename versions so you can go back.</p>
-</div>
-</section>
-<section id="export-versus-share" class="slide level2">
-<h2>Export Versus Share</h2>
-<ul>
-<li><strong>Share</strong>: the link to your published viz.&nbsp;Interactive, and the one you submit</li>
-<li><strong>Download → Image / PDF</strong>: a snapshot for a slide deck. Interactivity is gone</li>
-<li><strong>Download → Workbook</strong>: the <code>.twbx</code>, for someone who will edit it</li>
-<li><strong>Download → Data</strong>: the underlying table. Check whether you meant to offer this</li>
-</ul>
-</section>
-<section id="the-handover-test" class="slide level2">
-<h2>The Handover Test</h2>
-<p>The dashboard is finished when somebody can open it <strong>without you in the room</strong> and reach the conclusion you intended.</p>
-<div class="fragment">
-<p>Test it properly: send the link to someone outside the module, say nothing, and ask them what they think it says.</p>
-</div>
-<div class="fragment">
-<p><strong>Most dashboards fail this test on the title and the missing story</strong>, not on the charts.</p>
-</div>
-</section>
-<section id="caveats-belong-on-the-page" class="slide level2">
-<h2>Caveats Belong on the Page</h2>
-<p>Anything you know about the data that would change how it is read goes on the dashboard, in small text, not in your head:</p>
-<ul>
-<li>How many posts are behind the smallest bar</li>
-<li>That <code>attributed_revenue_eur</code> is what the platform claims, not what was audited</li>
-<li>That spend on days without a boosted post is not in the file, so the figures are the content budget rather than the media budget</li>
-</ul>
-<div class="fragment">
-<p><strong>A caveat you disclose is professional. The same caveat found by your reader is a credibility problem.</strong> We come back to this in Lecture 20.</p>
-</div>
-</section>
-<section id="assignment-1-brief" class="slide level2 smaller">
-<h2>Assignment 1 Brief</h2>
-<p>A Tableau Public <strong>dashboard</strong> built on <code>insta-data.csv</code>, answering Loomrow’s two questions. Marked in four equal parts:</p>
-<table class="caption-top">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Criterion</th>
-<th>25% each</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>Creativity</strong></td>
-<td>Menus, filters and interactions that do something</td>
-</tr>
-<tr class="even">
-<td><strong>Analytical depth</strong></td>
-<td>Figures that answer a question worth asking</td>
-</tr>
-<tr class="odd">
-<td><strong>Design</strong></td>
-<td>Layout, colour, typography, restraint</td>
-</tr>
-<tr class="even">
-<td><strong>Overall story</strong></td>
-<td>Title, narrative, and a conclusion with a recommendation</td>
-</tr>
-</tbody>
-</table>
-<div class="fragment">
-<p><strong>Submit the Tableau Public link.</strong> Not a story, not a PDF, not a workbook file. Due mid-November.</p>
-</div>
-</section>
-<section id="studio-time" class="slide level2" data-background="#43464B">
-<h2>Studio Time</h2>
-<p>Build. Checkpoints, in order:</p>
-<ol type="1">
-<li>Decision sentence written and visible on the page</li>
-<li>Sketch reviewed by one peer</li>
-<li>Draft assembled with real data, unstyled</li>
-<li>Steps 3 and 4 of the build: figures, then dashboard</li>
-<li>One filter action and one highlight action working</li>
-<li>Peer review against the Lecture 6 critique checklist</li>
-</ol>
-                    <div id="timer2"></div>
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function () {
-                            initializeTimer("timer2", 1500, "slide");
-                        });
-                    </script>
-                
-</section></section>
-<section>
-<section id="ai-as-a-dashboard-critic" class="title-slide slide level1 center">
-<h1>5. AI as a Dashboard Critic</h1>
-
-</section>
-<section id="ai-this-block-chat-with-context" class="slide level2">
-<h2>AI This Block: Chat With Context</h2>
-<p>Where we are on the module’s AI spine, set out in Lecture 1 and named properly in Lecture 12:</p>
-<blockquote>
-<p><strong>Chat with context.</strong> Attach the thing. A screenshot of your dashboard is context.</p>
-</blockquote>
-</section>
-<section id="specification-not-construction" class="slide level2">
-<h2>Specification, Not Construction</h2>
-<p>An assistant cannot build a Tableau workbook. It is good at the step before and the step after.</p>
-<div class="fragment">
-<blockquote>
-<p>“My dashboard supports this decision: <em>[your sentence]</em>. Propose a layout: which views, in what order, above and below the fold. Say what to leave out.”</p>
-</blockquote>
-</div>
-<div class="fragment">
-<p>And afterwards, on a screenshot:</p>
-<blockquote>
-<p>“Here is the dashboard. Read it as a client who has ninety seconds. What do you think it is telling me to do?”</p>
-</blockquote>
-</div>
-</section>
-<section id="the-removal-test" class="slide level2">
-<h2>The Removal Test</h2>
-<p>Give it your list of built views and ask <strong>which one does not change a decision</strong>.</p>
-<div class="fragment">
-<p>It is better at removing than you are, for one reason: it is not attached to the work. You spent two hours on that map.</p>
-</div>
-<div class="fragment">
-<p>Cut at least one view it names, even one you disagree about, and look at the dashboard again before you decide.</p>
-</div>
-</section>
-<section id="what-it-cannot-see" class="slide level2">
-<h2>What It Cannot See</h2>
-<ul>
-<li>Whether your filter action actually fires</li>
-<li>Whether the smallest bar rests on four posts</li>
-<li>What your client will really ask, which is usually about money</li>
-<li>Whether the colours survive on a projector</li>
-</ul>
-<div class="fragment">
-<div class="callout callout-note no-icon callout-style-simple">
-<div class="callout-body">
-<div class="callout-content">
-<p>Asked “is this dashboard good?”, it will say yes. Ask it what the dashboard is telling you to do instead: that question has a wrong answer, so it is worth asking.</p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="exercise-1" class="slide level2" data-background="#43464B">
-<h2>Exercise</h2>
-<ol type="1">
-<li>Give an assistant your decision sentence and your list of built views</li>
-<li>Ask which to cut, and why</li>
-<li>Cut at least one you disagree about, and look at the result</li>
-<li>Screenshot the dashboard (<i class="fa-brands fa-windows" aria-label="windows"></i> <kbd>⊞ Win</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd>, <i class="fa-brands fa-apple" aria-label="apple"></i> <kbd>⌘ Cmd</kbd> + <kbd>⇧ Shift</kbd> + <kbd>4</kbd>) and ask what it thinks you are recommending</li>
-</ol>
-<p>If its answer is not your recommendation, the dashboard is wrong, not the assistant.</p>
-                    <div id="timer3"></div>
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function () {
-                            initializeTimer("timer3", 600, "slide");
-                        });
-                    </script>
-                
-</section>
-<section id="going-further" class="slide level2">
-<h2>Going Further</h2>
-<ul>
-<li><a href="https://dashboarddesignpatterns.github.io/">Dashboard Design Patterns</a>, and its workshop slides</li>
-<li>Stephen Few, <em>Information Dashboard Design</em></li>
-<li><a href="https://public.tableau.com/app/discover">Tableau Public gallery</a>, and the annual Viz Wrap posts</li>
-<li>Tableau, <em>Actions</em> and <em>Dashboard Layout</em> documentation</li>
-</ul>
-</section>
-<section id="next-lecture" class="slide level2">
-<h2>Next Lecture</h2>
-<p>Block 2 closes here. Next week Block 1 of Semester 2 opens: you stop analysing data somebody else generated and start generating your own.</p>
-<div class="fragment">
-<p><strong>You will build a website.</strong></p>
-
-</div>
 </section></section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">

@@ -133,7 +133,7 @@ Source: Fred Hutch Data Science Lab, Introduction to Python [{{< fa link >}}](ht
 :::
 ::::
 
-Your notebook is a `.ipynb` file in **Colab Notebooks**, a folder of your Google Drive. Rename it from its title, top left.
+Your notebook is a `.ipynb` file in **Colab Notebooks**, a folder of your Google Drive. Rename it from its title, top left, and **keep the `.ipynb` extension**.
 
 ## A Notebook Is Made of Cells
 
@@ -189,7 +189,7 @@ The first cell you run connects the notebook to a **runtime**: a computer at Goo
 
 1. Open <https://colab.research.google.com>, signed in with your DCU account
 2. **File** → **New notebook in Drive**
-3. Click its name, top left, and type `STA1000 Lecture 6`
+3. Click its name, top left, and type `STA1000 Lecture 6`, **keeping `.ipynb` at the end**
 4. In the code cell, type `print("Hello, my name is Aoife")`, with your name
 5. Run it: {{< fa brands windows >}} <kbd>Shift</kbd> + <kbd>Enter</kbd> / {{< fa brands apple >}} <kbd>⇧ Shift</kbd> + <kbd>↩ Return</kbd>
 6. Click **+ Text**, top left, and type `# My first notebook`

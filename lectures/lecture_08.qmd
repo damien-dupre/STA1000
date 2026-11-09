@@ -24,7 +24,7 @@ countries = pd.read_csv("../data/maps/ads-by-country.csv")
 
 ## Previously ...
 
-- In Lecture 7 you opened `insta-data.csv` with pandas, looked at it, selected, filtered and sorted its rows, and added calculated columns.
+- In Lecture 7 you opened `insta-data.csv` with pandas, looked at it, fixed its dates, selected, filtered and sorted its rows, and added calculated columns.
 
 **Today, three questions:**
 
@@ -39,6 +39,7 @@ A new notebook, `STA1000 Lecture 8`. From Loop, upload four files: `insta-data.c
 ```{.python}
 import pandas as pd
 insta = pd.read_csv("insta-data.csv")
+insta["posted_at"] = pd.to_datetime(insta["posted_at"])
 insta["engagements"] = insta["likes"] + insta["comments"] + insta["saves"] + insta["shares"]
 ```
 
@@ -123,7 +124,7 @@ insta.groupby("format")["reach"].agg(["count", "mean", "median"])
 insta.groupby("format")["reach"].agg(["count", "mean", "median"]).round(1)
 ```
 
-`.round(1)` rounds what you show, to one decimal; `insta` keeps every digit for later calculations. Lecture 6's `round(value, 1)` works on one number, `.round(1)` on a whole column or table.
+As in Lecture 7, `.round(1)` rounds what you show, here a whole table, to one decimal; `insta` keeps every digit for later calculations.
 
 ## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
@@ -237,18 +238,6 @@ by_campaign.sort_values("roas", ascending=False).round(2)
 
 # 3. Over Time, and in Two Dimensions
 
-## Fix the Dates
-
-In Lecture 5, Tableau recognised `posted_at` as a date. pandas reads it as text, and one line converts it:
-
-```{python}
-insta["posted_at"] = pd.to_datetime(insta["posted_at"])
-insta["posted_at"].head(3)
-```
-
-- `insta["posted_at"] =` on the left **replaces** the column with what is on the right
-- Add the first line to your **first cell**, which fixes the types, and run that cell again
-
 ## Date Parts and Date Values
 
 ```{python}
@@ -339,28 +328,52 @@ ads.head(3)
 
 `insta-posts.csv` has the 431 posts, from Instagram; `meta-ads.csv` the 127 boosted posts, from Meta Ads Manager. **The key** they share: `post_id`.
 
-## Joins, Animated
+## Inner and Left Merges
 
 :::: {layout="[1,1]"}
 ::: {#first-column}
 
-![](./figures/external/tidyexplain_inner_join.gif)
+![](./figures/external/tidyexplain_inner_join_nocode.gif)
 
-**Inner**: only the keys found in both tables
+`how="inner"`: only the keys found in both tables, 1 and 2
 
 :::
 
 ::: {#second-column}
 
-![](./figures/external/tidyexplain_left_join.gif)
+![](./figures/external/tidyexplain_left_join_nocode.gif)
 
-**Left**: every row of the left table, matched or not
+`how="left"`: every row of `x`; 3 has no match, so its `y` is `NaN`
 
 :::
 ::::
 
 ::: {style="font-size:0.7em;text-align:center;"}
-Lecture 4's animations: `x` is the left table and `y` the right one. Source: Garrick Aden-Buie, tidyexplain [{{< fa link >}}](https://www.garrickadenbuie.com/project/tidyexplain/)
+`pd.merge(x, y, on="id", how=...)`: `x` on the left, `y` on the right, the coloured `id` as the key. Source: Garrick Aden-Buie, tidyexplain [{{< fa link >}}](https://www.garrickadenbuie.com/project/tidyexplain/)
+:::
+
+## Right and Outer Merges
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/external/tidyexplain_right_join_nocode.gif)
+
+`how="right"`: every row of `y`; 4 has no match, so its `x` is `NaN`
+
+:::
+
+::: {#second-column}
+
+![](./figures/external/tidyexplain_full_join_nocode.gif)
+
+`how="outer"`: every key of both tables, `NaN` where it has no match
+
+:::
+::::
+
+::: {style="font-size:0.7em;text-align:center;"}
+Source: Garrick Aden-Buie, tidyexplain [{{< fa link >}}](https://www.garrickadenbuie.com/project/tidyexplain/)
 :::
 
 ## pd.merge()
@@ -401,19 +414,9 @@ Lecture 4's join types, with the same counts.
 :::
 ::::
 
-## Missing Values
-
-```{python}
-insta["campaign"].value_counts(dropna=False)
-```
-
-- `NaN` marks a missing value: 225 posts went out outside any campaign
-- `insta["campaign"].isna().sum()` counts them: `.isna()` is True where a value is missing, and `.sum()` counts the True
-- **Missing does not mean wrong.** Here it means "no campaign". Find out what it means before you drop or fill it
-
 ## Missing Values After a Merge
 
-A post with no ad has nothing to match in `meta-ads.csv`: its ad columns are **missing**, `NaN`, like the `campaign` of the 225 posts outside any campaign.
+A post with no ad has nothing to match in `meta-ads.csv`: its ad columns are **missing**, `NaN`, like the `campaign` of the 225 posts outside any campaign in Lecture 7.
 
 ```{python}
 print(both["spend_eur"].isna().sum())
@@ -423,6 +426,28 @@ print(round(both["spend_eur"].sum(), 2))
 
 - `.isna().sum()` counts the missing values: 304, the organic posts
 - `.fillna(0)` replaces them with 0. Right here, because no ad means €0 spent. Wrong for a missing price or a missing age: decide, and say so
+
+## When a Key Appears Twice
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+![](./figures/external/tidyexplain_left_join_extra_nocode.gif)
+
+:::
+
+::: {#second-column}
+
+Key 2 appears **twice** in `y`, so the merge copies `x2`: 3 rows become 4.
+
+Every value of `x2` now counts twice, and no error message warns you.
+
+:::
+::::
+
+::: {style="font-size:0.7em;text-align:center;"}
+Source: Garrick Aden-Buie, tidyexplain [{{< fa link >}}](https://www.garrickadenbuie.com/project/tidyexplain/)
+:::
 
 ## Check Every Merge: Rows and a Total
 

@@ -10,6 +10,9 @@ filters:
 #| include: false
 # The slides read the repository copy of the data; students read the file they
 # uploaded to Colab, which is the code shown on the slides.
+# A two-column layout drops the code of an executed chunk and keeps only its
+# output: in a column, the code is shown as a ```{.python} block, and a hidden
+# chunk below it runs the same lines.
 import pandas as pd
 pd.set_option("display.max_columns", 7)
 pd.set_option("display.max_rows", 8)
@@ -23,41 +26,41 @@ insta = pd.read_csv("../data/insta-data.csv")
 
 **Today, three questions:**
 
-1. How do you **open** a table with pandas, and **look** at it?
-2. How do you **select** columns, **filter** rows and **sort** them?
-3. How do you **add** a column, and **save** the result?
+1. How do you **open** a table, and take a **first look** at it?
+2. How do you keep only the **columns** and the **rows** a question needs, and **sort** them?
+3. How do you **create** a column, and **save** the result?
 
-# 1. Open a Table with pandas
+## pandas and DataFrames
 
-## From Spreadsheet to DataFrame
+**pandas** is Python's library for tables, and a table in pandas is a **DataFrame**.
 
-![](./figures/external/ubc_spreadsheet_dataframe.png){fig-align="center" style="max-height:260px;"}
+![](./figures/external/ubc_spreadsheet_dataframe.png){fig-align="center" style="max-height:190px;"}
 
 ::: {style="font-size:0.5em;text-align:center;"}
 Source: UBC Master of Data Science, Programming in Python for Data Science [{{< fa link >}}](https://prog-learn.mds.ubc.ca/)
 :::
 
-pandas calls a table a **DataFrame**: a spreadsheet with one row per observation, one column per variable, a type for each column, and no hidden formulas.
+- Named columns, and rows labelled by an **index**
+- One column on its own: a **Series**
+- Every pandas command works on **whole columns at once**
 
-## pandas
+## Five Operations
 
-**pandas** is the Python library for tables. `import pandas as pd` loads it under the short name `pd`, which every example online and every AI answer assumes. Everything you clicked in Tableau has its line:
+Almost every data question needs only five operations, and you have done all five in Tableau:
 
-::: {style="font-size:0.6em; line-height:1.3;"}
+::: {style="font-size:0.7em; line-height:1.3;"}
 
-| In Tableau | In pandas | When |
-|---|---|---|
-| Connect to a text file | `pd.read_csv("insta-data.csv")` | Today |
-| The Abc, # and calendar icons | `insta.info()` | Today |
-| The Filters shelf | `insta[insta["format"] == "reel"]` | Today |
-| A calculated field | `insta["rate"] = insta["likes"] / insta["reach"]` | Today |
-| A dimension on Rows, `SUM` of a measure | `insta.groupby("format")["reach"].sum()` | Lecture 8 |
-| A relationship, or a join | `pd.merge(posts, ads, on="post_id", how="left")` | Lecture 8 |
-| Show Me | `insta["format"].value_counts().plot(kind="bar")` | Lecture 9 |
+| Operation | What it does | In Tableau | In pandas |
+|:-------------|:------------------|:----------------------|:-----------------------------------------------|
+| **Selection** | keeps columns | the fields you drag in | `insta[["format", "reach"]]` |
+| **Reduction** | keeps rows | the Filters shelf | `insta[insta["format"] == "reel"]` |
+| **Extension** | adds a column | a calculated field | `insta["rate"] = insta["likes"] / insta["reach"]` |
+| **Aggregation** | a row per group | `SUM` by a dimension | `insta.groupby("format")["reach"].sum()` |
+| **Combination** | joins two tables | a relationship or a join | `pd.merge(posts, ads, on="post_id", how="left")` |
 
 :::
 
-Every pandas command starts with `pd.` or with the name of a table, and works on **whole columns at once**.
+Today, a first look at the table, then the first three operations, one section each. Lecture 8 does the last two, and Lecture 9 draws the results.
 
 ## Today's Notebook
 
@@ -70,28 +73,45 @@ A new notebook, `STA1000 Lecture 7`. Python runs on Google's computer, and your 
 
 [{{< fa triangle-exclamation >}}]{style="color:#e34948;"} **Uploaded files are deleted with the runtime.** Next session, upload them again.
 
-## Read the File
+# 1. A First Look
 
-In the first cell:
+## Loading pandas
+
+In the first cell of every notebook:
 
 ```{.python}
 import pandas as pd
-insta = pd.read_csv("insta-data.csv")
 ```
 
-- `pd.read_csv()` reads a CSV file into a DataFrame
-- `insta =` stores that table under a name of your choice. From now on, `insta` **is** the table
-- The name of the file goes **between quotes**, exactly as it is spelt in the Files panel
+- `import` loads a **library**, ready-made code for one job: here, tables. Colab has pandas installed already
+- `as pd` gives it a short name: every pandas command then starts with `pd.`, as in `pd.read_csv()`. Use exactly `pd`: every example online assumes it
 
-Nothing is shown: `=` stores, it does not display. To see the table, run its name.
+::: {style="font-size:0.8em;"}
 
-## Show the Table
+| You see | Why |
+|:--------------------------|:--------------------------|
+| `ModuleNotFoundError: No module named 'panda'` | a typo: `pandas`, with an s |
+| `NameError: name 'pd' is not defined` | the first cell has not run since the session started: run it |
 
-```{python}
-insta
+:::
+
+## Reading a CSV File
+
+A **CSV** file is a table written as text (Lecture 2): names on the first line, one row per line, commas between the values. The start of `insta-data.csv`:
+
+```{.default}
+post_id,posted_at,format,product_line,theme,campaign,is_paid,...
+LR0001,2025-01-08 20:00:00,reel,Knitwear,styling,,False,...
+LR0002,2025-01-08 12:00:00,reel,Knitwear,customer,,False,...
 ```
 
-The 431 posts of Lectures 2 to 5, in Python: Colab shows the first and last rows, and the size underneath. The first cell of every notebook loads pandas and reads the file: **Runtime** → **Restart session and run all** should always bring you back here.
+```{.python}
+insta = pd.read_csv("insta-data.csv")    # first cell, after the import
+```
+
+- `pd.read_csv()` reads the text into a **DataFrame**, with a type for each column. The file's name goes **between quotes**, spelt as in the Files panel
+- `insta =` stores the table under a name of your choice. Nothing is shown: `=` stores, it does not display
+- Semicolon files: `pd.read_csv("file.csv", sep=";")`. Excel files: `pd.read_excel("file.xlsx")`
 
 ## When the File Is Not Found
 
@@ -101,26 +121,36 @@ FileNotFoundError: [Errno 2] No such file or directory: 'insta_data.csv'
 
 The last line means exactly what it says. Four checks:
 
-1. Is the file in the **Files** panel? Upload it again after every restart
+1. Is the file in the **Files** panel? A new runtime starts empty: upload it again
 2. Is the name spelt **exactly**? Here the file is `insta-data.csv`, with a hyphen
 3. Is the **extension** there? Windows and macOS hide it, Python does not: `insta-data` is not `insta-data.csv`
 4. Colab runs on Linux, where **capitals matter**: `Insta-data.csv` is another file
 
 Better than checking: {{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click on the file in the Files panel → **Copy path**, and paste it between the quotes.
 
-## Rows, Columns, Names
+## The Loomrow Dataset
+
+Each row is **a post** on Loomrow's Instagram account, January 2025 to June 2026: its `format`, `theme`, `reach`, `likes`, `saves`, ad spend and revenue.
+
+```{python}
+insta.head(3)
+```
+
+- `.head(3)`: the first 3 rows; `.tail(3)`: the last 3; `insta` alone: the first and last five, and the size
+- **Runtime** → **Restart session and run all** reruns the first cell, and brings you back here
+
+## Rows and Columns
 
 ```{python}
 insta.shape
 ```
 
 ```{python}
-insta.head(3)
+insta.columns
 ```
 
-- `.shape`: the number of rows, then of columns
-- `.head()`: the first 5 rows, or as many as you ask for. `.tail()`: the last ones
-- `.columns`: the names of the columns
+- `.shape` gives the number of rows, then of columns: a value, so no round brackets
+- `.columns` gives the 26 names: copy a name from here rather than typing it from memory
 
 ## The Type of Each Column
 
@@ -162,22 +192,36 @@ insta.info()
 
 Newer versions of pandas write `str` for text.
 
-**Non-Null Count**: `campaign` has 206 values out of 431. The 225 others are **missing**: Lecture 8 comes back to them.
+**Spot the text**: numbers should be `int64` or `float64`. `posted_at` holds dates as text: the next slide converts it.
+
+**Non-Null Count**: `campaign` has 206 values out of 431; the 225 others are **missing**.
 
 :::
 
 :::
 ::::
 
-## One Column
+## Fix the Dates
+
+In Lecture 5, Tableau recognised `posted_at` as a date. pandas reads it as text, and one line converts it:
 
 ```{python}
-insta["reach"]
+insta["posted_at"] = pd.to_datetime(insta["posted_at"])
+insta["posted_at"].head(3)
 ```
 
-- The name of the table, square brackets, and the name of the column in quotes
-- Spelt **exactly** as in the file: `insta["Reach"]` fails, the column is `reach`
-- One column is a **Series**: its values, with the row numbers on their left
+- `insta["posted_at"] =` on the left **replaces** the column with what is on the right
+- Add the first line to your **first cell**, which fixes the types, and run that cell again: Lecture 8 groups the posts by month
+
+## Missing Values
+
+```{python}
+insta["campaign"].value_counts(dropna=False)
+```
+
+- `NaN` marks a missing value: 225 posts went out outside any campaign
+- `insta["campaign"].isna().sum()` counts them: `.isna()` is True where a value is missing, and `.sum()` counts the True
+- **Missing does not mean wrong.** Here it means "no campaign". Find out what it means before you drop or fill it
 
 ## The Key Figures of a Column
 
@@ -215,84 +259,135 @@ insta["format"].value_counts()    # the categories of a text column
 
 ## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
-### A first look at Loomrow
+### A first look
 
-Start from your first cell, which reads the file. Then type each block in its own code cell, and run it:
+Replace each `____` with the missing word, then run the cell:
+
+1. The number of rows and columns, with `.shape`
+2. The mean and the median of the likes, with `.mean()` and `.median()`
+3. The share of the posts in each product line, with `normalize=True`
 
 ```{.python}
-# 1. rows and columns
-insta.shape
-
-# 2. the type of each column, in the Dtype column
-insta.info()
-
-# 3. the mean and the median of the likes
-print(insta["likes"].mean())
-print(insta["likes"].median())
-
-# 4. the share of the posts in each product line
-insta["product_line"].value_counts(normalize=True)
-
-# 5. the revenue for each euro spent on ads
-insta["attributed_revenue_eur"].sum() / insta["spend_eur"].sum()
+print(insta.____)
+print(insta["likes"].____(), insta["likes"].____())
+print(insta["product_line"].value_counts(normalize=____))
 ```
 
-::: {#timer7_1 .timer seconds="360" starton="interaction"}
+::: {style="max-width:80%;"}
+You should see `(431, 26)`, then `462.97...` and `278.0`. Then the five product lines, each with 0.18 to 0.21 of the posts.
+:::
+
+::: {#timer7_1 .timer seconds="300" starton="interaction"}
 :::
 
 ## Solution
 
 ```{python}
 print(insta.shape)
-print(insta["likes"].mean())
-print(insta["likes"].median())
+print(insta["likes"].mean(), insta["likes"].median())
+print(insta["product_line"].value_counts(normalize=True))
 ```
 
-`.info()`: 6 text columns, `posted_at` among them until Lecture 8 turns it into a date; 19 numbers; and `is_paid`, True or False. Mean 463 against median 278 likes: a few huge posts pull the mean up, the same skew as reach.
+A mean of 463 likes against a median of 278: a few big posts pull the mean up, as they do for the reach. Each product line has about a fifth of the posts.
 
-## Solution (continued)
+# 2. Selecting Columns
+
+## One Column
 
 ```{python}
-print(insta["product_line"].value_counts(normalize=True))
-print(insta["attributed_revenue_eur"].sum() / insta["spend_eur"].sum())
+insta["reach"].head(3)
 ```
 
-The five product lines share the posts almost equally, 18% to 21% each. And €3.16 of revenue for each euro spent, as you computed by hand in Lecture 6.
-
-# 2. Select, Filter, Sort
+- The name of the table, square brackets, and the name of the column in quotes
+- Spelt **exactly** as in the file: `insta["Reach"]` fails, the column is `reach`
+- One column is a **Series**: its values, with the row numbers on their left
 
 ## Several Columns
 
 ```{python}
-insta[["post_id", "format", "reach"]]
+insta[["post_id", "format", "reach"]].head(3)
 ```
 
 - `["post_id", "format", "reach"]` is a **list**: several values between square brackets, separated by commas
-- The outer pair of brackets selects. **One** pair gives one column; **two** pairs, a list inside, give a table
+- The outer pair of brackets selects. **One** pair gives one column; **two** pairs, a list inside, give a table, a **DataFrame**
+- Keep only the columns a question needs: `insta` has 26
 
-## Comparison Operators
-
-| Operator | Meaning |
-|:--|:--|
-| `==` | equal to |
-| `!=` | not equal to |
-| `>` `<` | greater than, less than |
-| `>=` `<=` | greater or equal, less or equal |
-
-[{{< fa triangle-exclamation >}}]{style="color:#e34948;"} **`=` stores, `==` compares.** Mixing them up happens to everyone.
-
-Lecture 6 compared one value at a time. On a column, pandas compares every row at once: one `True` or `False` per post.
-
-## Filter the Rows
+## Renaming Columns
 
 ```{python}
-reels = insta[insta["format"] == "reel"]
-reels.shape
+ads = insta[["post_id", "spend_eur", "attributed_revenue_eur"]]
+ads = ads.rename(columns={"spend_eur": "spend", "attributed_revenue_eur": "revenue"})
+ads.head(3)
 ```
 
-- `insta["format"] == "reel"` is Lecture 6's comparison, made for every row: True or False. `insta[...]` keeps the rows where it is True
-- The **Filters** shelf of Tableau, written down
-- `==` compares, `=` stores: `insta["format"] = "reel"` would replace every format with "reel"
+- `rename()` takes pairs between curly brackets, `{old name: new name}`, separated by commas
+- It **returns** a new table: without `ads =` in front, nothing changes
+- Only `ads` changed: `insta` keeps its own names
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### Select and rename
+
+Replace each `____` with the missing word, then run the cell. Column names go in quotes, like `"format"`:
+
+1. Keep only `post_id`, `product_line` and `attributed_purchases`, in a new table called `small`
+2. In `small`, rename `attributed_purchases` to `purchases`
+
+```{.python}
+small = insta[[____, "product_line", ____]]
+small = small.rename(columns={____: "purchases"})
+small.head(3)
+```
+
+::: {style="max-width:80%;"}
+You should see three columns, `post_id`, `product_line` and `purchases`, and LR0001, a Knitwear post, with 0 purchases.
+:::
+
+::: {#timer7_2 .timer seconds="300" starton="interaction"}
+:::
+
+## Solution
+
+```{python}
+small = insta[["post_id", "product_line", "attributed_purchases"]]
+small = small.rename(columns={"attributed_purchases": "purchases"})
+small.head(3)
+```
+
+The first posts are organic, so no purchases: Loomrow's first ad ran with LR0040. `insta` still has its 26 columns, under their own names.
+
+# 3. Filtering and Sorting Rows
+
+## Filtering Rows
+
+```{python}
+insta[insta["format"] == "reel"].head(3)
+```
+
+- `insta["format"] == "reel"` gives `True` or `False` for every row; the square brackets around it keep the rows that are `True`
+- The numbers on the left are the **index**: each row keeps its label, here 0, 1 and 6
+- Text goes in quotes, `"reel"`; numbers do not: `insta["reach"] > 50000`
+
+## Comparisons
+
+| Operator | Means |
+|:--|:--|
+| `==` | exactly equal |
+| `!=` | not equal |
+| `>` and `>=` | greater than, greater than or equal |
+| `<` and `<=` | less than, less than or equal |
+
+The easiest mistake to make is one `=` instead of two:
+
+```{.python}
+insta[insta["format"] = "reel"]
+```
+
+```
+SyntaxError: cannot assign to subscript here. Maybe you meant '==' instead of '='?
+```
+
+`=` stores a value, `==` compares two. Python stops, and suggests the fix.
 
 ## What `&` Does
 
@@ -307,65 +402,77 @@ Each condition keeps some rows; `&` keeps only the rows **both** conditions keep
 ## Two Conditions at Once
 
 ```{python}
-insta[(insta["format"] == "reel") & (insta["reach"] > 50000)]
+big_reels = insta[(insta["format"] == "reel") & (insta["reach"] > 50000)]
+reels_or_big = insta[(insta["format"] == "reel") | (insta["reach"] > 50000)]
+print(len(big_reels), len(reels_or_big))
 ```
 
-- `&` keeps the rows where **both** conditions are True; `|` where **either** is
-- Each condition in its **own brackets**. Without them, Python reads `"reel" & insta["reach"]` first, and fails
+- `&` keeps the rows where **both** conditions are True: 3 reels above 50,000 accounts
+- `|` keeps the rows where **either** is: the 203 reels, plus the 3 other posts above 50,000
+- Each condition in its **own round brackets**: without them, Python reads `"reel" & insta["reach"]` first, and fails. The words `and` and `or` do not work on columns
+- `len()` of a table counts its rows
 
-## Sort the Rows
+## Several Values at Once
+
+```{python}
+two_lines = insta[insta["product_line"].isin(["Denim", "Knitwear"])]
+small_posts = insta[insta["reach"].between(1000, 2000)]
+print(len(two_lines), len(small_posts))
+```
+
+- `isin([...])` keeps the rows whose value is **any** of a list: 171 Denim or Knitwear posts
+- `between(a, b)` keeps the values from a to b, both included: 54 posts reached 1,000 to 2,000 accounts
+- Each replaces a chain of conditions: `between(1000, 2000)` is `(insta["reach"] >= 1000) & (insta["reach"] <= 2000)`
+
+## Sorting Rows
 
 ```{python}
 top = insta.sort_values("reach", ascending=False)
-top[["post_id", "posted_at", "format", "reach"]].head(5)
+top[["post_id", "posted_at", "format", "reach"]].head(3)
 ```
 
-`ascending=False` puts the largest first. Lecture 3's reel, LR0184, tops the list with a reach almost four times the next one.
+- `sort_values("reach")` puts the smallest first; with `ascending=False`, the largest
+- After a sort, `.head(3)` gives the top three: Lecture 3's reel, LR0184, first, with almost four times the reach of the next one
+- `top` holds the same 431 posts in another order: a filter or a sort makes a **copy**, and `insta` is unchanged
 
 ## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
-### Question the posts
+### Filter
 
-Type each block in its own code cell, and run it:
+Replace each `____` with the missing word, then run the cell:
+
+1. Keep the paid posts, in a table called `paid`: `is_paid` is `True`
+2. From `paid`, keep the rows where `"format"` is `"carousel"`, in `paid_carousels`
+3. Sort them by reach, the largest first
 
 ```{.python}
-# 1. the five posts with the largest reach
-top = insta.sort_values("reach", ascending=False)
-top[["post_id", "format", "product_line"]].head(5)
-
-# 2. the number of paid posts, and their median reach
-paid = insta[insta["is_paid"] == True]
-print(paid.shape)
-print(paid["reach"].median())
-
-# 3. the reels that reached more than 50,000 accounts, by product line
-big_reels = insta[(insta["format"] == "reel") & (insta["reach"] > 50000)]
-big_reels["product_line"].value_counts()
+paid = insta[insta["is_paid"] == ____]
+paid_carousels = paid[paid[____] == "carousel"]
+print(len(paid), len(paid_carousels))
+top = paid_carousels.sort_values("reach", ascending=____)
+top[["post_id", "product_line", "reach"]].head(3)
 ```
 
-::: {#timer7_2 .timer seconds="420" starton="interaction"}
+::: {style="max-width:80%;"}
+You should see `127 45`, then LR0342, a Dresses carousel, first, with 45,649 accounts.
+:::
+
+::: {#timer7_3 .timer seconds="300" starton="interaction"}
 :::
 
 ## Solution
 
 ```{python}
-top = insta.sort_values("reach", ascending=False)
-print(top[["post_id", "format", "product_line"]].head(5))
 paid = insta[insta["is_paid"] == True]
-print(paid.shape, paid["reach"].median())
-big_reels = insta[(insta["format"] == "reel") & (insta["reach"] > 50000)]
-print(big_reels["product_line"].value_counts())
+paid_carousels = paid[paid["format"] == "carousel"]
+print(len(paid), len(paid_carousels))
+top = paid_carousels.sort_values("reach", ascending=False)
+top[["post_id", "product_line", "reach"]].head(3)
 ```
 
-## Solution (continued)
+`True` and `False` take no quotes: like numbers, they are values, not text.
 
-- Accessories has two of the five largest posts, both reels: LR0184 and LR0402
-- 127 paid posts, with a median reach of 5,585: barely more than the 5,184 of all posts
-- Three reels above 50,000: two Accessories, one Knitwear. Only one of the three was paid
-
-A filter keeps a **copy**: `insta` still holds all 431 posts. Nothing you filter or sort is lost.
-
-# 3. Add a Column, Save a Table
+# 4. Creating Columns and Saving Tables
 
 ## A New Column
 
@@ -374,128 +481,87 @@ insta["engagements"] = insta["likes"] + insta["comments"] + insta["saves"] + ins
 insta[["post_id", "likes", "comments", "saves", "shares", "engagements"]].head(3)
 ```
 
-- A **calculated field**, as in Tableau: the formula applies to every row at once, with no loop
-- The name on the left is yours: if it does not exist yet, the column is added at the end of the table
+- A **calculated field**, as in Tableau: the formula runs on **every row at once**, with no loop
+- A new name on the left creates a column, at the end of the table; an existing name replaces it
 
-## A Rate
+## A Rate, Rounded for the Reader
 
 ```{python}
 insta["engagement_rate"] = insta["engagements"] / insta["reach"] * 100
-insta[["post_id", "format", "engagements", "reach", "engagement_rate"]].head(3)
+insta[["post_id", "engagements", "reach", "engagement_rate"]].head(3).round(1)
 ```
 
-`+`, `-`, `*` and `/` work between columns, or with a number: `* 100` gives a percentage, and `insta["reach"] / 1000` gives the reach in thousands.
+- `+`, `-`, `*` and `/` work between columns, or with a number: `* 100` gives a percentage
+- `.round(1)` rounds what you show, to one decimal, as Lecture 6's `round(x, 1)` rounds one number
+- `insta` keeps every digit, for the calculations that come next
 
-## Keep a Result, Save a Result
+## Saving a Table
 
 ```{.python}
 paid = insta[insta["is_paid"] == True]
 paid.to_csv("paid-posts.csv", index=False)
 ```
 
-- `paid =` keeps the result under a new name. `insta` is unchanged
-- `.to_csv()` writes the table as a file in the Files panel: {{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click on it → **Download**
+- `.to_csv()` writes the table as a file in the **Files** panel: {{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click on it → **Download**
 - `index=False` stops pandas writing its row numbers as an extra column
+- Like an uploaded file, a saved file is deleted with the runtime: download it before you leave
 
 ## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
-### Calculated fields
+### New columns
 
-Type each block in its own code cell, and run it:
+Replace each `____` with the missing word, then run the cell:
+
+1. A column `non_followers_pct`: `reach_non_followers` as a % of `reach`
+2. The posts with the highest share first, with `.sort_values()`
+3. The sorted table saved as `non-followers.csv`: download it afterwards
 
 ```{.python}
-# 1. two new columns
-insta["engagements"] = insta["likes"] + insta["comments"] + insta["saves"] + insta["shares"]
-insta["engagement_rate"] = insta["engagements"] / insta["reach"] * 100
-
-# 2. the three posts with the highest engagement rate
-top = insta.sort_values("engagement_rate", ascending=False)
-top[["post_id", "format", "reach", "engagement_rate"]].head(3)
-
-# 3. the paid posts, four of their columns, saved as a file
-paid = insta[insta["is_paid"] == True]
-paid = paid[["post_id", "format", "spend_eur", "attributed_revenue_eur"]]
-paid.to_csv("paid-posts.csv", index=False)
+insta["non_followers_pct"] = insta[____] / insta["reach"] * 100
+top = insta.sort_values(____, ascending=False)
+top.to_csv(____, index=False)
+top[["post_id", "format", "non_followers_pct"]].head(3).round(1)
 ```
 
-Then download `paid-posts.csv` from the **Files** panel.
-
-::: {#timer7_3 .timer seconds="420" starton="interaction"}
+::: {style="max-width:80%;"}
+You should see three reels, LR0184, LR0267 and LR0402, each above 95%.
 :::
-
-## Solution
-
-```{python}
-top = insta.sort_values("engagement_rate", ascending=False)
-print(top[["post_id", "format", "reach", "engagement_rate"]].head(3))
-paid = insta[insta["is_paid"] == True]
-paid = paid[["post_id", "format", "spend_eur", "attributed_revenue_eur"]]
-```
-
-```{.python}
-paid.to_csv("paid-posts.csv", index=False)
-```
-
-The top two rates come from tiny posts: 403 and 616 accounts reached. **A rate needs its denominator next to it**: Lecture 8 comes back to it.
-
-# 4. When It Breaks
-
-## Read the Last Line
-
-Lecture 6's rule holds for tables: Python stops at the first problem, and the **last line** of the error names it.
-
-```
-KeyError                                  Traceback (most recent call last)
-...
-KeyError: 'Reach'
-```
-
-Skip the middle. Here, there is no column called `Reach`. The column is `reach`.
-
-## Five Errors You Will Meet Today {.smaller}
-
-| The last line says | What happened | The fix |
-|---|---|---|
-| `NameError: name 'insta' is not defined` | The cell that creates `insta` was not run, or the runtime restarted | Run the cells from the top |
-| `KeyError: 'Reach'` | No column with that exact name | Copy the name from `insta.columns` |
-| `FileNotFoundError: ... 'insta_data.csv'` | The file is not in the Files panel, or the name differs | Upload it again; copy its name |
-| `SyntaxError: ... Maybe you meant '==' instead of '='?` | A bracket, a quote, or a `=` for `==` | Python often suggests the fix: read it |
-| `TypeError: Cannot perform 'rand_' with a dtyped [int64] array ...` | Two conditions joined by `&` without their brackets | One pair of brackets around each condition |
-
-## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
-
-### Break it, fix it
-
-Each line holds **one** mistake. Type each line in its own code cell, exactly as it is:
-
-```{.python}
-insta = pd.read_csv("insta_data.csv")
-insta["Reach"].median()
-insta[insta["format"] = "image"]
-insta[insta["format"] == "reel" & insta["reach"] > 50000]
-```
-
-1. Run each cell, and read the **last line** of its error
-2. Fix the mistake, and run it again until it works
 
 ::: {#timer7_4 .timer seconds="300" starton="interaction"}
 :::
 
 ## Solution
 
-| Line | Error | The fix |
-|:--|:--|:--|
-| 1 | `FileNotFoundError` | a hyphen: `"insta-data.csv"` |
-| 2 | `KeyError` | lower case: `"reach"` |
-| 3 | `SyntaxError` | `==` to compare |
-| 4 | `TypeError` | brackets around each condition |
-
 ```{.python}
-insta = pd.read_csv("insta-data.csv")
-insta["reach"].median()
-insta[insta["format"] == "image"]
-insta[(insta["format"] == "reel") & (insta["reach"] > 50000)]
+insta["non_followers_pct"] = insta["reach_non_followers"] / insta["reach"] * 100
+top = insta.sort_values("non_followers_pct", ascending=False)
+top.to_csv("non-followers.csv", index=False)
+top[["post_id", "format", "non_followers_pct"]].head(3).round(1)
 ```
+
+```{python}
+#| echo: false
+# The same lines as above, without writing the file during the render
+insta["non_followers_pct"] = insta["reach_non_followers"] / insta["reach"] * 100
+top = insta.sort_values("non_followers_pct", ascending=False)
+top[["post_id", "format", "non_followers_pct"]].head(3).round(1)
+```
+
+The three posts that travelled furthest beyond the followers are the three reels above 50,000 accounts: reels are shown to people who do not follow Loomrow yet.
+
+## When pandas Stops {.smaller}
+
+| You see | Why | Fix |
+|:---------------------|:--------------|:-------------|
+| `FileNotFoundError: ... 'insta_data.csv'` | the file is missing, or misspelt | upload it; copy its path |
+| `NameError: name 'insta' is not defined` | `insta` was never created | run the cells from the top |
+| `KeyError: 'Reach'` | no column has that exact name | copy it from `insta.columns` |
+| `SyntaxError: ... Maybe you meant '=='` | one `=` inside a filter | `==` |
+| `TypeError: Cannot perform 'rand_' ...` | `&` without the brackets | `(...) & (...)` |
+| `ValueError: The truth value of a Series ...` | `and` or `or` on columns | `&` or <code>&#124;</code> |
+| no error, but nothing changed | `rename()` returns a new table | `small = small.rename(...)` |
+
+Read an error from its **last line**: it names the problem, and often the fix.
 
 ## {background="#43464B"}
 

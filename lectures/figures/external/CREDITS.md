@@ -40,7 +40,9 @@ Animated joins, copied unchanged from the `images/` folder of
 <https://github.com/gadenbuie/tidyexplain>. The images are released under
 **CC0 1.0** (the code under MIT); the author adds: "Please feel free to use these
 images for teaching or learning about action verbs from the tidyverse." Used in
-Lecture 4, with the source on each slide.
+Lecture 4, with the source on each slide. The `tidyexplain_*_nocode.gif` copies,
+used in Lecture 8, are the same animations with the R code cropped off the top
+(gifsicle 1.92 `--crop`, all 67 frames and their timings unchanged).
 
 ## `economist_mistakes.png`: The Economist, *Mistakes, we've drawn a few*
 <https://medium.economist.com/mistakes-weve-drawn-a-few-8cdd8a42d368>
