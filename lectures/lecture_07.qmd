@@ -152,6 +152,48 @@ insta.columns
 - `.shape` gives the number of rows, then of columns: a value, so no round brackets
 - `.columns` gives the 26 names: copy a name from here rather than typing it from memory
 
+## With or Without Brackets
+
+:::: {layout="[1,1]"}
+::: {#first-column}
+
+**Without**: an **attribute**, a value the table already holds. You only read it.
+
+```{.python}
+insta.shape      # its size
+insta.columns    # its column names
+```
+
+With brackets, it fails:
+
+```
+insta.shape()
+TypeError: 'tuple' object is not callable
+```
+
+:::
+
+::: {#second-column}
+
+**With**: a **method**, a function of the table (Lecture 6). The brackets run it, and hold its options.
+
+```{.python}
+insta.head(3)    # show 3 rows
+insta.info()     # describe each column
+```
+
+Without brackets, nothing runs:
+
+```
+insta.info
+<bound method DataFrame.info of ...>
+```
+
+:::
+::::
+
+**Has or does?** What the table **has**, its size or its names: no brackets. What it **does**, show, describe, count or sort: brackets.
+
 ## The Type of Each Column
 
 :::: {layout="[1.1,1]"}
@@ -565,6 +607,8 @@ The three posts that travelled furthest beyond the followers are the three reels
 | `FileNotFoundError: ... 'insta_data.csv'` | the file is missing, or misspelt | upload it; copy its path |
 | `NameError: name 'insta' is not defined` | `insta` was never created | run the cells from the top |
 | `KeyError: 'Reach'` | no column has that exact name | copy it from `insta.columns` |
+| `TypeError: 'tuple' object is not callable` | brackets after an attribute | `insta.shape` |
+| `<bound method ...>`, no result | a method without its brackets | `insta.info()` |
 | `SyntaxError: ... Maybe you meant '=='` | one `=` inside a filter | `==` |
 | `TypeError: Cannot perform 'rand_' ...` | `&` without the brackets | `(...) & (...)` |
 | `ValueError: The truth value of a Series ...` | `and` or `or` on columns | `&` or <code>&#124;</code> |
