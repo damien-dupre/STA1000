@@ -24,12 +24,12 @@ countries = pd.read_csv("../data/maps/ads-by-country.csv")
 
 ## Previously ...
 
-- In Lecture 7 you opened `insta-data.csv` with pandas, looked at it, fixed its dates, selected, filtered and sorted its rows, and added calculated columns.
+- In Lecture 7 you opened `insta-data.csv` with pandas, looked at it, fixed its dates, selected, filtered and sorted its rows, added calculated columns, and grouped the rows, with `.groupby()` and a pivot table.
 
 **Today, three questions:**
 
-1. How do you **group** the rows, to compare formats, themes or campaigns?
-2. How do you compute a **rate per group**, and group **by month**?
+1. How do you compute a **rate per group**, without averaging the rates?
+2. How do you group the posts **by month**?
 3. How do you **merge** two files, and check that nothing went wrong?
 
 ## Today's Notebook
@@ -45,128 +45,7 @@ insta["engagements"] = insta["likes"] + insta["comments"] + insta["saves"] + ins
 
 Lecture 7's first cell, plus the column today needs. The first cell of a notebook always does the same: load pandas, read the file, fix the types, add the columns.
 
-# 1. Group the Rows
-
-## The Question Behind Everything Today
-
-- Lecture 7 answered: **what is in this table?**
-- Today answers: **what is the answer per group?**
-
-Almost every marketing question is a grouped one:
-
-> Reach **per format**. Revenue **per campaign**. Sessions **per channel**, **per week**.
-
-In Tableau, a dimension on Rows did it. In pandas, `.groupby()`.
-
-## Split, Apply, Combine
-
-:::: {layout="[1,1.4]"}
-::: {#first-column}
-
-1. **Split** the rows into groups, by the values of a column
-2. **Apply** a calculation to each group
-3. **Combine** the results into a new table
-
-`.groupby()` does the splitting. On its own, it computes nothing.
-
-:::
-
-::: {#second-column}
-
-![](./figures/external/ubc_groupby_split.png){fig-align="center" style="max-height:380px;"}
-
-::: {style="font-size:0.5em;text-align:center;"}
-Source: UBC Master of Data Science, Programming in Python for Data Science [{{< fa link >}}](https://prog-learn.mds.ubc.ca/)
-:::
-
-:::
-::::
-
-## Your First groupby
-
-```{python}
-insta.groupby("format")["reach"].median()
-```
-
-Read it left to right:
-
-1. `.groupby("format")`: **split** the rows by format, as when `format` goes on Rows in Tableau
-2. `["reach"]`: the column to calculate on
-3. `.median()`: the calculation, applied to each group, and **combined** into one result. Or `.sum()`, `.mean()`, `.count()`
-
-## Sort the Result
-
-```{python}
-insta.groupby("product_line")["reach"].median().sort_values(ascending=False)
-```
-
-The result of a `groupby` is an ordinary Series: everything from Lecture 7 still applies to it, `.sort_values()`, `.round()`, `.head()`. Outerwear reaches furthest.
-
-## Several Columns at Once
-
-```{python}
-insta.groupby("format")[["reach", "engagements", "spend_eur"]].sum()
-```
-
-Two pairs of brackets again, a list of columns, as in Lecture 7. The result is a table with one row per format, and the formats as row names.
-
-## Several Figures per Group
-
-```{python}
-insta.groupby("format")["reach"].agg(["count", "mean", "median"])
-```
-
-`.agg()` takes a list of calculations. `count` is the number of posts behind each figure: always show it next to a mean, and the mean next to the median.
-
-## Round for the Reader
-
-```{python}
-insta.groupby("format")["reach"].agg(["count", "mean", "median"]).round(1)
-```
-
-As in Lecture 7, `.round(1)` rounds what you show, here a whole table, to one decimal; `insta` keeps every digit for later calculations.
-
-## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
-
-### Group the posts
-
-Type each block in its own code cell, and run it:
-
-```{.python}
-# 1. the total likes of each theme, the largest first
-insta.groupby("theme")["likes"].sum().sort_values(ascending=False)
-
-# 2. the number of posts, and the mean and median saves, of each format
-insta.groupby("format")["saves"].agg(["count", "mean", "median"]).round(1)
-
-# 3. the total ad spend of each format
-insta.groupby("format")["spend_eur"].sum()
-```
-
-::: {#timer8_1 .timer seconds="300" starton="interaction"}
-:::
-
-## Solution
-
-```{python}
-insta.groupby("theme")["likes"].sum().sort_values(ascending=False)
-```
-
-```{python}
-insta.groupby("format")["saves"].agg(["count", "mean", "median"]).round(1)
-```
-
-Founder posts collect the most likes, sustainability posts the fewest. Carousels are saved most: a median of 49 saves, twice the reels'.
-
-## Solution (continued)
-
-```{python}
-insta.groupby("format")["spend_eur"].sum()
-```
-
-The ad money splits almost evenly between carousels and reels, about €9,100 each, and €6,149 went on images.
-
-# 2. A Rate per Group
+# 1. A Rate per Group
 
 ## Average of the Rates, or Rate of the Totals?
 
@@ -236,7 +115,7 @@ by_campaign.sort_values("roas", ascending=False).round(2)
 
 **ROAS**, the return on ad spend: €6.97 a euro at Black Friday, €2.46 for the AW25 preorders.
 
-# 3. Over Time, and in Two Dimensions
+# 2. Over Time
 
 ## Date Parts and Date Values
 
@@ -261,15 +140,6 @@ monthly.sort_values(ascending=False).head(3)
 
 Group by a date value, and each month becomes a row: Lecture 5's line chart, as a table. August 2025 is the month of the viral reel. Lecture 9 draws the line.
 
-## Two Dimensions: a Pivot Table
-
-```{python}
-insta.pivot_table(index="format", columns="is_paid", values="reach", aggfunc="sum")
-```
-
-- `index`: the rows; `columns`: the columns; `values`: the column to calculate on; `aggfunc`: the calculation
-- Tableau's crosstab, with `format` on Rows and `is_paid` on Columns. An Excel pivot table, written down
-
 ## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
 ### Loomrow over time
@@ -284,12 +154,9 @@ insta["year"] = insta["posted_at"].dt.year
 print(insta.groupby("year")["reach"].sum())
 first_half = insta[insta["posted_at"].dt.month <= 6]
 print(first_half.groupby("year")["reach"].sum())
-
-# 3. the number of posts of each format, organic (False) or paid (True)
-insta.pivot_table(index="format", columns="is_paid", values="post_id", aggfunc="count")
 ```
 
-::: {#timer8_3 .timer seconds="420" starton="interaction"}
+::: {#timer8_3 .timer seconds="300" starton="interaction"}
 :::
 
 ## Solution
@@ -302,15 +169,7 @@ print(first_half.groupby("year")["reach"].sum())
 
 Fewer in total, because 2026 stops on 24 June: compare the same months, as in Lecture 5. From January to June, 2026 reached **4.6 times** as many accounts as 2025.
 
-## Solution (continued)
-
-```{python}
-insta.pivot_table(index="format", columns="is_paid", values="post_id", aggfunc="count")
-```
-
-45 of the 144 carousels were boosted, 50 of the 203 reels, and 32 of the 84 images.
-
-# 4. Merge Two Files
+# 3. Merge Two Files
 
 ## Two Files, One Key
 

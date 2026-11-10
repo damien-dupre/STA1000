@@ -217,11 +217,12 @@ Damien Dupré
 <ul>
 <li>In Lecture 6 you wrote your first lines of Python in Colab: variables, types, comparisons, and errors read from their last line.</li>
 </ul>
-<p><strong>Today, three questions:</strong></p>
+<p><strong>Today, four questions:</strong></p>
 <ol type="1">
 <li>How do you <strong>open</strong> a table, and take a <strong>first look</strong> at it?</li>
 <li>How do you keep only the <strong>columns</strong> and the <strong>rows</strong> a question needs, and <strong>sort</strong> them?</li>
 <li>How do you <strong>create</strong> a column, and <strong>save</strong> the result?</li>
+<li>How do you <strong>group</strong> the rows, and <strong>summarise</strong> each group?</li>
 </ol>
 </section>
 <section id="pandas-and-dataframes" class="slide level2">
@@ -294,7 +295,7 @@ Damien Dupré
 </tbody>
 </table>
 </div>
-<p>Today, a first look at the table, then the first three operations, one section each. Lecture 8 does the last two, and Lecture 9 draws the results.</p>
+<p>Today, a first look at the table, then the first four operations, one section each. Lecture 8 does the last one, with rates per group and dates, and Lecture 9 draws the results.</p>
 </section>
 <section id="todays-notebook" class="slide level2">
 <h2>Today’s Notebook</h2>
@@ -373,9 +374,9 @@ Damien Dupré
 <section id="the-loomrow-dataset" class="slide level2">
 <h2>The Loomrow Dataset</h2>
 <p>Each row is <strong>a post</strong> on Loomrow’s Instagram account, January 2025 to June 2026: its <code>format</code>, <code>theme</code>, <code>reach</code>, <code>likes</code>, <code>saves</code>, ad spend and revenue.</p>
-<div id="96871699" class="cell" data-execution_count="2">
+<div id="c54280e4" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href=""></a>insta.head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
+<div class="cell-output cell-output-display" data-execution_count="32">
 <div>
 <style scoped="">
     .dataframe tbody tr th:only-of-type {
@@ -449,15 +450,15 @@ Damien Dupré
 </section>
 <section id="rows-and-columns" class="slide level2">
 <h2>Rows and Columns</h2>
-<div id="e362da56" class="cell" data-execution_count="3">
+<div id="12c7d657" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href=""></a>insta.shape</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="3">
+<div class="cell-output cell-output-display" data-execution_count="33">
 <pre><code>(431, 26)</code></pre>
 </div>
 </div>
-<div id="8c9c67b3" class="cell" data-execution_count="4">
+<div id="8a9d2abf" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href=""></a>insta.columns</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
+<div class="cell-output cell-output-display" data-execution_count="34">
 <pre><code>Index(['post_id', 'posted_at', 'format', 'product_line', 'theme', 'campaign',
        'is_paid', 'caption_length', 'hashtag_count', 'followers_at_post',
        'reach', 'impressions', 'reach_followers', 'reach_non_followers',
@@ -565,10 +566,10 @@ TypeError: 'tuple' object is not callable</code></pre>
 <section id="fix-the-dates" class="slide level2">
 <h2>Fix the Dates</h2>
 <p>In Lecture 5, Tableau recognised <code>posted_at</code> as a date. pandas reads it as text, and one line converts it:</p>
-<div id="efaff225" class="cell" data-execution_count="5">
+<div id="4f084c37" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href=""></a>insta[<span class="st">"posted_at"</span>] <span class="op">=</span> pd.to_datetime(insta[<span class="st">"posted_at"</span>])</span>
 <span id="cb16-2"><a href=""></a>insta[<span class="st">"posted_at"</span>].head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="5">
+<div class="cell-output cell-output-display" data-execution_count="35">
 <pre><code>0   2025-01-08 20:00:00
 1   2025-01-08 12:00:00
 2   2025-01-09 09:00:00
@@ -582,9 +583,9 @@ Name: posted_at, dtype: datetime64[ns]</code></pre>
 </section>
 <section id="missing-values" class="slide level2">
 <h2>Missing Values</h2>
-<div id="155e3e80" class="cell" data-execution_count="6">
+<div id="4b0b7d9e" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href=""></a>insta[<span class="st">"campaign"</span>].value_counts(dropna<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="6">
+<div class="cell-output cell-output-display" data-execution_count="36">
 <pre><code>campaign
 NaN                  225
 SS25_Launch           50
@@ -604,9 +605,9 @@ Name: count, dtype: int64</code></pre>
 </section>
 <section id="the-key-figures-of-a-column" class="slide level2">
 <h2>The Key Figures of a Column</h2>
-<div id="5d1ab05b" class="cell" data-execution_count="7">
+<div id="e4909202" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href=""></a>insta[<span class="st">"reach"</span>].describe()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="7">
+<div class="cell-output cell-output-display" data-execution_count="37">
 <pre><code>count       431.000000
 mean       9787.928074
 std       27747.990577
@@ -623,9 +624,9 @@ Name: reach, dtype: float64</code></pre>
 </section>
 <section id="count-the-categories" class="slide level2">
 <h2>Count the Categories</h2>
-<div id="a352b1a2" class="cell" data-execution_count="8">
+<div id="b019f248" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href=""></a>insta[<span class="st">"format"</span>].value_counts()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="8">
+<div class="cell-output cell-output-display" data-execution_count="38">
 <pre><code>format
 reel        203
 carousel    144
@@ -633,9 +634,9 @@ image        84
 Name: count, dtype: int64</code></pre>
 </div>
 </div>
-<div id="fbfd9f2f" class="cell" data-execution_count="9">
+<div id="b0acd76a" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href=""></a>insta[<span class="st">"format"</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="9">
+<div class="cell-output cell-output-display" data-execution_count="39">
 <pre><code>format
 reel        0.470998
 carousel    0.334107
@@ -664,15 +665,18 @@ Name: proportion, dtype: float64</code></pre>
 <h3 id="a-first-look-1">A first look</h3>
 <p>In a new cell, replace each <code>____</code> with the missing word, and run it:</p>
 <ol type="1">
-<li>The number of rows and columns, with <code>.shape</code></li>
-<li>The mean and the median of the likes, with <code>.mean()</code> and <code>.median()</code></li>
+<li>Drop your file in the File folder of Colab</li>
+<li>Load pandas as <code>pd</code>, and read the file with <code>pd.read_csv()</code></li>
+<li>The size with <code>.shape</code>, then the likes’ <code>.mean()</code> and <code>.median()</code></li>
 <li>The share of the posts in each product line, with <code>normalize=True</code></li>
 </ol>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href=""></a><span class="bu">print</span>(insta.____)</span>
-<span id="cb28-2"><a href=""></a><span class="bu">print</span>(insta[<span class="st">"likes"</span>].____(), insta[<span class="st">"likes"</span>].____())</span>
-<span id="cb28-3"><a href=""></a><span class="bu">print</span>(insta[<span class="st">"product_line"</span>].value_counts(normalize<span class="op">=</span>____))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href=""></a><span class="im">import</span> pandas <span class="im">as</span> ____</span>
+<span id="cb28-2"><a href=""></a>insta <span class="op">=</span> pd.____(<span class="st">"insta-data.csv"</span>)</span>
+<span id="cb28-3"><a href=""></a><span class="bu">print</span>(insta.____)</span>
+<span id="cb28-4"><a href=""></a><span class="bu">print</span>(insta[<span class="st">"likes"</span>].____(), insta[<span class="st">"likes"</span>].____())</span>
+<span id="cb28-5"><a href=""></a><span class="bu">print</span>(insta[<span class="st">"product_line"</span>].value_counts(normalize<span class="op">=</span>____))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div style="max-width:80%;">
-<p>You should see <code>(431, 26)</code>, then <code>462.97...</code> and <code>278.0</code>. Then the five product lines, each with 0.18 to 0.21 of the posts.</p>
+<p>You should see <code>(431, 26)</code>, <code>462.97...</code>, <code>278.0</code> and five shares.</p>
 </div>
                     <div id="timer7_1"></div>
                     <script>
@@ -684,10 +688,12 @@ Name: proportion, dtype: float64</code></pre>
 </section>
 <section id="solution" class="slide level2">
 <h2>Solution</h2>
-<div id="43bfd30f" class="cell" data-execution_count="10">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href=""></a><span class="bu">print</span>(insta.shape)</span>
-<span id="cb29-2"><a href=""></a><span class="bu">print</span>(insta[<span class="st">"likes"</span>].mean(), insta[<span class="st">"likes"</span>].median())</span>
-<span id="cb29-3"><a href=""></a><span class="bu">print</span>(insta[<span class="st">"product_line"</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href=""></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb29-2"><a href=""></a>insta <span class="op">=</span> pd.read_csv(<span class="st">"insta-data.csv"</span>)</span>
+<span id="cb29-3"><a href=""></a><span class="bu">print</span>(insta.shape)</span>
+<span id="cb29-4"><a href=""></a><span class="bu">print</span>(insta[<span class="st">"likes"</span>].mean(), insta[<span class="st">"likes"</span>].median())</span>
+<span id="cb29-5"><a href=""></a><span class="bu">print</span>(insta[<span class="st">"product_line"</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="e8a8f169" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-stdout">
 <pre><code>(431, 26)
 462.97447795823666 278.0
@@ -709,9 +715,9 @@ Name: proportion, dtype: float64</code></pre>
 </section>
 <section id="one-column" class="slide level2">
 <h2>One Column</h2>
-<div id="eabad093" class="cell" data-execution_count="11">
+<div id="76c7fa23" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href=""></a>insta[<span class="st">"reach"</span>].head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="11">
+<div class="cell-output cell-output-display" data-execution_count="41">
 <pre><code>0      735
 1     2647
 2    10393
@@ -726,9 +732,9 @@ Name: reach, dtype: int64</code></pre>
 </section>
 <section id="several-columns" class="slide level2">
 <h2>Several Columns</h2>
-<div id="cd080b75" class="cell" data-execution_count="12">
+<div id="df48b718" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href=""></a>insta[[<span class="st">"post_id"</span>, <span class="st">"format"</span>, <span class="st">"reach"</span>]].head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="12">
+<div class="cell-output cell-output-display" data-execution_count="42">
 <div>
 <style scoped="">
     .dataframe tbody tr th:only-of-type {
@@ -786,11 +792,11 @@ Name: reach, dtype: int64</code></pre>
 </section>
 <section id="renaming-columns" class="slide level2">
 <h2>Renaming Columns</h2>
-<div id="c9df2cff" class="cell" data-execution_count="13">
+<div id="4a384526" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href=""></a>ads <span class="op">=</span> insta[[<span class="st">"post_id"</span>, <span class="st">"spend_eur"</span>, <span class="st">"attributed_revenue_eur"</span>]]</span>
 <span id="cb34-2"><a href=""></a>ads <span class="op">=</span> ads.rename(columns<span class="op">=</span>{<span class="st">"spend_eur"</span>: <span class="st">"spend"</span>, <span class="st">"attributed_revenue_eur"</span>: <span class="st">"revenue"</span>})</span>
 <span id="cb34-3"><a href=""></a>ads.head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="13">
+<div class="cell-output cell-output-display" data-execution_count="43">
 <div>
 <style scoped="">
     .dataframe tbody tr th:only-of-type {
@@ -863,18 +869,18 @@ Name: reach, dtype: int64</code></pre>
                     <div id="timer7_2"></div>
                     <script>
                         document.addEventListener("DOMContentLoaded", function () {
-                            initializeTimer("timer7_2", 300, "interaction");
+                            initializeTimer("timer7_2", 180, "interaction");
                         });
                     </script>
                 
 </section>
 <section id="solution-1" class="slide level2">
 <h2>Solution</h2>
-<div id="606a6255" class="cell" data-execution_count="14">
+<div id="8f92f7a5" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href=""></a>small <span class="op">=</span> insta[[<span class="st">"post_id"</span>, <span class="st">"product_line"</span>, <span class="st">"attributed_purchases"</span>]]</span>
 <span id="cb36-2"><a href=""></a>small <span class="op">=</span> small.rename(columns<span class="op">=</span>{<span class="st">"attributed_purchases"</span>: <span class="st">"purchases"</span>})</span>
 <span id="cb36-3"><a href=""></a>small.head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="14">
+<div class="cell-output cell-output-display" data-execution_count="44">
 <div>
 <style scoped="">
     .dataframe tbody tr th:only-of-type {
@@ -933,9 +939,9 @@ Name: reach, dtype: int64</code></pre>
 </section>
 <section id="filtering-rows" class="slide level2">
 <h2>Filtering Rows</h2>
-<div id="44b7720f" class="cell" data-execution_count="15">
+<div id="72914b94" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href=""></a>insta[insta[<span class="st">"format"</span>] <span class="op">==</span> <span class="st">"reel"</span>].head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="15">
+<div class="cell-output cell-output-display" data-execution_count="45">
 <div>
 <style scoped="">
     .dataframe tbody tr th:only-of-type {
@@ -1055,7 +1061,7 @@ Name: reach, dtype: int64</code></pre>
 </section>
 <section id="two-conditions-at-once" class="slide level2">
 <h2>Two Conditions at Once</h2>
-<div id="6ab12515" class="cell" data-execution_count="16">
+<div id="69f5bc57" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href=""></a>big_reels <span class="op">=</span> insta[(insta[<span class="st">"format"</span>] <span class="op">==</span> <span class="st">"reel"</span>) <span class="op">&amp;</span> (insta[<span class="st">"reach"</span>] <span class="op">&gt;</span> <span class="dv">50000</span>)]</span>
 <span id="cb40-2"><a href=""></a>reels_or_big <span class="op">=</span> insta[(insta[<span class="st">"format"</span>] <span class="op">==</span> <span class="st">"reel"</span>) <span class="op">|</span> (insta[<span class="st">"reach"</span>] <span class="op">&gt;</span> <span class="dv">50000</span>)]</span>
 <span id="cb40-3"><a href=""></a><span class="bu">print</span>(<span class="bu">len</span>(big_reels), <span class="bu">len</span>(reels_or_big))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -1072,7 +1078,7 @@ Name: reach, dtype: int64</code></pre>
 </section>
 <section id="several-values-at-once" class="slide level2">
 <h2>Several Values at Once</h2>
-<div id="2b415351" class="cell" data-execution_count="17">
+<div id="06caccae" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href=""></a>two_lines <span class="op">=</span> insta[insta[<span class="st">"product_line"</span>].isin([<span class="st">"Denim"</span>, <span class="st">"Knitwear"</span>])]</span>
 <span id="cb42-2"><a href=""></a>low_reach <span class="op">=</span> insta[insta[<span class="st">"reach"</span>].between(<span class="dv">1000</span>, <span class="dv">2000</span>)]</span>
 <span id="cb42-3"><a href=""></a><span class="bu">print</span>(<span class="bu">len</span>(two_lines), <span class="bu">len</span>(low_reach))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -1088,10 +1094,10 @@ Name: reach, dtype: int64</code></pre>
 </section>
 <section id="sorting-rows" class="slide level2">
 <h2>Sorting Rows</h2>
-<div id="200aeacd" class="cell" data-execution_count="18">
+<div id="380c579f" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href=""></a>by_reach <span class="op">=</span> insta.sort_values(<span class="st">"reach"</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb44-2"><a href=""></a>by_reach[[<span class="st">"post_id"</span>, <span class="st">"posted_at"</span>, <span class="st">"format"</span>, <span class="st">"reach"</span>]].head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="18">
+<div class="cell-output cell-output-display" data-execution_count="48">
 <div>
 <style scoped="">
     .dataframe tbody tr th:only-of-type {
@@ -1171,14 +1177,14 @@ Name: reach, dtype: int64</code></pre>
                     <div id="timer7_3"></div>
                     <script>
                         document.addEventListener("DOMContentLoaded", function () {
-                            initializeTimer("timer7_3", 300, "interaction");
+                            initializeTimer("timer7_3", 240, "interaction");
                         });
                     </script>
                 
 </section>
 <section id="solution-2" class="slide level2">
 <h2>Solution</h2>
-<div id="c68d810c" class="cell" data-execution_count="19">
+<div id="9f00d261" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href=""></a>paid <span class="op">=</span> insta[insta[<span class="st">"is_paid"</span>] <span class="op">==</span> <span class="va">True</span>]</span>
 <span id="cb46-2"><a href=""></a>paid_carousels <span class="op">=</span> paid[paid[<span class="st">"format"</span>] <span class="op">==</span> <span class="st">"carousel"</span>]</span>
 <span id="cb46-3"><a href=""></a><span class="bu">print</span>(<span class="bu">len</span>(paid), <span class="bu">len</span>(paid_carousels))</span>
@@ -1187,7 +1193,7 @@ Name: reach, dtype: int64</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>127 45</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="19">
+<div class="cell-output cell-output-display" data-execution_count="49">
 <div>
 <style scoped="">
     .dataframe tbody tr th:only-of-type {
@@ -1246,10 +1252,10 @@ Name: reach, dtype: int64</code></pre>
 </section>
 <section id="a-new-column" class="slide level2">
 <h2>A New Column</h2>
-<div id="bd7d9055" class="cell" data-execution_count="20">
+<div id="d188ea4b" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href=""></a>insta[<span class="st">"engagements"</span>] <span class="op">=</span> insta[<span class="st">"likes"</span>] <span class="op">+</span> insta[<span class="st">"comments"</span>] <span class="op">+</span> insta[<span class="st">"saves"</span>] <span class="op">+</span> insta[<span class="st">"shares"</span>]</span>
 <span id="cb48-2"><a href=""></a>insta[[<span class="st">"post_id"</span>, <span class="st">"likes"</span>, <span class="st">"comments"</span>, <span class="st">"saves"</span>, <span class="st">"shares"</span>, <span class="st">"engagements"</span>]].head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="20">
+<div class="cell-output cell-output-display" data-execution_count="50">
 <div>
 <style scoped="">
     .dataframe tbody tr th:only-of-type {
@@ -1318,10 +1324,10 @@ Name: reach, dtype: int64</code></pre>
 </section>
 <section id="a-rate-rounded-for-the-reader" class="slide level2">
 <h2>A Rate, Rounded for the Reader</h2>
-<div id="24099ed3" class="cell" data-execution_count="21">
+<div id="1edea20a" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href=""></a>insta[<span class="st">"engagement_rate"</span>] <span class="op">=</span> insta[<span class="st">"engagements"</span>] <span class="op">/</span> insta[<span class="st">"reach"</span>] <span class="op">*</span> <span class="dv">100</span></span>
 <span id="cb49-2"><a href=""></a>insta[[<span class="st">"post_id"</span>, <span class="st">"engagements"</span>, <span class="st">"reach"</span>, <span class="st">"engagement_rate"</span>]].head(<span class="dv">3</span>).<span class="bu">round</span>(<span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="21">
+<div class="cell-output cell-output-display" data-execution_count="51">
 <div>
 <style scoped="">
     .dataframe tbody tr th:only-of-type {
@@ -1410,7 +1416,7 @@ Name: reach, dtype: int64</code></pre>
                     <div id="timer7_4"></div>
                     <script>
                         document.addEventListener("DOMContentLoaded", function () {
-                            initializeTimer("timer7_4", 300, "interaction");
+                            initializeTimer("timer7_4", 240, "interaction");
                         });
                     </script>
                 
@@ -1421,8 +1427,8 @@ Name: reach, dtype: int64</code></pre>
 <span id="cb52-2"><a href=""></a>by_non_followers <span class="op">=</span> insta.sort_values(<span class="st">"non_followers_pct"</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb52-3"><a href=""></a>by_non_followers.to_csv(<span class="st">"non-followers.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb52-4"><a href=""></a>by_non_followers[[<span class="st">"post_id"</span>, <span class="st">"format"</span>, <span class="st">"non_followers_pct"</span>]].head(<span class="dv">3</span>).<span class="bu">round</span>(<span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div id="24b8e79b" class="cell" data-execution_count="22">
-<div class="cell-output cell-output-display" data-execution_count="22">
+<div id="fd782f48" class="cell" data-execution_count="22">
+<div class="cell-output cell-output-display" data-execution_count="52">
 <div>
 <style scoped="">
     .dataframe tbody tr th:only-of-type {
@@ -1473,6 +1479,383 @@ Name: reach, dtype: int64</code></pre>
 </div>
 </div>
 <p>The three posts that travelled furthest beyond the followers are the three reels above 50,000 accounts: reels are shown to people who do not follow Loomrow yet.</p>
+</section></section>
+<section>
+<section id="grouping-and-summarising" class="title-slide slide level1 center">
+<h1>5. Grouping and Summarising</h1>
+
+</section>
+<section id="split-apply-combine" class="slide level2">
+<h2>Split, Apply, Combine</h2>
+<p>Most marketing questions are grouped: reach <strong>per format</strong>, revenue <strong>per campaign</strong>. Tableau puts a dimension on Rows; pandas uses <code>.groupby()</code>.</p>
+<div class="quarto-layout-panel" data-layout="[1,1.2]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 45.5%;justify-content: flex-start;">
+<ol type="1">
+<li><strong>Split</strong> the rows into groups, by the values of a column</li>
+<li><strong>Apply</strong> a calculation to each group</li>
+<li><strong>Combine</strong> the results into a new table</li>
+</ol>
+<p><code>.groupby()</code> does the splitting. On its own, it computes nothing.</p>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 54.6%;justify-content: center;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="./figures/external/ubc_groupby_split.png" class="quarto-figure quarto-figure-center" style="max-height:290px;"></p>
+</figure>
+</div>
+<div style="font-size:0.5em;text-align:center;">
+<p>Source: UBC Master of Data Science, Programming in Python for Data Science <a href="https://prog-learn.mds.ubc.ca/"><i class="fa-solid fa-link" aria-label="link"></i></a></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="your-first-groupby" class="slide level2">
+<h2>Your First groupby</h2>
+<div id="677df353" class="cell" data-execution_count="23">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href=""></a>insta.groupby(<span class="st">"format"</span>)[<span class="st">"reach"</span>].median()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="53">
+<pre><code>format
+carousel    6186.5
+image       4669.0
+reel        4680.0
+Name: reach, dtype: float64</code></pre>
+</div>
+</div>
+<p>Read it left to right:</p>
+<ol type="1">
+<li><code>.groupby("format")</code>: <strong>split</strong> the rows by format, as when <code>format</code> goes on Rows in Tableau</li>
+<li><code>["reach"]</code>: the column to calculate on</li>
+<li><code>.median()</code>: the calculation, applied to each group, and <strong>combined</strong> into one result. Or <code>.sum()</code>, <code>.mean()</code>, <code>.count()</code></li>
+</ol>
+</section>
+<section id="sort-the-result" class="slide level2">
+<h2>Sort the Result</h2>
+<div id="9550d757" class="cell" data-execution_count="24">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href=""></a>insta.groupby(<span class="st">"product_line"</span>)[<span class="st">"reach"</span>].median().sort_values(ascending<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="54">
+<pre><code>product_line
+Outerwear      6248.5
+Knitwear       5268.0
+Denim          5006.5
+Dresses        4972.0
+Accessories    4942.5
+Name: reach, dtype: float64</code></pre>
+</div>
+</div>
+<p>The result of a <code>groupby</code> is an ordinary Series: everything from today still applies to it, <code>.sort_values()</code>, <code>.round()</code>, <code>.head()</code>. Outerwear reaches furthest.</p>
+</section>
+<section id="several-columns-at-once" class="slide level2">
+<h2>Several Columns at Once</h2>
+<div id="3acd0e21" class="cell" data-execution_count="25">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href=""></a>insta.groupby(<span class="st">"format"</span>)[[<span class="st">"reach"</span>, <span class="st">"likes"</span>, <span class="st">"spend_eur"</span>]].<span class="bu">sum</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="55">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe caption-top" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">reach</th>
+<th data-quarto-table-cell-role="th">likes</th>
+<th data-quarto-table-cell-role="th">spend_eur</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">format</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">carousel</th>
+<td>1313259</td>
+<td>91563</td>
+<td>9069.00</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">image</th>
+<td>697810</td>
+<td>34558</td>
+<td>6148.78</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">reel</th>
+<td>2207528</td>
+<td>73421</td>
+<td>9128.00</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Two pairs of brackets again, a list of columns, as on “Several Columns”. The result is a table with one row per format, and the formats as row names.</p>
+</section>
+<section id="summarise-each-group" class="slide level2">
+<h2>Summarise Each Group</h2>
+<div id="b0d78fe6" class="cell" data-execution_count="26">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href=""></a>insta.groupby(<span class="st">"format"</span>)[<span class="st">"reach"</span>].agg([<span class="st">"count"</span>, <span class="st">"mean"</span>, <span class="st">"median"</span>]).<span class="bu">round</span>(<span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="56">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe caption-top" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+<th data-quarto-table-cell-role="th">mean</th>
+<th data-quarto-table-cell-role="th">median</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">format</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">carousel</th>
+<td>144</td>
+<td>9119.9</td>
+<td>6186.5</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">image</th>
+<td>84</td>
+<td>8307.3</td>
+<td>4669.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">reel</th>
+<td>203</td>
+<td>10874.5</td>
+<td>4680.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<ul>
+<li><code>.agg()</code> takes a list of calculations, and <strong>summarises</strong> each group in one row</li>
+<li><code>count</code> is the number of posts behind each figure: always show it next to a mean, and the mean next to the median</li>
+<li><code>.round(1)</code> rounds what you show, as for a rate</li>
+</ul>
+</section>
+<section id="two-dimensions-a-pivot-table" class="slide level2">
+<h2>Two Dimensions: a Pivot Table</h2>
+<div id="c897b0d6" class="cell" data-execution_count="27">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href=""></a>insta.pivot_table(index<span class="op">=</span><span class="st">"format"</span>, columns<span class="op">=</span><span class="st">"is_paid"</span>, values<span class="op">=</span><span class="st">"reach"</span>, aggfunc<span class="op">=</span><span class="st">"sum"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="57">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe caption-top" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th">is_paid</th>
+<th data-quarto-table-cell-role="th">False</th>
+<th data-quarto-table-cell-role="th">True</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">format</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">carousel</th>
+<td>890767</td>
+<td>422492</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">image</th>
+<td>395735</td>
+<td>302075</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">reel</th>
+<td>1727783</td>
+<td>479745</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<ul>
+<li><code>index</code>: the rows; <code>columns</code>: the columns; <code>values</code>: the column to calculate on; <code>aggfunc</code>: the calculation</li>
+<li>Tableau’s crosstab, with <code>format</code> on Rows and <code>is_paid</code> on Columns. An Excel pivot table, written down</li>
+</ul>
+</section>
+<section id="your-turn-4" class="slide level2" data-background="#43464B">
+<h2><i class="fa-solid fa-screwdriver-wrench" aria-label="screwdriver-wrench"></i> Your Turn!</h2>
+<h3 id="group-and-summarise">Group and summarise</h3>
+<p>In a new cell, replace each <code>____</code> with the missing word, and run it:</p>
+<ol type="1">
+<li>The total likes of each theme, with <code>.groupby()</code> and <code>.sum()</code>, the largest first</li>
+<li>The count, mean and median reach of each product line, with <code>.agg()</code></li>
+<li>The number of posts of each format, with <code>is_paid</code> as the columns</li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb60"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href=""></a>likes_per_theme <span class="op">=</span> insta.____(<span class="st">"theme"</span>)[<span class="st">"likes"</span>].____()</span>
+<span id="cb60-2"><a href=""></a><span class="bu">print</span>(likes_per_theme.sort_values(ascending<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb60-3"><a href=""></a>summary <span class="op">=</span> insta.groupby(<span class="st">"product_line"</span>)[<span class="st">"reach"</span>].____([<span class="st">"count"</span>, <span class="st">"mean"</span>, <span class="st">"median"</span>])</span>
+<span id="cb60-4"><a href=""></a><span class="bu">print</span>(summary.<span class="bu">round</span>(<span class="dv">1</span>))</span>
+<span id="cb60-5"><a href=""></a>insta.pivot_table(index<span class="op">=</span><span class="st">"format"</span>, columns<span class="op">=</span><span class="st">"____"</span>,</span>
+<span id="cb60-6"><a href=""></a>                  values<span class="op">=</span><span class="st">"post_id"</span>, aggfunc<span class="op">=</span><span class="st">"count"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div style="max-width:80%;">
+<p>You should see founder posts first, and 45 paid carousels.</p>
+</div>
+                    <div id="timer7_5"></div>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            initializeTimer("timer7_5", 240, "interaction");
+                        });
+                    </script>
+                
+</section>
+<section id="solution-4" class="slide level2">
+<h2>Solution</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb61"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href=""></a>likes_per_theme <span class="op">=</span> insta.groupby(<span class="st">"theme"</span>)[<span class="st">"likes"</span>].<span class="bu">sum</span>()</span>
+<span id="cb61-2"><a href=""></a><span class="bu">print</span>(likes_per_theme.sort_values(ascending<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb61-3"><a href=""></a>summary <span class="op">=</span> insta.groupby(<span class="st">"product_line"</span>)[<span class="st">"reach"</span>].agg([<span class="st">"count"</span>, <span class="st">"mean"</span>, <span class="st">"median"</span>])</span>
+<span id="cb61-4"><a href=""></a><span class="bu">print</span>(summary.<span class="bu">round</span>(<span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="quarto-layout-panel" data-layout="[1,1.25]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 44.4%;justify-content: flex-start;">
+<div id="befa2037" class="cell" data-execution_count="28">
+<div class="cell-output cell-output-stdout">
+<pre><code>theme
+founder              38705
+styling              37629
+customer             35759
+product              33198
+behind the scenes    32405
+sustainability       21846
+Name: likes, dtype: int64</code></pre>
+</div>
+</div>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 55.6%;justify-content: flex-start;">
+<div id="78da279c" class="cell" data-execution_count="29">
+<div class="cell-output cell-output-stdout">
+<pre><code>              count     mean  median
+product_line                        
+Accessories      78  15939.6  4942.5
+Denim            86   7138.9  5006.5
+Dresses          90   8438.3  4972.0
+Knitwear         85   8326.3  5268.0
+Outerwear        92   9719.3  6248.5</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Sustainability posts collect the fewest likes. One viral reel lifts the Accessories mean to three times its median: compare the medians.</p>
+</section>
+<section id="solution-continued" class="slide level2">
+<h2>Solution (continued)</h2>
+<div id="ea1b0e4b" class="cell" data-execution_count="30">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href=""></a>insta.pivot_table(index<span class="op">=</span><span class="st">"format"</span>, columns<span class="op">=</span><span class="st">"is_paid"</span>,</span>
+<span id="cb64-2"><a href=""></a>                  values<span class="op">=</span><span class="st">"post_id"</span>, aggfunc<span class="op">=</span><span class="st">"count"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="60">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe caption-top" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th">is_paid</th>
+<th data-quarto-table-cell-role="th">False</th>
+<th data-quarto-table-cell-role="th">True</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">format</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">carousel</th>
+<td>99</td>
+<td>45</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">image</th>
+<td>52</td>
+<td>32</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">reel</th>
+<td>153</td>
+<td>50</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>127 of the 431 posts were boosted: 45 of the 144 carousels, 50 of the 203 reels, and 32 of the 84 images.</p>
 </section>
 <section id="when-pandas-stops" class="slide level2 smaller">
 <h2>When pandas Stops</h2>

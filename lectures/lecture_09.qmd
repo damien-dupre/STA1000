@@ -26,7 +26,7 @@ insta["engagement_rate"] = insta["engagements"] / insta["reach"] * 100
 
 ## Previously ...
 
-- In Lecture 8 you grouped the posts by format, theme and month, divided totals to get a rate per group, and merged two files without multiplying the rows.
+- In Lecture 7 you grouped the posts by format and theme, in a `groupby` or a pivot table. In Lecture 8 you divided totals to get a rate per group, grouped by month, and merged two files without multiplying the rows.
 
 **Today, three questions:**
 
@@ -189,7 +189,7 @@ by_month = insta.pivot_table(index="month", columns="format", values="reach", ag
 by_month.plot()
 ```
 
-A table with several columns draws one line per column, and a legend: Lecture 8's pivot table is ready to draw.
+A table with several columns draws one line per column, and a legend: Lecture 7's pivot table, by Lecture 8's month, is ready to draw.
 
 ## One Figure, or Several, per Cell
 

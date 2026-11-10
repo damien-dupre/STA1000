@@ -24,11 +24,12 @@ insta = pd.read_csv("../data/insta-data.csv")
 
 - In Lecture 6 you wrote your first lines of Python in Colab: variables, types, comparisons, and errors read from their last line.
 
-**Today, three questions:**
+**Today, four questions:**
 
 1. How do you **open** a table, and take a **first look** at it?
 2. How do you keep only the **columns** and the **rows** a question needs, and **sort** them?
 3. How do you **create** a column, and **save** the result?
+4. How do you **group** the rows, and **summarise** each group?
 
 ## pandas and DataFrames
 
@@ -60,7 +61,7 @@ Almost every data question needs only five operations, and you have done all fiv
 
 :::
 
-Today, a first look at the table, then the first three operations, one section each. Lecture 8 does the last two, and Lecture 9 draws the results.
+Today, a first look at the table, then the first four operations, one section each. Lecture 8 does the last one, with rates per group and dates, and Lecture 9 draws the results.
 
 ## Today's Notebook
 
@@ -314,18 +315,21 @@ insta["format"].value_counts()    # the categories of a text column
 
 In a new cell, replace each `____` with the missing word, and run it:
 
-1. The number of rows and columns, with `.shape`
-2. The mean and the median of the likes, with `.mean()` and `.median()`
-3. The share of the posts in each product line, with `normalize=True`
+1. Drop your file in the File folder of Colab
+2. Load pandas as `pd`, and read the file with `pd.read_csv()`
+3. The size with `.shape`, then the likes' `.mean()` and `.median()`
+4. The share of the posts in each product line, with `normalize=True`
 
 ```{.python}
+import pandas as ____
+insta = pd.____("insta-data.csv")
 print(insta.____)
 print(insta["likes"].____(), insta["likes"].____())
 print(insta["product_line"].value_counts(normalize=____))
 ```
 
 ::: {style="max-width:80%;"}
-You should see `(431, 26)`, then `462.97...` and `278.0`. Then the five product lines, each with 0.18 to 0.21 of the posts.
+You should see `(431, 26)`, `462.97...`, `278.0` and five shares.
 :::
 
 ::: {#timer7_1 .timer seconds="300" starton="interaction"}
@@ -333,7 +337,17 @@ You should see `(431, 26)`, then `462.97...` and `278.0`. Then the five product 
 
 ## Solution
 
+```{.python}
+import pandas as pd
+insta = pd.read_csv("insta-data.csv")
+print(insta.shape)
+print(insta["likes"].mean(), insta["likes"].median())
+print(insta["product_line"].value_counts(normalize=True))
+```
+
 ```{python}
+#| echo: false
+# The same lines as above, on the table the slides read at the start
 print(insta.shape)
 print(insta["likes"].mean(), insta["likes"].median())
 print(insta["product_line"].value_counts(normalize=True))
@@ -394,7 +408,7 @@ small.head(3)
 You should see three columns, `post_id`, `product_line` and `purchases`, and LR0001, a Knitwear post, with 0 purchases.
 :::
 
-::: {#timer7_2 .timer seconds="300" starton="interaction"}
+::: {#timer7_2 .timer seconds="180" starton="interaction"}
 :::
 
 ## Solution
@@ -508,7 +522,7 @@ paid_carousels[["post_id", "product_line", "reach"]].head(3)
 You should see `127 45`, then LR0342, a Dresses carousel, first, with 45,649 accounts.
 :::
 
-::: {#timer7_3 .timer seconds="300" starton="interaction"}
+::: {#timer7_3 .timer seconds="240" starton="interaction"}
 :::
 
 ## Solution
@@ -578,7 +592,7 @@ by_non_followers[["post_id", "format", "non_followers_pct"]].head(3).round(1)
 You should see three reels above 95%, LR0184 first.
 :::
 
-::: {#timer7_4 .timer seconds="300" starton="interaction"}
+::: {#timer7_4 .timer seconds="240" starton="interaction"}
 :::
 
 ## Solution
@@ -599,6 +613,149 @@ by_non_followers[["post_id", "format", "non_followers_pct"]].head(3).round(1)
 ```
 
 The three posts that travelled furthest beyond the followers are the three reels above 50,000 accounts: reels are shown to people who do not follow Loomrow yet.
+
+# 5. Grouping and Summarising
+
+## Split, Apply, Combine
+
+Most marketing questions are grouped: reach **per format**, revenue **per campaign**. Tableau puts a dimension on Rows; pandas uses `.groupby()`.
+
+:::: {layout="[1,1.2]"}
+::: {#first-column}
+
+1. **Split** the rows into groups, by the values of a column
+2. **Apply** a calculation to each group
+3. **Combine** the results into a new table
+
+`.groupby()` does the splitting. On its own, it computes nothing.
+
+:::
+
+::: {#second-column}
+
+![](./figures/external/ubc_groupby_split.png){fig-align="center" style="max-height:290px;"}
+
+::: {style="font-size:0.5em;text-align:center;"}
+Source: UBC Master of Data Science, Programming in Python for Data Science [{{< fa link >}}](https://prog-learn.mds.ubc.ca/)
+:::
+
+:::
+::::
+
+## Your First groupby
+
+```{python}
+insta.groupby("format")["reach"].median()
+```
+
+Read it left to right:
+
+1. `.groupby("format")`: **split** the rows by format, as when `format` goes on Rows in Tableau
+2. `["reach"]`: the column to calculate on
+3. `.median()`: the calculation, applied to each group, and **combined** into one result. Or `.sum()`, `.mean()`, `.count()`
+
+## Sort the Result
+
+```{python}
+insta.groupby("product_line")["reach"].median().sort_values(ascending=False)
+```
+
+The result of a `groupby` is an ordinary Series: everything from today still applies to it, `.sort_values()`, `.round()`, `.head()`. Outerwear reaches furthest.
+
+## Several Columns at Once
+
+```{python}
+insta.groupby("format")[["reach", "likes", "spend_eur"]].sum()
+```
+
+Two pairs of brackets again, a list of columns, as on "Several Columns". The result is a table with one row per format, and the formats as row names.
+
+## Summarise Each Group
+
+```{python}
+insta.groupby("format")["reach"].agg(["count", "mean", "median"]).round(1)
+```
+
+- `.agg()` takes a list of calculations, and **summarises** each group in one row
+- `count` is the number of posts behind each figure: always show it next to a mean, and the mean next to the median
+- `.round(1)` rounds what you show, as for a rate
+
+## Two Dimensions: a Pivot Table
+
+```{python}
+insta.pivot_table(index="format", columns="is_paid", values="reach", aggfunc="sum")
+```
+
+- `index`: the rows; `columns`: the columns; `values`: the column to calculate on; `aggfunc`: the calculation
+- Tableau's crosstab, with `format` on Rows and `is_paid` on Columns. An Excel pivot table, written down
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### Group and summarise
+
+In a new cell, replace each `____` with the missing word, and run it:
+
+1. The total likes of each theme, with `.groupby()` and `.sum()`, the largest first
+2. The count, mean and median reach of each product line, with `.agg()`
+3. The number of posts of each format, with `is_paid` as the columns
+
+```{.python}
+likes_per_theme = insta.____("theme")["likes"].____()
+print(likes_per_theme.sort_values(ascending=False))
+summary = insta.groupby("product_line")["reach"].____(["count", "mean", "median"])
+print(summary.round(1))
+insta.pivot_table(index="format", columns="____",
+                  values="post_id", aggfunc="count")
+```
+
+::: {style="max-width:80%;"}
+You should see founder posts first, and 45 paid carousels.
+:::
+
+::: {#timer7_5 .timer seconds="240" starton="interaction"}
+:::
+
+## Solution
+
+```{.python}
+likes_per_theme = insta.groupby("theme")["likes"].sum()
+print(likes_per_theme.sort_values(ascending=False))
+summary = insta.groupby("product_line")["reach"].agg(["count", "mean", "median"])
+print(summary.round(1))
+```
+
+:::: {layout="[1,1.25]"}
+::: {#first-column}
+
+```{python}
+#| echo: false
+likes_per_theme = insta.groupby("theme")["likes"].sum()
+print(likes_per_theme.sort_values(ascending=False))
+```
+
+:::
+
+::: {#second-column}
+
+```{python}
+#| echo: false
+summary = insta.groupby("product_line")["reach"].agg(["count", "mean", "median"])
+print(summary.round(1))
+```
+
+:::
+::::
+
+Sustainability posts collect the fewest likes. One viral reel lifts the Accessories mean to three times its median: compare the medians.
+
+## Solution (continued)
+
+```{python}
+insta.pivot_table(index="format", columns="is_paid",
+                  values="post_id", aggfunc="count")
+```
+
+127 of the 431 posts were boosted: 45 of the 144 carousels, 50 of the 203 reels, and 32 of the 84 images.
 
 ## When pandas Stops {.smaller}
 
