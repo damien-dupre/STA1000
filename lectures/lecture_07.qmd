@@ -61,7 +61,7 @@ Almost every data question needs only five operations, and you have done all fiv
 
 :::
 
-Today, a first look at the table, then the first four operations, one section each. Lecture 8 does the last one, with rates per group and dates, and Lecture 9 draws the results.
+Today, a first look at the table, then the first four operations, one section each. Lecture 8 draws the results, and Lecture 9 does the last one, with rates per group and dates.
 
 ## Today's Notebook
 
@@ -254,7 +254,7 @@ insta["posted_at"].head(3)
 ```
 
 - `insta["posted_at"] =` on the left **replaces** the column with what is on the right
-- Add the first line to your **first cell**, which fixes the types, and run that cell again: Lecture 8 groups the posts by month
+- Add the first line to your **first cell**, which fixes the types, and run that cell again: Lectures 8 and 9 use the dates
 
 ## Missing Values
 

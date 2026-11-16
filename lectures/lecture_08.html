@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<script src="lecture_08_files/libs/clipboard/clipboard.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="lecture_08_files/libs/clipboard/clipboard.min.js"></script>
 <script src="lecture_08_files/libs/quarto-html/tabby.min.js"></script>
 <script src="lecture_08_files/libs/quarto-html/popper.min.js"></script>
 <script src="lecture_08_files/libs/quarto-html/tippy.umd.min.js"></script>
@@ -8,11 +8,13 @@
 <link href="lecture_08_files/libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="lecture_08_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="lecture_08_files/libs/quarto-contrib/quarto-timer-1.0.0/timer.js"></script>
-<link href="lecture_08_files/libs/quarto-contrib/quarto-timer-1.0.0/timer.css" rel="stylesheet"><meta charset="utf-8">
+<link href="lecture_08_files/libs/quarto-contrib/quarto-timer-1.0.0/timer.css" rel="stylesheet">
+<link href="lecture_08_files/libs/quarto-contrib/fontawesome6-1.2.0/all.min.css" rel="stylesheet">
+<link href="lecture_08_files/libs/quarto-contrib/fontawesome6-1.2.0/latex-fontsize.css" rel="stylesheet"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.25">
 
   <meta name="author" content="Damien Dupré">
-  <title>Lecture 8: Build the Site</title>
+  <title>Lecture 8: Python III - Figures with matplotlib</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -97,7 +99,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="lecture_08_files/libs/revealjs/dist/theme/quarto-8ff52f0e31ad5c532cba6b018e3cb49b.css">
+  <link rel="stylesheet" href="lecture_08_files/libs/revealjs/dist/theme/quarto-158af071109d29c7035ba1450a51c90c.css">
   <link href="lecture_08_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="lecture_08_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="lecture_08_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -189,13 +191,16 @@
       margin-right: 0; 
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+  
+  <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 </head>
 <body class="quarto-light">
   <div class="reveal">
     <div class="slides">
 
 <section id="title-slide" data-background-iframe="colored-particles/index.html" class="quarto-title-block center">
-  <h1 class="title">Lecture 8: Build the Site</h1>
+  <h1 class="title">Lecture 8: Python III - Figures with matplotlib</h1>
   <p class="subtitle">STA1000 - Data Analytics and Metrics</p>
 
 <div class="quarto-title-authors">
@@ -209,122 +214,224 @@ Damien Dupré
 </section>
 <section id="previously" class="slide level2">
 <h2>Previously …</h2>
-<p>Six lectures analysing Loomrow’s data, ending in a published dashboard. Every number in it came from a file somebody else handed you.</p>
-<div class="fragment">
-<p>Two questions a supplied dataset never forces:</p>
 <ul>
-<li>What was worth recording in the first place?</li>
-<li>What can this number actually prove?</li>
+<li>In Lecture 7 you opened <code>insta-data.csv</code> with pandas, took a first look, selected, filtered and sorted its rows, added calculated columns, and grouped the rows, with <code>.groupby()</code> and a pivot table.</li>
 </ul>
-</div>
-<div class="fragment">
-<p><strong>Today we build the thing we are going to measure, so that both questions become yours.</strong></p>
-</div>
+<p><strong>Today, four questions:</strong></p>
+<ol type="1">
+<li>How do you draw a <strong>first chart</strong> with matplotlib?</li>
+<li>How do you make a chart <strong>say something</strong>, and save it?</li>
+<li>How do you draw a table you computed with <strong>pandas</strong>?</li>
+<li>How do you have an <strong>AI assistant</strong> write the code, and <strong>check</strong> it?</li>
+</ol>
 </section>
-<section id="learning-outcomes" class="slide level2">
-<h2>Learning Outcomes</h2>
-<p>By the end of this lecture you will be able to:</p>
-<ul>
-<li>Build and publish a small multi-page site suitable for tracking</li>
-<li>Identify the user actions on that site that carry commercial meaning</li>
-<li>Write a statement of success <strong>before</strong> any tracking exists</li>
-</ul>
-</section>
-<section>
-<section id="why-build-before-measuring" class="title-slide slide level1 center">
-<h1>1. Why Build Before Measuring</h1>
+<section id="summary-statistics-lie" class="slide level2">
+<h2>Summary Statistics Lie</h2>
+<div id="07ceceab" class="cell" data-execution_count="2">
+<div class="cell-output cell-output-display" data-execution_count="35">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
-</section>
-<section id="the-problem-with-borrowed-data" class="slide level2">
-<h2>The Problem With Borrowed Data</h2>
-<!-- Speaker notes: the standard analytics module hands students a clean sample
-     dataset. Students learn the tool but never learn the judgement, because
-     they never had to decide what was worth recording. Loomrow was deliberately
-     that module for six weeks; this is the pivot. -->
-<p><code>insta-data.csv</code> was clean, complete and rectangular. Somebody decided that <code>reach_followers</code> and <code>reach_non_followers</code> were worth splitting out, and you inherited that decision without ever making it.</p>
-<div class="fragment">
-<p>That is the shape of most analytics teaching, and of a lot of analytics work. It produces people who are fluent in tools and helpless about measurement.</p>
-</div>
-<div class="fragment">
-<p><strong>From today the decisions are yours, and so are the consequences.</strong></p>
-</div>
-</section>
-<section id="the-portfolio-as-a-business" class="slide level2">
-<h2>The Portfolio as a Business</h2>
-<p>Your site is not a CV. It is a <strong>business with an objective</strong>, and it is the object of study for the rest of the module.</p>
-<div class="fragment">
-<p>That means it needs something a visitor can <em>do</em>:</p>
-<ul>
-<li>Send an enquiry</li>
-<li>Sign up to something</li>
-<li>Download something</li>
-<li>Book a slot</li>
-</ul>
-</div>
-<div class="fragment">
-<p><strong>A site nobody can act on generates page views and nothing else</strong>, and page views cannot carry the second half of this module.</p>
-</div>
-</section>
-<section id="what-you-are-signing-up-to" class="slide level2 smaller">
-<h2>What You Are Signing Up To</h2>
-<table class="caption-top">
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe caption-top" data-border="1">
 <thead>
-<tr class="header">
-<th>Lecture</th>
-<th>What your site has to support</th>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th">dataset</th>
+<th data-quarto-table-cell-role="th">I</th>
+<th data-quarto-table-cell-role="th">II</th>
+<th data-quarto-table-cell-role="th">III</th>
+<th data-quarto-table-cell-role="th">IV</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>9</td>
-<td>A measurement plan and a live GA4 property</td>
+<th data-quarto-table-cell-role="th">mean x</th>
+<td>9.00</td>
+<td>9.00</td>
+<td>9.00</td>
+<td>9.00</td>
 </tr>
 <tr class="even">
-<td>10</td>
-<td>A consent banner and a privacy notice you wrote</td>
+<th data-quarto-table-cell-role="th">mean y</th>
+<td>7.50</td>
+<td>7.50</td>
+<td>7.50</td>
+<td>7.50</td>
 </tr>
 <tr class="odd">
-<td>11</td>
-<td>An export with enough rows to be worth opening</td>
+<th data-quarto-table-cell-role="th">sd x</th>
+<td>3.32</td>
+<td>3.32</td>
+<td>3.32</td>
+<td>3.32</td>
 </tr>
 <tr class="even">
-<td>13-16</td>
-<td>Your own data, in Python</td>
+<th data-quarto-table-cell-role="th">sd y</th>
+<td>2.03</td>
+<td>2.03</td>
+<td>2.03</td>
+<td>2.03</td>
 </tr>
 <tr class="odd">
-<td>19</td>
-<td>A funnel with a middle</td>
-</tr>
-<tr class="even">
-<td>24</td>
-<td>A story about your own traffic, presented and defended</td>
+<th data-quarto-table-cell-role="th">r</th>
+<td>0.82</td>
+<td>0.82</td>
+<td>0.82</td>
+<td>0.82</td>
 </tr>
 </tbody>
 </table>
-<div class="fragment">
-<p><strong>The site has to be live by next week</strong>, because Lecture 9 tags it and Lecture 11 needs several weeks of accumulated traffic.</p>
+
 </div>
-</section></section>
+</div>
+</div>
+<div id="ddf8214b" class="cell" data-execution_count="3">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-4-output-1.png" width="1057" height="221"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Anscombe’s quartet</strong> (1973): the same means, standard deviations, correlation and best-fit line. Only the charts tell them apart. <strong>Always plot the data.</strong></p>
+</section>
+<section id="todays-notebook" class="slide level2">
+<h2>Today’s Notebook</h2>
+<p>A new notebook, <code>STA1000 Lecture 8</code>, and <code>insta-data.csv</code> from Loop uploaded to the <i class="fa-solid fa-folder" aria-label="folder"></i> <strong>Files</strong> panel. The first cell:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href=""></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt          <span class="co"># the plotting library, as plt</span></span>
+<span id="cb1-3"><a href=""></a>insta <span class="op">=</span> pd.read_csv(<span class="st">"insta-data.csv"</span>)</span>
+<span id="cb1-4"><a href=""></a>insta[<span class="st">"posted_at"</span>] <span class="op">=</span> pd.to_datetime(insta[<span class="st">"posted_at"</span>])</span>
+<span id="cb1-5"><a href=""></a>insta[<span class="st">"engagements"</span>] <span class="op">=</span> insta[<span class="st">"likes"</span>] <span class="op">+</span> insta[<span class="st">"comments"</span>] <span class="op">+</span> insta[<span class="st">"saves"</span>] <span class="op">+</span> insta[<span class="st">"shares"</span>]</span>
+<span id="cb1-6"><a href=""></a>insta[<span class="st">"engagement_rate"</span>] <span class="op">=</span> insta[<span class="st">"engagements"</span>] <span class="op">/</span> insta[<span class="st">"reach"</span>] <span class="op">*</span> <span class="dv">100</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
+<li>Lecture 7’s first cell and its two calculated columns, plus one new line: <strong>matplotlib</strong>, Python’s plotting library, under its short name <code>plt</code>, as pandas is <code>pd</code></li>
+<li>Colab has matplotlib installed already: nothing to install</li>
+<li>Every chart today starts from <code>insta</code>, its 431 posts and 28 columns</li>
+</ul>
+</section>
+<section id="your-turn" class="slide level2" data-background="#43464B">
+<h2><i class="fa-solid fa-screwdriver-wrench" aria-label="screwdriver-wrench"></i> Your Turn!</h2>
+<h3 id="get-set-up">Get set up</h3>
+<ol type="1">
+<li>In Colab, open a new notebook, and name it <code>STA1000 Lecture 8</code></li>
+<li>From Loop, download <code>insta-data.csv</code>, then drag it into the <i class="fa-solid fa-folder" aria-label="folder"></i> <strong>Files</strong> panel</li>
+<li>In the first cell, run the code below</li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-2"><a href=""></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb2-3"><a href=""></a>insta <span class="op">=</span> pd.read_csv(<span class="st">"insta-data.csv"</span>)</span>
+<span id="cb2-4"><a href=""></a>insta[<span class="st">"posted_at"</span>] <span class="op">=</span> pd.to_datetime(insta[<span class="st">"posted_at"</span>])</span>
+<span id="cb2-5"><a href=""></a>insta[<span class="st">"engagements"</span>] <span class="op">=</span> insta[<span class="st">"likes"</span>] <span class="op">+</span> insta[<span class="st">"comments"</span>] <span class="op">+</span> insta[<span class="st">"saves"</span>] <span class="op">+</span> insta[<span class="st">"shares"</span>]</span>
+<span id="cb2-6"><a href=""></a>insta[<span class="st">"engagement_rate"</span>] <span class="op">=</span> insta[<span class="st">"engagements"</span>] <span class="op">/</span> insta[<span class="st">"reach"</span>] <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb2-7"><a href=""></a><span class="bu">print</span>(insta.shape)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+                    <div id="timer8_0"></div>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            initializeTimer("timer8_0", 240, "interaction");
+                        });
+                    </script>
+                
+</section>
 <section>
-<section id="site-structure" class="title-slide slide level1 center">
-<h1>2. Site Structure</h1>
+<section id="basic-visualisations-with-matplotlib" class="title-slide slide level1 center">
+<h1>1. Basic Visualisations with matplotlib</h1>
 
 </section>
-<section id="minimum-viable-structure" class="slide level2">
-<h2>Minimum Viable Structure</h2>
-<p>Four pages. No more, for now.</p>
-<ul>
-<li><strong>Home</strong>: who you are and what you offer, above the fold</li>
-<li><strong>Work</strong>: two or three case studies, each its own page or anchor</li>
-<li><strong>About</strong>: the human bit</li>
-<li><strong>Contact</strong>: the page that exists to be a conversion</li>
-</ul>
-<div class="fragment">
-<p>The fourth page is the one that matters. <strong>One page must exist purely to be converted on</strong>, whether that is a form, a download or a booking link.</p>
+<section id="using-matplotlib" class="slide level2">
+<h2>Using matplotlib</h2>
+<p><strong>matplotlib</strong> is Python’s main plotting library: pandas, seaborn and most charts written by AI assistants draw with it. A chart is built in <strong>layers</strong>, one line of code each:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()     <span class="co"># 1. the canvas: an empty frame</span></span>
+<span id="cb3-2"><a href=""></a>ax.scatter(x, y)             <span class="co"># 2. a geometry: what to draw, and which columns</span></span>
+<span id="cb3-3"><a href=""></a>ax.set_xlabel(<span class="st">"..."</span>)         <span class="co"># 3. more layers: labels, scales, colours</span></span>
+<span id="cb3-4"><a href=""></a>plt.show()                   <span class="co"># 4. show it</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="2d9d9f12" class="cell" data-execution_count="4">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-5-output-1.png" width="1057" height="205"></p>
+</figure>
 </div>
+</div>
+</div>
+<p>Read from top to bottom: each line adds to what the lines above it drew.</p>
 </section>
-<section id="tooling-options" class="slide level2 smaller">
-<h2>Tooling Options</h2>
+<section id="the-canvas-fig-and-ax" class="slide level2">
+<h2>The Canvas: fig and ax</h2>
+<div id="76de33f1" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="fl">1.2</span>))</span>
+<span id="cb4-2"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-6-output-1.png" width="892" height="144"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li><code>plt.subplots()</code> gives back two things, stored under the two names left of <code>=</code>: <code>fig</code>, the whole <strong>figure</strong>, and <code>ax</code>, its plotting area, the <strong>axes</strong></li>
+<li><code>figsize=</code>: the width, then the height, in inches. Without it, matplotlib picks a size</li>
+<li>An empty frame: every layer from now on is a <strong>method</strong> of <code>ax</code>, such as <code>ax.scatter()</code></li>
+</ul>
+</section>
+<section id="mapping-x-and-y" class="slide level2">
+<h2>Mapping x and y</h2>
+<p>A geometry’s first two arguments are its <strong>mapping</strong>: the x column, then the y column.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb5-2"><a href=""></a>ax.scatter(my_table[<span class="st">"my_x_column"</span>], my_table[<span class="st">"my_y_column"</span>])   <span class="co"># x first, then y</span></span>
+<span id="cb5-3"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="b5ca7c19" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb6-2"><a href=""></a>ax.scatter(insta[<span class="st">"reach"</span>], insta[<span class="st">"engagement_rate"</span>])</span>
+<span id="cb6-3"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-8-output-1.png" width="892" height="166"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>One point per post; the one far right stretches the axis: section 2 deals with it.</p>
+</section>
+<section id="more-than-x-and-y" class="slide level2">
+<h2>More Than x and y</h2>
+<div id="5ce5e9e3" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7" data-code-line-numbers="3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb7-2"><a href=""></a>ax.scatter(insta[<span class="st">"reach"</span>], insta[<span class="st">"engagement_rate"</span>],</span>
+<span id="cb7-3"><a href=""></a>           color<span class="op">=</span><span class="st">"darkred"</span>, s<span class="op">=</span><span class="dv">15</span>, marker<span class="op">=</span><span class="st">"s"</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb7-4"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-10-output-1.png" width="892" height="188"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li><code>color</code>: a name or a code, such as <code>"#C44E52"</code>. <code>s</code>: the size. <code>marker</code>: the shape, <code>"o"</code>, <code>"s"</code> or <code>"^"</code>. <code>alpha</code>: from 0, invisible, to 1, solid</li>
+<li>Each is <strong>one value for the whole layer</strong>: section 2 colours by format</li>
+<li>A long line can continue inside its brackets, on the next line</li>
+</ul>
+</section>
+<section id="geometries" class="slide level2">
+<h2>Geometries</h2>
+<p>Each kind of chart has its own <code>ax</code> method, its <strong>geometry</strong>:</p>
+<div style="font-size:0.75em; line-height:1.3;">
 <table class="caption-top">
 <colgroup>
 <col style="width: 25%">
@@ -334,296 +441,740 @@ Damien Dupré
 </colgroup>
 <thead>
 <tr class="header">
-<th>Option</th>
-<th>Cost</th>
-<th>Control</th>
-<th>Tagging</th>
+<th style="text-align: left;">Method</th>
+<th style="text-align: left;">Draws</th>
+<th style="text-align: left;">To show</th>
+<th style="text-align: left;">Family</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><strong>Quarto + GitHub Pages</strong></td>
-<td>Free</td>
-<td>Total</td>
-<td>Trivial: one line in <code>_quarto.yml</code></td>
+<td style="text-align: left;"><code>ax.scatter(x, y)</code></td>
+<td style="text-align: left;">points</td>
+<td style="text-align: left;">how two columns relate</td>
+<td style="text-align: left;">relationship</td>
 </tr>
 <tr class="even">
-<td><strong>Plain HTML + GitHub Pages</strong></td>
-<td>Free</td>
-<td>Total</td>
-<td>Trivial, but you write everything</td>
+<td style="text-align: left;"><code>ax.plot(x, y)</code></td>
+<td style="text-align: left;">a line</td>
+<td style="text-align: left;">a change over time</td>
+<td style="text-align: left;">evolution (Lecture 5)</td>
 </tr>
 <tr class="odd">
-<td><strong>Wix, Squarespace, Carrd</strong></td>
-<td>Paid tiers</td>
-<td>Limited</td>
-<td>Possible, often behind a plan</td>
+<td style="text-align: left;"><code>ax.bar(x, heights)</code></td>
+<td style="text-align: left;">bars</td>
+<td style="text-align: left;">one number per category</td>
+<td style="text-align: left;">composition, comparison</td>
 </tr>
 <tr class="even">
-<td><strong>Notion, Canva sites</strong></td>
-<td>Free tiers</td>
-<td>Very limited</td>
-<td>Frequently impossible</td>
+<td style="text-align: left;"><code>ax.barh(y, widths)</code></td>
+<td style="text-align: left;">sideways bars</td>
+<td style="text-align: left;">the same, for long names</td>
+<td style="text-align: left;">composition, comparison</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>ax.hist(values)</code></td>
+<td style="text-align: left;">a histogram</td>
+<td style="text-align: left;">how one column is spread</td>
+<td style="text-align: left;">distribution</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>ax.boxplot(groups)</code></td>
+<td style="text-align: left;">boxes</td>
+<td style="text-align: left;">the spread in each group</td>
+<td style="text-align: left;">distribution, comparison</td>
 </tr>
 </tbody>
 </table>
-<div class="fragment">
-<div class="callout callout-note no-icon callout-style-simple">
-<div class="callout-body">
-<div class="callout-content">
-<p><strong>The hard constraint: you must be able to inject a script into <code>&lt;head&gt;</code> on every page.</strong> Check this before you build anything. A platform that will not let you is a platform you cannot use for this module.</p>
 </div>
-</div>
-</div>
-</div>
-<div class="fragment">
-<p><strong>The default for this module is Quarto published to GitHub Pages</strong>, because it is free, versioned, and the tag goes in one file.</p>
-</div>
+<p>Lecture 3’s four families, plus time. <strong>The question picks the geometry.</strong> All the others: <a href="https://matplotlib.org/stable/plot_types/index.html">plot types</a>.</p>
 </section>
-<section id="why-github-beyond-hosting" class="slide level2">
-<h2>Why GitHub, Beyond Hosting</h2>
-<p>GitHub is a code-collaboration platform that quietly became several other things. Two matter here:</p>
+<section id="line-chart" class="slide level2">
+<h2>Line Chart</h2>
+<div id="81557911" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href=""></a>by_date <span class="op">=</span> insta.sort_values(<span class="st">"posted_at"</span>)</span>
+<span id="cb8-2"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb8-3"><a href=""></a>ax.plot(by_date[<span class="st">"posted_at"</span>], by_date[<span class="st">"followers_at_post"</span>])</span>
+<span id="cb8-4"><a href=""></a>fig.autofmt_xdate()</span>
+<span id="cb8-5"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-11-output-1.png" width="892" height="188"></p>
+</figure>
+</div>
+</div>
+</div>
 <ul>
-<li><strong>File and code storage with version control.</strong> Every change to your site is recorded, dated and reversible</li>
-<li><strong>Online publication.</strong> GitHub Pages hosts a static site straight out of a repository, free, over HTTPS</li>
+<li>A line joins the rows <strong>in the table’s order</strong>: sort them by date first. <code>fig.autofmt_xdate()</code> tilts the dates, so they do not overlap</li>
+<li>5,253 followers in January 2025, 38,668 in June 2026: steeper after August 2025, the month of the viral reel</li>
 </ul>
-<div class="fragment">
-<p>You will use the same account again in Lecture 13 for notebooks, and in Assignment 2.</p>
-</div>
 </section>
-<section id="creating-the-repository" class="slide level2 smaller">
-<h2>Creating the Repository</h2>
+<section id="bar-chart" class="slide level2">
+<h2>Bar Chart</h2>
+<div id="ab55ebd3" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href=""></a>counts <span class="op">=</span> insta[<span class="st">"format"</span>].value_counts()</span>
+<span id="cb9-2"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb9-3"><a href=""></a>ax.bar(counts.index, counts.values)</span>
+<span id="cb9-4"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-12-output-1.png" width="892" height="188"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li><code>value_counts()</code> gives one count per format, the formats as its <strong>index</strong> (Lecture 7): <code>counts.index</code> for the x positions, <code>counts.values</code> for the heights</li>
+<li>A bar’s length is its value, so the axis starts at 0: 203 reels, 144 carousels, 84 images</li>
+</ul>
+</section>
+<section id="histogram" class="slide level2">
+<h2>Histogram</h2>
+<div id="5c2583df" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb10-2"><a href=""></a>ax.hist(insta[<span class="st">"engagement_rate"</span>], bins<span class="op">=</span><span class="dv">30</span>, edgecolor<span class="op">=</span><span class="st">"white"</span>)</span>
+<span id="cb10-3"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-13-output-1.png" width="892" height="188"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>One column only: matplotlib cuts it into 30 <strong>bins</strong>, and counts the posts in each. Too few bins hide the shape, too many make noise</li>
+<li><strong>Two humps</strong>: most posts engage around 5%, others around 8.5%. The mean, 6.4%, describes neither</li>
+</ul>
+</section>
+<section id="boxplot" class="slide level2">
+<h2>Boxplot</h2>
+<div id="6154e659" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href=""></a>carousels <span class="op">=</span> insta[insta[<span class="st">"format"</span>] <span class="op">==</span> <span class="st">"carousel"</span>]</span>
+<span id="cb11-2"><a href=""></a>images <span class="op">=</span> insta[insta[<span class="st">"format"</span>] <span class="op">==</span> <span class="st">"image"</span>]</span>
+<span id="cb11-3"><a href=""></a>reels <span class="op">=</span> insta[insta[<span class="st">"format"</span>] <span class="op">==</span> <span class="st">"reel"</span>]</span>
+<span id="cb11-4"><a href=""></a>boxes <span class="op">=</span> [carousels[<span class="st">"engagement_rate"</span>], images[<span class="st">"engagement_rate"</span>], reels[<span class="st">"engagement_rate"</span>]]</span>
+<span id="cb11-5"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb11-6"><a href=""></a>ax.boxplot(boxes, tick_labels<span class="op">=</span>[<span class="st">"carousel"</span>, <span class="st">"image"</span>, <span class="st">"reel"</span>])</span>
+<span id="cb11-7"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-14-output-1.png" width="892" height="188"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>A <strong>list</strong> of three columns, one box each, named by <code>tick_labels</code></li>
+<li>The humps were formats: the worst carousel, 7.2%, beats the best reel, 6.9%</li>
+</ul>
+</section>
+<section id="your-turn-1" class="slide level2" data-background="#43464B">
+<h2><i class="fa-solid fa-screwdriver-wrench" aria-label="screwdriver-wrench"></i> Your Turn!</h2>
+<h3 id="first-charts">First charts</h3>
+<p>In a new cell, replace each <code>____</code> with the missing word, and run it:</p>
 <ol type="1">
-<li>Top right, the <code>+</code> menu → <strong>New repository</strong></li>
-<li><strong>A short, memorable name.</strong> No spaces; <code>snake_case</code> or <code>kebab-case</code></li>
-<li>Optionally a description</li>
-<li><strong>Public</strong>. Pages does not serve a private repository on the free tier</li>
-<li>Tick <strong>Add a README file</strong></li>
-<li><strong>Create repository</strong></li>
+<li>A histogram of <code>caption_length</code>, with <code>.hist()</code></li>
+<li>The posts of each theme, counted with <code>.value_counts()</code>, as bars with <code>.barh()</code></li>
 </ol>
-<div class="fragment">
-<div class="callout callout-note no-icon callout-style-simple">
-<div class="callout-body">
-<div class="callout-content">
-<p>Name it carefully. The repository name becomes part of your public URL, and renaming it later breaks every link you have shared, including the ones in your GA4 property.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb12-2"><a href=""></a>ax.____(insta[<span class="st">"caption_length"</span>], bins<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb12-3"><a href=""></a>plt.show()</span>
+<span id="cb12-4"><a href=""></a>themes <span class="op">=</span> insta[<span class="st">"theme"</span>].____()</span>
+<span id="cb12-5"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb12-6"><a href=""></a>ax.____(themes.index, themes.values)</span>
+<span id="cb12-7"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div style="max-width:80%;">
+<p>You should see one hump, then six bars, founder the longest.</p>
 </div>
-</div>
-</div>
-</div>
+                    <div id="timer8_1"></div>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            initializeTimer("timer8_1", 300, "interaction");
+                        });
+                    </script>
+                
 </section>
-<section id="turning-on-github-pages" class="slide level2">
-<h2>Turning On GitHub Pages</h2>
-<ol type="1">
-<li><strong>Settings</strong> → <strong>Pages</strong> in the left pane</li>
-<li>Under <strong>Branch</strong>, change <code>None</code> to <code>main</code>, and <strong>Save</strong></li>
-<li><strong>Actions</strong>, and wait for <em>pages build and deployment</em> to finish</li>
-</ol>
-<div class="fragment">
-<p>Your site is then at:</p>
-<pre><code>https://&lt;username&gt;.github.io/&lt;repository&gt;/</code></pre>
+<section id="solution" class="slide level2">
+<h2>Solution</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb13-2"><a href=""></a>ax.hist(insta[<span class="st">"caption_length"</span>], bins<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb13-3"><a href=""></a>plt.show()</span>
+<span id="cb13-4"><a href=""></a>themes <span class="op">=</span> insta[<span class="st">"theme"</span>].value_counts()</span>
+<span id="cb13-5"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb13-6"><a href=""></a>ax.barh(themes.index, themes.values)</span>
+<span id="cb13-7"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="6ddb4efb" class="cell quarto-layout-panel" data-layout-ncol="2" data-execution_count="15">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img data-src="lecture_08_files/figure-revealjs/cell-16-output-1.png" width="507"></p>
 </div>
-<div class="fragment">
-<p>So for the user <code>damien-dupre</code> and the repository <code>portfolio</code>, that is <code>https://damien-dupre.github.io/portfolio/</code>. <strong>Write your URL down. Lecture 9 needs it.</strong></p>
-</div>
-</section>
-<section id="the-quarto-site" class="slide level2 smaller">
-<h2>The Quarto Site</h2>
-<p>A Quarto website is a folder of <code>.qmd</code> files plus one configuration file:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><a href=""></a><span class="fu">project</span><span class="kw">:</span></span>
-<span id="cb2-2"><a href=""></a><span class="at">  </span><span class="fu">type</span><span class="kw">:</span><span class="at"> website</span></span>
-<span id="cb2-3"><a href=""></a></span>
-<span id="cb2-4"><a href=""></a><span class="fu">website</span><span class="kw">:</span></span>
-<span id="cb2-5"><a href=""></a><span class="at">  </span><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"Your Name"</span></span>
-<span id="cb2-6"><a href=""></a><span class="at">  </span><span class="fu">navbar</span><span class="kw">:</span></span>
-<span id="cb2-7"><a href=""></a><span class="at">    </span><span class="fu">left</span><span class="kw">:</span></span>
-<span id="cb2-8"><a href=""></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">href</span><span class="kw">:</span><span class="at"> index.qmd</span></span>
-<span id="cb2-9"><a href=""></a><span class="at">        </span><span class="fu">text</span><span class="kw">:</span><span class="at"> Home</span></span>
-<span id="cb2-10"><a href=""></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">href</span><span class="kw">:</span><span class="at"> work.qmd</span></span>
-<span id="cb2-11"><a href=""></a><span class="at">        </span><span class="fu">text</span><span class="kw">:</span><span class="at"> Work</span></span>
-<span id="cb2-12"><a href=""></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">href</span><span class="kw">:</span><span class="at"> about.qmd</span></span>
-<span id="cb2-13"><a href=""></a><span class="at">        </span><span class="fu">text</span><span class="kw">:</span><span class="at"> About</span></span>
-<span id="cb2-14"><a href=""></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">href</span><span class="kw">:</span><span class="at"> contact.qmd</span></span>
-<span id="cb2-15"><a href=""></a><span class="at">        </span><span class="fu">text</span><span class="kw">:</span><span class="at"> Contact</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="fragment">
-<p><code>quarto render</code> turns it into a <code>_site/</code> folder of plain HTML. <strong>That folder is what GitHub Pages serves.</strong></p>
-</div>
-</section>
-<section id="the-one-line-that-matters" class="slide level2">
-<h2>The One Line That Matters</h2>
-<p>Also in <code>_quarto.yml</code>, and the reason this toolchain was chosen:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb3-1"><a href=""></a><span class="fu">format</span><span class="kw">:</span></span>
-<span id="cb3-2"><a href=""></a><span class="at">  </span><span class="fu">html</span><span class="kw">:</span></span>
-<span id="cb3-3"><a href=""></a><span class="at">    </span><span class="fu">theme</span><span class="kw">:</span><span class="at"> cosmo</span></span>
-<span id="cb3-4"><a href=""></a><span class="at">    </span><span class="fu">include-in-header</span><span class="kw">:</span><span class="at"> head.html</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="fragment">
-<p>Whatever is in <code>head.html</code> is injected into <code>&lt;head&gt;</code> on <strong>every page of the site, from one file</strong>. Next week that file holds your Google tag.</p>
-</div>
-<div class="fragment">
-<div class="callout callout-note no-icon callout-style-simple">
-<div class="callout-body">
-<div class="callout-content">
-<p>A tag that fires on the homepage but not on the contact page is the single most common cause of a broken funnel. This pattern is how you avoid it.</p>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img data-src="lecture_08_files/figure-revealjs/cell-16-output-2.png" width="507"></p>
 </div>
 </div>
 </div>
-</div>
-</section>
-<section id="live-demo" class="slide level2" data-background="#43464B">
-<h2>Live Demo</h2>
-<!-- Speaker notes: fifteen minutes, and it always runs long. Have a repository
-     pre-made as a fallback so the Pages build wait does not stall the room. -->
-<ol type="1">
-<li>Create the repository, public, with a README</li>
-<li>Four <code>.qmd</code> files and a <code>_quarto.yml</code></li>
-<li><code>quarto render</code>, and look at <code>_site/</code></li>
-<li>Push, enable Pages, wait for the Action</li>
-<li>Open the live URL, then view source and find <code>&lt;head&gt;</code></li>
-</ol>
+<p>Captions are not skewed: one hump, around 190 characters, unlike the likes. Founder posts are the most frequent (80), sustainability posts the least (61).</p>
 </section></section>
 <section>
-<section id="defining-success-before-tracking" class="title-slide slide level1 center">
-<h1>3. Defining Success Before Tracking</h1>
+<section id="advanced-visualisations-with-matplotlib" class="title-slide slide level1 center">
+<h1>2. Advanced Visualisations with matplotlib</h1>
 
 </section>
-<section id="the-pre-registration-habit" class="slide level2">
-<h2>The Pre-Registration Habit</h2>
-<p>Experimental science has a rule: <strong>write down what you expect to find before you look.</strong> Otherwise every result is a finding, because the hypothesis moves.</p>
-<div class="fragment">
-<p>Marketing analytics has no such norm, and suffers for it. A month of traffic can be made to look like a success by anyone allowed to choose the metric afterwards.</p>
+<section id="grey-everything-colour-one-thing" class="slide level2">
+<h2>Grey Everything, Colour One Thing</h2>
+<div id="8c4b5d8a" class="cell" data-execution_count="17">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href=""></a>viral <span class="op">=</span> insta[insta[<span class="st">"post_id"</span>] <span class="op">==</span> <span class="st">"LR0184"</span>]</span>
+<span id="cb14-2"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb14-3"><a href=""></a>ax.scatter(insta[<span class="st">"reach"</span>], insta[<span class="st">"engagement_rate"</span>], color<span class="op">=</span><span class="st">"lightgrey"</span>)</span>
+<span id="cb14-4"><a href=""></a>ax.scatter(viral[<span class="st">"reach"</span>], viral[<span class="st">"engagement_rate"</span>], color<span class="op">=</span><span class="st">"red"</span>)</span>
+<span id="cb14-5"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-18-output-1.png" width="892" height="188"></p>
+</figure>
 </div>
-<div class="fragment">
-<p><strong>So choose it now, while you still have no data and nothing to defend.</strong></p>
 </div>
+</div>
+<ul>
+<li>Two layers: every post in grey, then LR0184 in red, <strong>on top</strong>. Bars work the same way</li>
+<li>LR0184 stretches the axis: Lecture 6’s viral reel, 535,086 accounts reached, and the lowest rate, 1.6%</li>
+</ul>
 </section>
-<section id="the-success-statement" class="slide level2 smaller">
-<h2>The Success Statement</h2>
-<p>One paragraph, written today, kept for the rest of the module:</p>
-<blockquote>
-<p><em>This site is for <strong>[audience]</strong>. Success is <strong>[a specific action]</strong>. A good month is <strong>[a number]</strong> of them. I will conclude it is not working if <strong>[a condition]</strong>.</em></p>
-</blockquote>
-<div class="fragment">
-<p>Worked example:</p>
-<blockquote>
-<p><em>This site is for Dublin agency recruiters hiring junior analysts. Success is a completed contact form. A good month is five. I will conclude it is not working if fewer than 100 people reach the work page in a month, because then the problem is traffic, not the site.</em></p>
-</blockquote>
+<section id="colour-by-group" class="slide level2">
+<h2>Colour by Group</h2>
+<div id="74e1ab65" class="cell" data-execution_count="18">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb15-2"><a href=""></a>ax.scatter(carousels[<span class="st">"reach"</span>], carousels[<span class="st">"engagement_rate"</span>], label<span class="op">=</span><span class="st">"carousel"</span>)</span>
+<span id="cb15-3"><a href=""></a>ax.scatter(images[<span class="st">"reach"</span>], images[<span class="st">"engagement_rate"</span>], label<span class="op">=</span><span class="st">"image"</span>)</span>
+<span id="cb15-4"><a href=""></a>ax.scatter(reels[<span class="st">"reach"</span>], reels[<span class="st">"engagement_rate"</span>], label<span class="op">=</span><span class="st">"reel"</span>)</span>
+<span id="cb15-5"><a href=""></a>ax.legend()</span>
+<span id="cb15-6"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-19-output-1.png" width="892" height="188"></p>
+</figure>
 </div>
-<div class="fragment">
-<p>Note what the last clause buys you: a <strong>failure condition that distinguishes two different problems</strong>. That is what makes it worth writing.</p>
 </div>
+</div>
+<ul>
+<li>matplotlib colours a <strong>layer</strong>, not a column: one layer per format, from the three tables of the <strong>Boxplot</strong> slide</li>
+<li><code>label=</code> names each layer, and <code>ax.legend()</code> lists the names</li>
+</ul>
 </section>
-<section id="objectives-are-not-metrics" class="slide level2">
-<h2>Objectives Are Not Metrics</h2>
+<section id="styles" class="slide level2">
+<h2>Styles</h2>
+<div id="da7fb647" class="cell" data-execution_count="19">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16" data-code-line-numbers="1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href=""></a>plt.style.use(<span class="st">"petroff10"</span>)</span>
+<span id="cb16-2"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb16-3"><a href=""></a>ax.scatter(carousels[<span class="st">"reach"</span>], carousels[<span class="st">"engagement_rate"</span>], label<span class="op">=</span><span class="st">"carousel"</span>)</span>
+<span id="cb16-4"><a href=""></a>ax.scatter(images[<span class="st">"reach"</span>], images[<span class="st">"engagement_rate"</span>], label<span class="op">=</span><span class="st">"image"</span>)</span>
+<span id="cb16-5"><a href=""></a>ax.scatter(reels[<span class="st">"reach"</span>], reels[<span class="st">"engagement_rate"</span>], label<span class="op">=</span><span class="st">"reel"</span>)</span>
+<span id="cb16-6"><a href=""></a>ax.legend()</span>
+<span id="cb16-7"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-20-output-1.png" width="892" height="188"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>A style changes <strong>every chart after it</strong>: <code>petroff10</code>’s colours stay distinct for colour-blind readers. Others: <code>"ggplot"</code>, <code>"bmh"</code>, <code>"grayscale"</code></li>
+</ul>
+</section>
+<section id="scales" class="slide level2">
+<h2>Scales</h2>
+<div id="2ee18a28" class="cell" data-execution_count="20">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17" data-code-line-numbers="6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb17-2"><a href=""></a>ax.scatter(carousels[<span class="st">"reach"</span>], carousels[<span class="st">"engagement_rate"</span>], label<span class="op">=</span><span class="st">"carousel"</span>)</span>
+<span id="cb17-3"><a href=""></a>ax.scatter(images[<span class="st">"reach"</span>], images[<span class="st">"engagement_rate"</span>], label<span class="op">=</span><span class="st">"image"</span>)</span>
+<span id="cb17-4"><a href=""></a>ax.scatter(reels[<span class="st">"reach"</span>], reels[<span class="st">"engagement_rate"</span>], label<span class="op">=</span><span class="st">"reel"</span>)</span>
+<span id="cb17-5"><a href=""></a>ax.legend()</span>
+<span id="cb17-6"><a href=""></a>ax.set_xscale(<span class="st">"log"</span>)</span>
+<span id="cb17-7"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-21-output-1.png" width="892" height="188"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>On a <strong>log axis</strong>, each step ×10 covers the same distance: 1,000, 10,000, then 100,000 accounts. The squashed cloud spreads out</li>
+<li><code>ax.set_ylim(0, 12)</code> sets a range instead</li>
+</ul>
+</section>
+<section id="labels" class="slide level2">
+<h2>Labels</h2>
+<div id="82ab87ef" class="cell" data-execution_count="21">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18" data-code-line-numbers="6,7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb18-2"><a href=""></a>ax.scatter(carousels[<span class="st">"reach"</span>], carousels[<span class="st">"engagement_rate"</span>], label<span class="op">=</span><span class="st">"carousel"</span>)</span>
+<span id="cb18-3"><a href=""></a>ax.scatter(images[<span class="st">"reach"</span>], images[<span class="st">"engagement_rate"</span>], label<span class="op">=</span><span class="st">"image"</span>)</span>
+<span id="cb18-4"><a href=""></a>ax.scatter(reels[<span class="st">"reach"</span>], reels[<span class="st">"engagement_rate"</span>], label<span class="op">=</span><span class="st">"reel"</span>)</span>
+<span id="cb18-5"><a href=""></a>ax.legend()</span>
+<span id="cb18-6"><a href=""></a>ax.<span class="bu">set</span>(xscale<span class="op">=</span><span class="st">"log"</span>, xlabel<span class="op">=</span><span class="st">"Accounts reached (log scale)"</span>, ylabel<span class="op">=</span><span class="st">"Engagement rate (%)"</span>)</span>
+<span id="cb18-7"><a href=""></a>ax.set_title(<span class="st">"Carousels engage most, whatever their reach"</span>, loc<span class="op">=</span><span class="st">"left"</span>)</span>
+<span id="cb18-8"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-22-output-1.png" width="892" height="188"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li><code>ax.set()</code> sets several things in one line: the scale, the labels. The title states the <strong>finding</strong>, not the columns</li>
+</ul>
+</section>
+<section id="panels" class="slide level2">
+<h2>Panels</h2>
+<div id="a054b7c0" class="cell" data-execution_count="22">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href=""></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, sharey<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb19-2"><a href=""></a>axes[<span class="dv">0</span>].scatter(carousels[<span class="st">"reach"</span>], carousels[<span class="st">"engagement_rate"</span>])</span>
+<span id="cb19-3"><a href=""></a>axes[<span class="dv">0</span>].<span class="bu">set</span>(title<span class="op">=</span><span class="st">"carousel"</span>, xscale<span class="op">=</span><span class="st">"log"</span>)</span>
+<span id="cb19-4"><a href=""></a>axes[<span class="dv">1</span>].scatter(reels[<span class="st">"reach"</span>], reels[<span class="st">"engagement_rate"</span>])</span>
+<span id="cb19-5"><a href=""></a>axes[<span class="dv">1</span>].<span class="bu">set</span>(title<span class="op">=</span><span class="st">"reel"</span>, xscale<span class="op">=</span><span class="st">"log"</span>)</span>
+<span id="cb19-6"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-23-output-1.png" width="892" height="188"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>Two panels, <code>axes[0]</code> and <code>axes[1]</code>, counted from 0, each with its own layers</li>
+<li><code>sharey=True</code>: one y-axis for both, so the heights compare</li>
+</ul>
+</section>
+<section id="reference-lines" class="slide level2">
+<h2>Reference Lines</h2>
+<div id="1f32ee09" class="cell" data-execution_count="23">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb20-2"><a href=""></a>ax.hist(insta[<span class="st">"likes"</span>], bins<span class="op">=</span><span class="dv">40</span>, color<span class="op">=</span><span class="st">"lightgrey"</span>, edgecolor<span class="op">=</span><span class="st">"white"</span>)</span>
+<span id="cb20-3"><a href=""></a>ax.axvline(insta[<span class="st">"likes"</span>].mean(), color<span class="op">=</span><span class="st">"red"</span>, label<span class="op">=</span><span class="st">"mean"</span>)</span>
+<span id="cb20-4"><a href=""></a>ax.axvline(insta[<span class="st">"likes"</span>].median(), color<span class="op">=</span><span class="st">"black"</span>, label<span class="op">=</span><span class="st">"median"</span>)</span>
+<span id="cb20-5"><a href=""></a>ax.legend()</span>
+<span id="cb20-6"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-24-output-1.png" width="892" height="188"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>pandas computes the number, <code>ax.axvline()</code> draws it as a vertical line; <code>ax.axhline()</code>, as a horizontal one</li>
+<li>Lecture 7’s mean, 463 likes, and median, 278: big posts pull the mean right</li>
+</ul>
+</section>
+<section id="saving-a-figure" class="slide level2">
+<h2>Saving a Figure</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href=""></a>fig.savefig(<span class="st">"likes.png"</span>, dpi<span class="op">=</span><span class="dv">300</span>, bbox_inches<span class="op">=</span><span class="st">"tight"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
+<li>In the <strong>same cell</strong> as the chart, before <code>plt.show()</code>. The file appears in the <strong>Files</strong> panel: <i class="fa-brands fa-windows" aria-label="windows"></i> right-click / <i class="fa-brands fa-apple" aria-label="apple"></i> <kbd>⌃ Control</kbd> + click on it → <strong>Download</strong></li>
+<li><code>dpi=300</code> for print, 150 for a screen</li>
+<li><code>bbox_inches="tight"</code> stops the labels being cut off at the edges</li>
+<li><code>.png</code> for documents and slides; <code>.svg</code> or <code>.pdf</code> for anything that will be resized</li>
+<li><strong>Save with code, never with a screenshot</strong>: next month, the same cell redraws the chart on the new data</li>
+</ul>
+</section>
+<section id="your-turn-2" class="slide level2" data-background="#43464B">
+<h2><i class="fa-solid fa-screwdriver-wrench" aria-label="screwdriver-wrench"></i> Your Turn!</h2>
+<h3 id="do-boosted-reels-earn-their-spend">Do boosted reels earn their spend?</h3>
+<p>In a new cell, replace each <code>____</code>, and run it:</p>
+<ol type="1">
+<li>Every paid post in <code>"lightgrey"</code>, then the paid reels in <code>"red"</code>, on top</li>
+<li>Labels <code>"Ad spend (EUR)"</code> and <code>"Revenue (EUR)"</code>, then a title with the finding</li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href=""></a>paid <span class="op">=</span> insta[insta[<span class="st">"is_paid"</span>] <span class="op">==</span> <span class="va">True</span>]</span>
+<span id="cb22-2"><a href=""></a>paid_reels <span class="op">=</span> paid[paid[<span class="st">"format"</span>] <span class="op">==</span> <span class="st">"reel"</span>]</span>
+<span id="cb22-3"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb22-4"><a href=""></a>ax.scatter(paid[<span class="st">"spend_eur"</span>], paid[<span class="st">"attributed_revenue_eur"</span>], color<span class="op">=</span>____)</span>
+<span id="cb22-5"><a href=""></a>ax.scatter(paid_reels[<span class="st">"spend_eur"</span>], paid_reels[<span class="st">"attributed_revenue_eur"</span>], color<span class="op">=</span>____)</span>
+<span id="cb22-6"><a href=""></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span>____, ylabel<span class="op">=</span>____, title<span class="op">=</span>____)</span>
+<span id="cb22-7"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div style="max-width:80%;">
+<p>You should see the 50 paid reels in red, rising with their spend. Then save it as <code>paid-reels.png</code>.</p>
+</div>
+                    <div id="timer8_2"></div>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            initializeTimer("timer8_2", 300, "interaction");
+                        });
+                    </script>
+                
+</section>
+<section id="solution-1" class="slide level2">
+<h2>Solution</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href=""></a>paid <span class="op">=</span> insta[insta[<span class="st">"is_paid"</span>] <span class="op">==</span> <span class="va">True</span>]</span>
+<span id="cb23-2"><a href=""></a>paid_reels <span class="op">=</span> paid[paid[<span class="st">"format"</span>] <span class="op">==</span> <span class="st">"reel"</span>]</span>
+<span id="cb23-3"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb23-4"><a href=""></a>ax.scatter(paid[<span class="st">"spend_eur"</span>], paid[<span class="st">"attributed_revenue_eur"</span>], color<span class="op">=</span><span class="st">"lightgrey"</span>)</span>
+<span id="cb23-5"><a href=""></a>ax.scatter(paid_reels[<span class="st">"spend_eur"</span>], paid_reels[<span class="st">"attributed_revenue_eur"</span>], color<span class="op">=</span><span class="st">"red"</span>)</span>
+<span id="cb23-6"><a href=""></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"Ad spend (EUR)"</span>, ylabel<span class="op">=</span><span class="st">"Revenue (EUR)"</span>,</span>
+<span id="cb23-7"><a href=""></a>       title<span class="op">=</span><span class="st">"Boosted reels: the more spent, the more earned"</span>)</span>
+<span id="cb23-8"><a href=""></a>fig.savefig(<span class="st">"paid-reels.png"</span>, dpi<span class="op">=</span><span class="dv">300</span>, bbox_inches<span class="op">=</span><span class="st">"tight"</span>)</span>
+<span id="cb23-9"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="a78f018e" class="cell" data-execution_count="24">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-25-output-1.png" width="892" height="199"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The red points rise almost in a line: for reels, revenue follows spend more closely than for the other formats.</p>
+</section></section>
+<section>
+<section id="combine-pandas-and-matplotlib" class="title-slide slide level1 center">
+<h1>3. Combine pandas and matplotlib</h1>
+
+</section>
+<section id="a-new-column-then-plot" class="slide level2">
+<h2>A New Column, Then Plot</h2>
+<div id="7ddf2338" class="cell" data-execution_count="26">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href=""></a>insta[<span class="st">"non_followers_pct"</span>] <span class="op">=</span> insta[<span class="st">"reach_non_followers"</span>] <span class="op">/</span> insta[<span class="st">"reach"</span>] <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb24-2"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb24-3"><a href=""></a>ax.hist(insta[<span class="st">"non_followers_pct"</span>], bins<span class="op">=</span><span class="dv">30</span>, edgecolor<span class="op">=</span><span class="st">"white"</span>)</span>
+<span id="cb24-4"><a href=""></a>ax.set_xlabel(<span class="st">"Accounts reached that do not follow Loomrow (%)"</span>)</span>
+<span id="cb24-5"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-27-output-1.png" width="892" height="188"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>pandas first: Lecture 7’s <code>non_followers_pct</code>. Then matplotlib draws it like any column</li>
+<li>Two humps: carousels and images reach 10 to 47% of non-followers; reels, 60 to almost 100%</li>
+</ul>
+</section>
+<section id="groupby-then-plot" class="slide level2">
+<h2>groupby(), Then Plot</h2>
+<div id="5261f462" class="cell" data-execution_count="27">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href=""></a>likes_per_theme <span class="op">=</span> insta.groupby(<span class="st">"theme"</span>)[<span class="st">"likes"</span>].<span class="bu">sum</span>().sort_values()</span>
+<span id="cb25-2"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb25-3"><a href=""></a>ax.barh(likes_per_theme.index, likes_per_theme.values)</span>
+<span id="cb25-4"><a href=""></a>ax.set_xlabel(<span class="st">"Likes, all posts together"</span>)</span>
+<span id="cb25-5"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-28-output-1.png" width="892" height="188"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>Lecture 7’s <code>likes_per_theme</code>, sorted lowest first: <code>barh()</code> draws from the bottom up, so the largest ends on top</li>
+<li>Founder posts collect the most likes, 38,705: also the most posts. A total grows with the count</li>
+</ul>
+</section>
+<section id="pivot_table-then-plot" class="slide level2">
+<h2>pivot_table(), Then Plot</h2>
+<div id="1f18e408" class="cell" data-execution_count="29">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href=""></a>rates <span class="op">=</span> insta.pivot_table(index<span class="op">=</span><span class="st">"product_line"</span>, columns<span class="op">=</span><span class="st">"format"</span>,</span>
+<span id="cb26-2"><a href=""></a>                          values<span class="op">=</span><span class="st">"engagement_rate"</span>, aggfunc<span class="op">=</span><span class="st">"median"</span>)</span>
+<span id="cb26-3"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb26-4"><a href=""></a>rates.plot(kind<span class="op">=</span><span class="st">"bar"</span>, ax<span class="op">=</span>ax, rot<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb26-5"><a href=""></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">""</span>, ylabel<span class="op">=</span><span class="st">"Median rate (%)"</span>, ylim<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">11</span>))</span>
+<span id="cb26-6"><a href=""></a>ax.legend(ncol<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb26-7"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-30-output-1.png" width="892" height="177"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>Lecture 7’s pivot table, drawn by pandas’ <code>.plot()</code> on your <code>ax</code>. <code>kind=</code> picks the geometry, a line by default; <code>rot=0</code> keeps names level</li>
+<li>In every product line, carousels engage most: the format matters, not the line</li>
+</ul>
+</section>
+<section id="your-turn-3" class="slide level2" data-background="#43464B">
+<h2><i class="fa-solid fa-screwdriver-wrench" aria-label="screwdriver-wrench"></i> Your Turn!</h2>
+<h3 id="table-to-chart">Table to chart</h3>
+<p>In a new cell, replace each <code>____</code> with the missing word, and run it:</p>
+<ol type="1">
+<li>The median reach of each <code>"product_line"</code>, with <code>.groupby()</code> and <code>.median()</code></li>
+<li>Sorted, the lowest first, with <code>.sort_values()</code></li>
+<li>Sideways bars, with <code>.barh()</code>, labelled <code>"Median reach per post"</code></li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href=""></a>medians <span class="op">=</span> insta.groupby(____)[<span class="st">"reach"</span>].____()</span>
+<span id="cb27-2"><a href=""></a>medians <span class="op">=</span> medians.____()</span>
+<span id="cb27-3"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb27-4"><a href=""></a>ax.____(medians.index, medians.values)</span>
+<span id="cb27-5"><a href=""></a>ax.set_xlabel(____)</span>
+<span id="cb27-6"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div style="max-width:80%;">
+<p>You should see Outerwear on top, at about 6,250 accounts.</p>
+</div>
+                    <div id="timer8_3"></div>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            initializeTimer("timer8_3", 240, "interaction");
+                        });
+                    </script>
+                
+</section>
+<section id="solution-2" class="slide level2">
+<h2>Solution</h2>
+<div id="2039cc35" class="cell" data-execution_count="30">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href=""></a>medians <span class="op">=</span> insta.groupby(<span class="st">"product_line"</span>)[<span class="st">"reach"</span>].median()</span>
+<span id="cb28-2"><a href=""></a>medians <span class="op">=</span> medians.sort_values()</span>
+<span id="cb28-3"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb28-4"><a href=""></a>ax.barh(medians.index, medians.values)</span>
+<span id="cb28-5"><a href=""></a>ax.set_xlabel(<span class="st">"Median reach per post"</span>)</span>
+<span id="cb28-6"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-31-output-1.png" width="892" height="177"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Outerwear posts reach the most accounts, by a narrow margin: medians of about 4,940 to 6,250, on 78 to 92 posts per line, a gap small enough to be chance.</p>
+</section>
+<section id="same-chart-one-line" class="slide level2">
+<h2>Same Chart, One Line</h2>
+<div id="3ec2d01a" class="cell" data-execution_count="32">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href=""></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb29-2"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb29-3"><a href=""></a>sns.scatterplot(data<span class="op">=</span>insta, x<span class="op">=</span><span class="st">"reach"</span>, y<span class="op">=</span><span class="st">"engagement_rate"</span>, hue<span class="op">=</span><span class="st">"format"</span>, ax<span class="op">=</span>ax,</span>
+<span id="cb29-4"><a href=""></a>                hue_order<span class="op">=</span>[<span class="st">"carousel"</span>, <span class="st">"image"</span>, <span class="st">"reel"</span>])</span>
+<span id="cb29-5"><a href=""></a>ax.<span class="bu">set</span>(xscale<span class="op">=</span><span class="st">"log"</span>, xlabel<span class="op">=</span><span class="st">"Accounts reached (log scale)"</span>, ylabel<span class="op">=</span><span class="st">"Engagement rate (%)"</span>)</span>
+<span id="cb29-6"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-33-output-1.png" width="892" height="166"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li><strong>seaborn</strong> draws with matplotlib: the whole table in <code>data=</code>, the columns by name, on <code>ax=ax</code></li>
+<li><code>hue="format"</code> replaces the three layers, in the order of <code>hue_order</code></li>
+</ul>
+</section>
+<section id="what-seaborn-computes-for-you" class="slide level2">
+<h2>What seaborn Computes For You</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Function</th>
+<th style="text-align: left;">Draws</th>
+<th style="text-align: left;">Watch out</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>sns.histplot</code></td>
+<td style="text-align: left;">a histogram</td>
+<td style="text-align: left;">it chooses the bins</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>sns.boxplot</code></td>
+<td style="text-align: left;">a box per group</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>sns.scatterplot</code></td>
+<td style="text-align: left;">the points</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>sns.barplot</code></td>
+<td style="text-align: left;">the <strong>mean</strong> per group</td>
+<td style="text-align: left;">error bars: <code>errorbar=None</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>sns.lineplot</code></td>
+<td style="text-align: left;">the <strong>mean</strong> per x value</td>
+<td style="text-align: left;">a band: <code>errorbar=None</code></td>
+</tr>
+</tbody>
+</table>
+<p>seaborn summarises <strong>before</strong> it draws, as pandas did in this section. If you cannot say what it computed, you cannot defend the chart. AI assistants use it often: section 4.</p>
+</section></section>
+<section>
+<section id="vibe-coding-visualisations" class="title-slide slide level1 center">
+<h1>4. Vibe Coding Visualisations</h1>
+
+</section>
+<section id="what-is-vibe-coding" class="slide level2">
+<h2>What Is Vibe Coding?</h2>
+<p>Describe the chart in plain English, and an AI assistant writes the code.</p>
+<p><strong>1. The prompt:</strong> <em>“With pandas and matplotlib, using fig, ax: a sorted horizontal bar chart of the median engagement_rate per theme in insta, with labels and a title.”</em></p>
+<p><strong>2. The code it writes:</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href=""></a>medians <span class="op">=</span> insta.groupby(<span class="st">"theme"</span>)[<span class="st">"engagement_rate"</span>].median().sort_values()</span>
+<span id="cb30-2"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb30-3"><a href=""></a>ax.barh(medians.index, medians.values, color<span class="op">=</span><span class="st">"steelblue"</span>)</span>
+<span id="cb30-4"><a href=""></a>ax.set_xlabel(<span class="st">"Median engagement rate (%)"</span>)</span>
+<span id="cb30-5"><a href=""></a>ax.set_title(<span class="st">"Median Engagement Rate by Theme"</span>)</span>
+<span id="cb30-6"><a href=""></a>plt.tight_layout()</span>
+<span id="cb30-7"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>3. Read every line, then run it:</strong> <code>plt.tight_layout()</code> is new: ask what it does. The title names the columns; the finding is that the theme barely moves the rate.</p>
+</section>
+<section id="check-before-you-trust" class="slide level2">
+<h2>Check Before You Trust</h2>
 <div class="quarto-layout-panel" data-layout="[1,1]">
 <div class="quarto-layout-row">
 <div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<p><strong>Not an objective</strong></p>
+<p><strong>Ask for:</strong></p>
 <ul>
-<li>“Build my brand”</li>
-<li>“Increase engagement”</li>
-<li>“Get noticed”</li>
+<li>pandas and matplotlib, with <code>fig, ax</code></li>
+<li>the table, and its columns</li>
+<li>the geometry</li>
+<li>labels and a title</li>
 </ul>
-<p>None of these names an action, so none of them can be recorded, so none of them can be wrong.</p>
 </div>
 <div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
-<p><strong>An objective</strong></p>
+<p><strong>Then check:</strong></p>
 <ul>
-<li>“Five completed contact forms a month”</li>
-<li>“Half of work-page visitors reach the bottom”</li>
+<li>do the columns exist?</li>
+<li>a line you have not seen?</li>
+<li>a mean you did not ask for?</li>
+<li>units? A title with the finding?</li>
 </ul>
-<p>Each names an action, a count and a period.</p>
 </div>
 </div>
 </div>
-<div class="fragment">
-<p>This distinction is the whole of Lecture 9, brought forward by a week.</p>
-</div>
+<p>Use an assistant’s code only if you can <strong>explain every line</strong> of it, and say so: Lecture 1’s policy. A <code>KeyError</code> names a column that does not exist: <code>engagementRate</code> for <code>engagement_rate</code>.</p>
 </section>
-<section id="exercise" class="slide level2" data-background="#43464B">
-<h2>Exercise</h2>
-<p>Write the success statement for your own site. Four sentences, in your notes, where you will still have them in April:</p>
+<section id="your-turn-4" class="slide level2" data-background="#43464B">
+<h2><i class="fa-solid fa-screwdriver-wrench" aria-label="screwdriver-wrench"></i> Your Turn!</h2>
+<h3 id="ask-then-check">Ask, then check</h3>
 <ol type="1">
-<li>Who is the site for?</li>
-<li>What single action counts as success?</li>
-<li>How many of those make a good month?</li>
-<li>What would make you conclude it is not working?</li>
+<li>Ask an AI assistant, Gemini in Colab or another: <em>“With pandas and matplotlib, using fig, ax: from a DataFrame called insta, with the columns format, theme, reach, likes, saves and engagement_rate, a horizontal bar chart of the median saves of each format, sorted, with labels and a title that states the finding.”</em></li>
+<li>Paste its code in a new cell, below the first cell. Check it with the last slide’s list <strong>before</strong> you run it</li>
 </ol>
-<p>Then say it out loud to the person beside you. <strong>If they can argue the number, it is specific enough.</strong></p>
-                    <div id="timer1"></div>
+<div style="max-width:80%;">
+<p>You should see three bars, carousels on top, at 49 saves, twice the reels’ 24. If not, what did you fix?</p>
+</div>
+                    <div id="timer8_4"></div>
                     <script>
                         document.addEventListener("DOMContentLoaded", function () {
-                            initializeTimer("timer1", 900, "slide");
-                        });
-                    </script>
-                
-</section></section>
-<section>
-<section id="vibe-coding-your-site" class="title-slide slide level1 center">
-<h1>4. Vibe Coding Your Site</h1>
-
-</section>
-<section id="ai-this-block-chat" class="slide level2">
-<h2>AI This Block: Chat</h2>
-<p>Where we are on the module’s AI spine, set out in Lecture 1 and named properly in Lecture 12:</p>
-<blockquote>
-<p><strong>Chat.</strong> A tutor. Ask it to explain, and to type. Not to decide.</p>
-</blockquote>
-</section>
-<section id="building-a-site-by-describing-it" class="slide level2">
-<h2>Building a Site by Describing It</h2>
-<p>An assistant will produce a working Quarto site from a description faster than you can write one, and this is a good use of it: the site is scaffolding, not the thing being assessed.</p>
-<div class="fragment">
-<blockquote>
-<p>“Create a four-page Quarto website: home, work, about, contact. The contact page has a form. Give me <code>_quarto.yml</code> and one page as an example, and show me where a script tag would go in <code>&lt;head&gt;</code> for every page.”</p>
-</blockquote>
-</div>
-<div class="fragment">
-<p>Then read every line before you publish it. <strong>You are publishing this under your own name, at a URL you will put on a CV.</strong></p>
-</div>
-</section>
-<section id="what-you-must-still-decide-yourself" class="slide level2">
-<h2>What You Must Still Decide Yourself</h2>
-<ul>
-<li><strong>What the site is for.</strong> No assistant can tell you, and it will invent something plausible if you let it</li>
-<li><strong>Which action counts as a conversion.</strong> A commercial judgement about your own work</li>
-<li><strong>Whether the generated page actually loads the tag</strong> on every page, which you verify by looking, not by asking</li>
-</ul>
-<div class="fragment">
-<p><strong>Delegate the typing. Keep the deciding.</strong> Students who let an assistant design their measurement cannot analyse their own data in April, and it shows.</p>
-</div>
-</section>
-<section id="exercise-1" class="slide level2" data-background="#43464B">
-<h2>Exercise</h2>
-<ol type="1">
-<li>Generate a site skeleton by describing it to an assistant</li>
-<li>Read the output and list two things you would change</li>
-<li>Publish it to GitHub Pages and open the live URL</li>
-<li>View source on <strong>two different pages</strong> and confirm you can see where a script in <code>&lt;head&gt;</code> would land</li>
-</ol>
-<p>Step 4 is the one Lecture 9 depends on. Do not leave without it.</p>
-                    <div id="timer2"></div>
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function () {
-                            initializeTimer("timer2", 900, "slide");
+                            initializeTimer("timer8_4", 300, "interaction");
                         });
                     </script>
                 
 </section>
-<section id="going-further" class="slide level2">
-<h2>Going Further</h2>
-<ul>
-<li><a href="https://quarto.org/docs/websites/">Quarto: Creating a Website</a></li>
-<li><a href="https://docs.github.com/en/pages">GitHub Pages: Getting Started</a></li>
-<li><a href="https://docs.github.com/en/get-started/quickstart/create-a-repo">GitHub: Create a repo</a></li>
-<li>Center for Open Science, on pre-registration, for where the habit in section 3 comes from</li>
-</ul>
-</section>
-<section id="next-lecture" class="slide level2">
-<h2>Next Lecture</h2>
-<p>We turn that success statement into a measurement plan, and into GA4 events.</p>
-<div class="fragment">
-<p><strong>Bring your live URL and your four sentences.</strong> Without both, next week is a spectator sport.</p>
-
+<section id="one-answer" class="slide level2">
+<h2>One Answer</h2>
+<div id="fefed8ba" class="cell" data-execution_count="33">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href=""></a>saves <span class="op">=</span> insta.groupby(<span class="st">"format"</span>)[<span class="st">"saves"</span>].median().sort_values()</span>
+<span id="cb31-2"><a href=""></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb31-3"><a href=""></a>ax.barh(saves.index, saves.values)</span>
+<span id="cb31-4"><a href=""></a>ax.set_xlabel(<span class="st">"Median saves per post"</span>)</span>
+<span id="cb31-5"><a href=""></a>ax.set_title(<span class="st">"The median carousel is saved twice as often as the median reel"</span>, loc<span class="op">=</span><span class="st">"left"</span>)</span>
+<span id="cb31-6"><a href=""></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_08_files/figure-revealjs/cell-34-output-1.png" width="892" height="166"></p>
+</figure>
 </div>
+</div>
+</div>
+<p>Whatever the assistant wrote, the checks are the same: the columns exist, the median is a median, and the title says what the founders should take away.</p>
+</section>
+<section id="when-a-chart-goes-wrong" class="slide level2 smaller">
+<h2>When a Chart Goes Wrong</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 43%">
+<col style="width: 29%">
+<col style="width: 27%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">You see</th>
+<th style="text-align: left;">Why</th>
+<th style="text-align: left;">Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>NameError: name 'plt' is not defined</code></td>
+<td style="text-align: left;">the first cell has not run</td>
+<td style="text-align: left;">run it: it imports <code>plt</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>AttributeError: 'Axes' object has no attribute 'histogram'</code></td>
+<td style="text-align: left;">no geometry has that name</td>
+<td style="text-align: left;"><code>ax.hist()</code>: the Geometries slide</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>KeyError: 'engagementRate'</code></td>
+<td style="text-align: left;">no column has that exact name</td>
+<td style="text-align: left;">copy it from <code>insta.columns</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>ValueError: x and y must be the same size</code></td>
+<td style="text-align: left;">x and y come from two tables</td>
+<td style="text-align: left;">take both from the same table</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">two charts on top of each other</td>
+<td style="text-align: left;">one <code>ax</code> for both</td>
+<td style="text-align: left;">a new <code>fig, ax = plt.subplots()</code> for each</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">bars in alphabetical order</td>
+<td style="text-align: left;">the result was not sorted</td>
+<td style="text-align: left;"><code>.sort_values()</code> before you draw</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">a line such as <code>&lt;matplotlib...&gt;</code> above the chart</td>
+<td style="text-align: left;"><code>plt.show()</code> is missing</td>
+<td style="text-align: left;">end the cell with <code>plt.show()</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">labels cut off in the saved file</td>
+<td style="text-align: left;">the figure was saved as it is</td>
+<td style="text-align: left;"><code>bbox_inches="tight"</code></td>
+</tr>
+</tbody>
+</table>
+<p>Read an error from its <strong>last line</strong>: it names the problem, and often the fix.</p>
+</section>
+<section id="section" class="slide level2" data-background="#43464B">
+<h2></h2>
+<style>img.circle {border-radius:50%;}</style>
+<div class="quarto-layout-panel" data-layout="[1,1]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<p><img class="circle" src="https://github.com/damien-dupre.png"></p>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<p><strong>Thanks for your attention and don’t hesitate to ask if you have any questions!</strong></p>
+<p><a href="https://datasci.social/@damien_dupre"><i class="fa-brands fa-mastodon" aria-label="mastodon"></i> <span class="citation" data-cites="damien_dupre">@damien_dupre</span></a></p>
+<p><a href="https://github.com/damien-dupre"><i class="fa-brands fa-github" aria-label="github"></i> <span class="citation" data-cites="damien-dupre">@damien-dupre</span></a></p>
+<p><a href="https://damien-dupre.github.io"><i class="fa-solid fa-link" aria-label="link"></i> https://damien-dupre.github.io</a></p>
+<p><a href="mailto:damien.dupre@dcu.ie"><i class="fa-solid fa-paper-plane" aria-label="paper-plane"></i> damien.dupre@dcu.ie</a></p>
+</div>
+</div>
+</div>
+
 </section></section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">

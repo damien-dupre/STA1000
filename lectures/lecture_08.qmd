@@ -1,5 +1,5 @@
 ---
-title: "Lecture 8: Python III - Group and Merge"
+title: "Lecture 8: Python III - Figures with matplotlib"
 subtitle: STA1000 - Data Analytics and Metrics
 jupyter: python3
 filters:
@@ -8,370 +8,700 @@ filters:
 
 ```{python}
 #| include: false
-# The slides read the repository copies of the data; students read the files they
-# uploaded to Colab, which is the code shown on the slides.
+# The slides read the repository copy of the data; students read the file they
+# uploaded to Colab, which is the code shown on the slides. The figure size only
+# makes the figures fit a slide: Colab draws them larger. The hidden chunks
+# marked "display size only" change it between slides.
+import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 pd.set_option("display.max_columns", 7)
-pd.set_option("display.max_rows", 12)
+pd.set_option("display.max_rows", 8)
 pd.set_option("display.width", 80)
+plt.rcParams["figure.figsize"] = (8, 1.6)
+plt.rcParams["figure.dpi"] = 110
+plt.rcParams["figure.constrained_layout.use"] = True
+plt.rcParams["font.size"] = 11
+plt.rcParams["legend.fontsize"] = 8
+plt.rcParams["legend.labelspacing"] = 0.2
+plt.rcParams["legend.borderpad"] = 0.3
 insta = pd.read_csv("../data/insta-data.csv")
 insta["posted_at"] = pd.to_datetime(insta["posted_at"])
 insta["engagements"] = insta["likes"] + insta["comments"] + insta["saves"] + insta["shares"]
-posts = pd.read_csv("../data/merge/insta-posts.csv")
-ads = pd.read_csv("../data/merge/meta-ads.csv")
-countries = pd.read_csv("../data/maps/ads-by-country.csv")
+insta["engagement_rate"] = insta["engagements"] / insta["reach"] * 100
 ```
 
 ## Previously ...
 
-- In Lecture 7 you opened `insta-data.csv` with pandas, looked at it, fixed its dates, selected, filtered and sorted its rows, added calculated columns, and grouped the rows, with `.groupby()` and a pivot table.
+- In Lecture 7 you opened `insta-data.csv` with pandas, took a first look, selected, filtered and sorted its rows, added calculated columns, and grouped the rows, with `.groupby()` and a pivot table.
 
-**Today, three questions:**
+**Today, four questions:**
 
-1. How do you compute a **rate per group**, without averaging the rates?
-2. How do you group the posts **by month**?
-3. How do you **merge** two files, and check that nothing went wrong?
+1. How do you draw a **first chart** with matplotlib?
+2. How do you make a chart **say something**, and save it?
+3. How do you draw a table you computed with **pandas**?
+4. How do you have an **AI assistant** write the code, and **check** it?
+
+## Summary Statistics Lie
+
+```{python}
+#| echo: false
+anscombe = pd.DataFrame({
+    "dataset": ["I"] * 11 + ["II"] * 11 + ["III"] * 11 + ["IV"] * 11,
+    "x": [10, 8, 13, 9, 11, 14, 6, 4, 12, 7, 5] * 3 + [8, 8, 8, 8, 8, 8, 8, 19, 8, 8, 8],
+    "y": [8.04, 6.95, 7.58, 8.81, 8.33, 9.96, 7.24, 4.26, 10.84, 4.82, 5.68,
+          9.14, 8.14, 8.74, 8.77, 9.26, 8.10, 6.13, 3.10, 9.13, 7.26, 4.74,
+          7.46, 6.77, 12.74, 7.11, 7.81, 8.84, 6.08, 5.39, 8.15, 6.42, 5.73,
+          6.58, 5.76, 7.71, 8.84, 8.47, 7.04, 5.25, 12.50, 5.56, 7.91, 6.89],
+})
+rows = []
+for name, d in anscombe.groupby("dataset"):
+    rows.append({"dataset": name, "mean x": d["x"].mean(), "mean y": d["y"].mean(),
+                 "sd x": d["x"].std(), "sd y": d["y"].std(), "r": d["x"].corr(d["y"])})
+pd.DataFrame(rows).set_index("dataset").round(2).T
+```
+
+```{python}
+#| echo: false
+fig, axes = plt.subplots(1, 4, figsize=(9.5, 1.9), sharey=True)
+for ax, (name, d) in zip(axes, anscombe.groupby("dataset")):
+    slope, intercept = np.polyfit(d["x"], d["y"], 1)
+    ax.scatter(d["x"], d["y"], s=22)
+    ax.plot([3, 20], [intercept + slope * 3, intercept + slope * 20], color="#C44E52")
+    ax.set_title(name, fontsize=10)
+plt.show()
+```
+
+**Anscombe's quartet** (1973): the same means, standard deviations, correlation and best-fit line. Only the charts tell them apart. **Always plot the data.**
 
 ## Today's Notebook
 
-A new notebook, `STA1000 Lecture 8`. From Loop, upload four files: `insta-data.csv`, `insta-posts.csv`, `meta-ads.csv` and `ads-by-country.csv`. Then, in the first cell:
+A new notebook, `STA1000 Lecture 8`, and `insta-data.csv` from Loop uploaded to the {{< fa folder >}} **Files** panel. The first cell:
 
 ```{.python}
 import pandas as pd
+import matplotlib.pyplot as plt          # the plotting library, as plt
 insta = pd.read_csv("insta-data.csv")
 insta["posted_at"] = pd.to_datetime(insta["posted_at"])
 insta["engagements"] = insta["likes"] + insta["comments"] + insta["saves"] + insta["shares"]
-```
-
-Lecture 7's first cell, plus the column today needs. The first cell of a notebook always does the same: load pandas, read the file, fix the types, add the columns.
-
-# 1. A Rate per Group
-
-## Average of the Rates, or Rate of the Totals?
-
-```{python}
 insta["engagement_rate"] = insta["engagements"] / insta["reach"] * 100
-print(insta["engagement_rate"].mean())
-print(insta["engagements"].sum() / insta["reach"].sum() * 100)
 ```
 
-Lecture 4's row level against aggregate, in two lines:
-
-- The **average of the rates**, 6.4%, gives each of the 431 posts the same weight
-- The **rate of the totals**, 5.7%, gives each account reached the same weight
-
-"Loomrow's engagement rate" is the second: **divide the totals**, never average the rates.
-
-## Divide the Totals, per Group
-
-```{python}
-by_format = insta.groupby("format")[["engagements", "reach"]].sum()
-by_format["engagement_rate"] = by_format["engagements"] / by_format["reach"] * 100
-by_format
-```
-
-Group the counts first, then divide: the rate of the totals, per format. Reels reach the most accounts but have the lowest rate: 4.0%, against 8.4% for carousels.
+- Lecture 7's first cell and its two calculated columns, plus one new line: **matplotlib**, Python's plotting library, under its short name `plt`, as pandas is `pd`
+- Colab has matplotlib installed already: nothing to install
+- Every chart today starts from `insta`, its 431 posts and 28 columns
 
 ## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
-### Which theme engages, which campaign pays?
+### Get set up
 
-Type each block in its own code cell, and run it:
+1. In Colab, open a new notebook, and name it `STA1000 Lecture 8`
+2. From Loop, download `insta-data.csv`, then drag it into the {{< fa folder >}} **Files** panel
+3. In the first cell, run the code below
 
 ```{.python}
-# 1. the engagement rate of each theme: total engagements / total reach
-by_theme = insta.groupby("theme")[["reach", "engagements"]].sum()
-by_theme["engagement_rate"] = by_theme["engagements"] / by_theme["reach"] * 100
-by_theme.sort_values("engagement_rate", ascending=False).round(1)
+import pandas as pd
+import matplotlib.pyplot as plt
+insta = pd.read_csv("insta-data.csv")
+insta["posted_at"] = pd.to_datetime(insta["posted_at"])
+insta["engagements"] = insta["likes"] + insta["comments"] + insta["saves"] + insta["shares"]
+insta["engagement_rate"] = insta["engagements"] / insta["reach"] * 100
+print(insta.shape)
+```
 
-# 2. the revenue for each euro spent, roas, of each campaign
+::: {#timer8_0 .timer seconds="240" starton="interaction"}
+:::
+
+
+# 1. Basic Visualisations with matplotlib
+
+## Using matplotlib
+
+**matplotlib** is Python's main plotting library: pandas, seaborn and most charts written by AI assistants draw with it. A chart is built in **layers**, one line of code each:
+
+```{.python}
+fig, ax = plt.subplots()     # 1. the canvas: an empty frame
+ax.scatter(x, y)             # 2. a geometry: what to draw, and which columns
+ax.set_xlabel("...")         # 3. more layers: labels, scales, colours
+plt.show()                   # 4. show it
+```
+
+```{python}
+#| echo: false
 paid = insta[insta["is_paid"] == True]
-by_campaign = paid.groupby("campaign")[["spend_eur", "attributed_revenue_eur"]].sum()
-by_campaign["roas"] = by_campaign["attributed_revenue_eur"] / by_campaign["spend_eur"]
-by_campaign.sort_values("roas", ascending=False).round(2)
+fig, axes = plt.subplots(1, 3, figsize=(9.5, 1.75))
+steps = ["1. fig, ax = plt.subplots()", "2. ax.scatter(x, y)", "3. ax.set_xlabel(...)"]
+for ax, step in zip(axes, steps):
+    ax.set_title(step, fontsize=9, family="monospace", loc="left")
+    ax.tick_params(labelsize=7)
+for ax in axes[1:]:
+    ax.scatter(paid["spend_eur"], paid["attributed_revenue_eur"], s=5)
+axes[2].set_xlabel("Ad spend (€)", fontsize=8)
+plt.show()
 ```
 
-::: {#timer8_2 .timer seconds="420" starton="interaction"}
+Read from top to bottom: each line adds to what the lines above it drew.
+
+## The Canvas: fig and ax
+
+```{python}
+fig, ax = plt.subplots(figsize=(8, 1.2))
+plt.show()
+```
+
+- `plt.subplots()` gives back two things, stored under the two names left of `=`: `fig`, the whole **figure**, and `ax`, its plotting area, the **axes**
+- `figsize=`: the width, then the height, in inches. Without it, matplotlib picks a size
+- An empty frame: every layer from now on is a **method** of `ax`, such as `ax.scatter()`
+
+## Mapping x and y
+
+A geometry's first two arguments are its **mapping**: the x column, then the y column.
+
+```{.python}
+fig, ax = plt.subplots()
+ax.scatter(my_table["my_x_column"], my_table["my_y_column"])   # x first, then y
+plt.show()
+```
+
+```{python}
+#| include: false
+plt.rcParams["figure.figsize"] = (8, 1.4)     # display size only, to fit the slide
+```
+
+```{python}
+fig, ax = plt.subplots()
+ax.scatter(insta["reach"], insta["engagement_rate"])
+plt.show()
+```
+
+One point per post; the one far right stretches the axis: section 2 deals with it.
+
+## More Than x and y
+
+```{python}
+#| include: false
+plt.rcParams["figure.figsize"] = (8, 1.6)     # display size only, to fit the slide
+```
+
+```{python}
+#| code-line-numbers: "3"
+fig, ax = plt.subplots()
+ax.scatter(insta["reach"], insta["engagement_rate"],
+           color="darkred", s=15, marker="s", alpha=0.5)
+plt.show()
+```
+
+- `color`: a name or a code, such as `"#C44E52"`. `s`: the size. `marker`: the shape, `"o"`, `"s"` or `"^"`. `alpha`: from 0, invisible, to 1, solid
+- Each is **one value for the whole layer**: section 2 colours by format
+- A long line can continue inside its brackets, on the next line
+
+## Geometries
+
+Each kind of chart has its own `ax` method, its **geometry**:
+
+::: {style="font-size:0.75em; line-height:1.3;"}
+
+| Method | Draws | To show | Family |
+|:--|:--|:--|:--|
+| `ax.scatter(x, y)` | points | how two columns relate | relationship |
+| `ax.plot(x, y)` | a line | a change over time | evolution (Lecture 5) |
+| `ax.bar(x, heights)` | bars | one number per category | composition, comparison |
+| `ax.barh(y, widths)` | sideways bars | the same, for long names | composition, comparison |
+| `ax.hist(values)` | a histogram | how one column is spread | distribution |
+| `ax.boxplot(groups)` | boxes | the spread in each group | distribution, comparison |
+
+:::
+
+Lecture 3's four families, plus time. **The question picks the geometry.** All the others: [plot types](https://matplotlib.org/stable/plot_types/index.html).
+
+## Line Chart
+
+```{python}
+by_date = insta.sort_values("posted_at")
+fig, ax = plt.subplots()
+ax.plot(by_date["posted_at"], by_date["followers_at_post"])
+fig.autofmt_xdate()
+plt.show()
+```
+
+- A line joins the rows **in the table's order**: sort them by date first. `fig.autofmt_xdate()` tilts the dates, so they do not overlap
+- 5,253 followers in January 2025, 38,668 in June 2026: steeper after August 2025, the month of the viral reel
+
+## Bar Chart
+
+```{python}
+counts = insta["format"].value_counts()
+fig, ax = plt.subplots()
+ax.bar(counts.index, counts.values)
+plt.show()
+```
+
+- `value_counts()` gives one count per format, the formats as its **index** (Lecture 7): `counts.index` for the x positions, `counts.values` for the heights
+- A bar's length is its value, so the axis starts at 0: 203 reels, 144 carousels, 84 images
+
+## Histogram
+
+```{python}
+fig, ax = plt.subplots()
+ax.hist(insta["engagement_rate"], bins=30, edgecolor="white")
+plt.show()
+```
+
+- One column only: matplotlib cuts it into 30 **bins**, and counts the posts in each. Too few bins hide the shape, too many make noise
+- **Two humps**: most posts engage around 5%, others around 8.5%. The mean, 6.4%, describes neither
+
+## Boxplot
+
+```{python}
+carousels = insta[insta["format"] == "carousel"]
+images = insta[insta["format"] == "image"]
+reels = insta[insta["format"] == "reel"]
+boxes = [carousels["engagement_rate"], images["engagement_rate"], reels["engagement_rate"]]
+fig, ax = plt.subplots()
+ax.boxplot(boxes, tick_labels=["carousel", "image", "reel"])
+plt.show()
+```
+
+- A **list** of three columns, one box each, named by `tick_labels`
+- The humps were formats: the worst carousel, 7.2%, beats the best reel, 6.9%
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### First charts
+
+In a new cell, replace each `____` with the missing word, and run it:
+
+1. A histogram of `caption_length`, with `.hist()`
+2. The posts of each theme, counted with `.value_counts()`, as bars with `.barh()`
+
+```{.python}
+fig, ax = plt.subplots()
+ax.____(insta["caption_length"], bins=20)
+plt.show()
+themes = insta["theme"].____()
+fig, ax = plt.subplots()
+ax.____(themes.index, themes.values)
+plt.show()
+```
+
+::: {style="max-width:80%;"}
+You should see one hump, then six bars, founder the longest.
+:::
+
+::: {#timer8_1 .timer seconds="300" starton="interaction"}
 :::
 
 ## Solution
 
 ```{python}
-by_theme = insta.groupby("theme")[["reach", "engagements"]].sum()
-by_theme["engagement_rate"] = by_theme["engagements"] / by_theme["reach"] * 100
-by_theme.sort_values("engagement_rate", ascending=False).round(1)
+#| include: false
+plt.rcParams["figure.figsize"] = (4.5, 1.8)   # display size only, to fit the slide
 ```
 
-**Customer** posts engage most; **behind the scenes** least, dragged down by LR0184 and its 535,086 accounts.
+```{python}
+#| layout-ncol: 2
+fig, ax = plt.subplots()
+ax.hist(insta["caption_length"], bins=20)
+plt.show()
+themes = insta["theme"].value_counts()
+fig, ax = plt.subplots()
+ax.barh(themes.index, themes.values)
+plt.show()
+```
 
-## Solution (continued)
+Captions are not skewed: one hump, around 190 characters, unlike the likes. Founder posts are the most frequent (80), sustainability posts the least (61).
+
+# 2. Advanced Visualisations with matplotlib
+
+## Grey Everything, Colour One Thing
 
 ```{python}
+#| include: false
+plt.rcParams["figure.figsize"] = (8, 1.6)     # display size only, to fit the slide
+```
+
+```{python}
+viral = insta[insta["post_id"] == "LR0184"]
+fig, ax = plt.subplots()
+ax.scatter(insta["reach"], insta["engagement_rate"], color="lightgrey")
+ax.scatter(viral["reach"], viral["engagement_rate"], color="red")
+plt.show()
+```
+
+- Two layers: every post in grey, then LR0184 in red, **on top**. Bars work the same way
+- LR0184 stretches the axis: Lecture 6's viral reel, 535,086 accounts reached, and the lowest rate, 1.6%
+
+## Colour by Group
+
+```{python}
+fig, ax = plt.subplots()
+ax.scatter(carousels["reach"], carousels["engagement_rate"], label="carousel")
+ax.scatter(images["reach"], images["engagement_rate"], label="image")
+ax.scatter(reels["reach"], reels["engagement_rate"], label="reel")
+ax.legend()
+plt.show()
+```
+
+- matplotlib colours a **layer**, not a column: one layer per format, from the three tables of the **Boxplot** slide
+- `label=` names each layer, and `ax.legend()` lists the names
+
+## Styles
+
+```{python}
+#| code-line-numbers: "1"
+plt.style.use("petroff10")
+fig, ax = plt.subplots()
+ax.scatter(carousels["reach"], carousels["engagement_rate"], label="carousel")
+ax.scatter(images["reach"], images["engagement_rate"], label="image")
+ax.scatter(reels["reach"], reels["engagement_rate"], label="reel")
+ax.legend()
+plt.show()
+```
+
+- A style changes **every chart after it**: `petroff10`'s colours stay distinct for colour-blind readers. Others: `"ggplot"`, `"bmh"`, `"grayscale"`
+
+## Scales
+
+```{python}
+#| code-line-numbers: "6"
+fig, ax = plt.subplots()
+ax.scatter(carousels["reach"], carousels["engagement_rate"], label="carousel")
+ax.scatter(images["reach"], images["engagement_rate"], label="image")
+ax.scatter(reels["reach"], reels["engagement_rate"], label="reel")
+ax.legend()
+ax.set_xscale("log")
+plt.show()
+```
+
+- On a **log axis**, each step ×10 covers the same distance: 1,000, 10,000, then 100,000 accounts. The squashed cloud spreads out
+- `ax.set_ylim(0, 12)` sets a range instead
+
+## Labels
+
+```{python}
+#| code-line-numbers: "6,7"
+fig, ax = plt.subplots()
+ax.scatter(carousels["reach"], carousels["engagement_rate"], label="carousel")
+ax.scatter(images["reach"], images["engagement_rate"], label="image")
+ax.scatter(reels["reach"], reels["engagement_rate"], label="reel")
+ax.legend()
+ax.set(xscale="log", xlabel="Accounts reached (log scale)", ylabel="Engagement rate (%)")
+ax.set_title("Carousels engage most, whatever their reach", loc="left")
+plt.show()
+```
+
+- `ax.set()` sets several things in one line: the scale, the labels. The title states the **finding**, not the columns
+
+## Panels
+
+```{python}
+fig, axes = plt.subplots(1, 2, sharey=True)
+axes[0].scatter(carousels["reach"], carousels["engagement_rate"])
+axes[0].set(title="carousel", xscale="log")
+axes[1].scatter(reels["reach"], reels["engagement_rate"])
+axes[1].set(title="reel", xscale="log")
+plt.show()
+```
+
+- Two panels, `axes[0]` and `axes[1]`, counted from 0, each with its own layers
+- `sharey=True`: one y-axis for both, so the heights compare
+
+## Reference Lines
+
+```{python}
+fig, ax = plt.subplots()
+ax.hist(insta["likes"], bins=40, color="lightgrey", edgecolor="white")
+ax.axvline(insta["likes"].mean(), color="red", label="mean")
+ax.axvline(insta["likes"].median(), color="black", label="median")
+ax.legend()
+plt.show()
+```
+
+- pandas computes the number, `ax.axvline()` draws it as a vertical line; `ax.axhline()`, as a horizontal one
+- Lecture 7's mean, 463 likes, and median, 278: big posts pull the mean right
+
+## Saving a Figure
+
+```{.python}
+fig.savefig("likes.png", dpi=300, bbox_inches="tight")
+```
+
+- In the **same cell** as the chart, before `plt.show()`. The file appears in the **Files** panel: {{< fa brands windows >}} right-click / {{< fa brands apple >}} <kbd>⌃ Control</kbd> + click on it → **Download**
+- `dpi=300` for print, 150 for a screen
+- `bbox_inches="tight"` stops the labels being cut off at the edges
+- `.png` for documents and slides; `.svg` or `.pdf` for anything that will be resized
+- **Save with code, never with a screenshot**: next month, the same cell redraws the chart on the new data
+
+## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
+
+### Do boosted reels earn their spend?
+
+In a new cell, replace each `____`, and run it:
+
+1. Every paid post in `"lightgrey"`, then the paid reels in `"red"`, on top
+2. Labels `"Ad spend (EUR)"` and `"Revenue (EUR)"`, then a title with the finding
+
+```{.python}
 paid = insta[insta["is_paid"] == True]
-by_campaign = paid.groupby("campaign")[["spend_eur", "attributed_revenue_eur"]].sum()
-by_campaign["roas"] = by_campaign["attributed_revenue_eur"] / by_campaign["spend_eur"]
-by_campaign.sort_values("roas", ascending=False).round(2)
+paid_reels = paid[paid["format"] == "reel"]
+fig, ax = plt.subplots()
+ax.scatter(paid["spend_eur"], paid["attributed_revenue_eur"], color=____)
+ax.scatter(paid_reels["spend_eur"], paid_reels["attributed_revenue_eur"], color=____)
+ax.set(xlabel=____, ylabel=____, title=____)
+plt.show()
 ```
 
-**ROAS**, the return on ad spend: €6.97 a euro at Black Friday, €2.46 for the AW25 preorders.
+::: {style="max-width:80%;"}
+You should see the 50 paid reels in red, rising with their spend. Then save it as `paid-reels.png`.
+:::
 
-# 2. Over Time
+::: {#timer8_2 .timer seconds="300" starton="interaction"}
+:::
 
-## Date Parts and Date Values
+## Solution
+
+```{.python}
+paid = insta[insta["is_paid"] == True]
+paid_reels = paid[paid["format"] == "reel"]
+fig, ax = plt.subplots()
+ax.scatter(paid["spend_eur"], paid["attributed_revenue_eur"], color="lightgrey")
+ax.scatter(paid_reels["spend_eur"], paid_reels["attributed_revenue_eur"], color="red")
+ax.set(xlabel="Ad spend (EUR)", ylabel="Revenue (EUR)",
+       title="Boosted reels: the more spent, the more earned")
+fig.savefig("paid-reels.png", dpi=300, bbox_inches="tight")
+plt.show()
+```
 
 ```{python}
-insta["year"] = insta["posted_at"].dt.year
-insta["month"] = insta["posted_at"].dt.to_period("M")
-insta["weekday"] = insta["posted_at"].dt.day_name()
-insta[["posted_at", "year", "month", "weekday"]].head(2)
+#| echo: false
+# The same lines as above, without writing the file during the render
+plt.rcParams["figure.figsize"] = (8, 1.7)     # display size only, to fit the slide
+paid = insta[insta["is_paid"] == True]
+paid_reels = paid[paid["format"] == "reel"]
+fig, ax = plt.subplots()
+ax.scatter(paid["spend_eur"], paid["attributed_revenue_eur"], color="lightgrey")
+ax.scatter(paid_reels["spend_eur"], paid_reels["attributed_revenue_eur"], color="red")
+ax.set(xlabel="Ad spend (EUR)", ylabel="Revenue (EUR)",
+       title="Boosted reels: the more spent, the more earned")
+plt.show()
 ```
 
-`.dt` opens the date toolbox of a date column. As with Tableau's two **Month** options in Lecture 5:
+The red points rise almost in a line: for reels, revenue follows spend more closely than for the other formats.
 
-- **Date parts**: `.dt.year`, `.dt.month`, `.dt.day_name()`: "Monday" means every Monday
-- **Date values**: `.dt.to_period("M")`: that month only, 2025-01, as the **Month** with a year
+# 3. Combine pandas and matplotlib
 
-## Over Time
+## A New Column, Then Plot
 
 ```{python}
-monthly = insta.groupby("month")["reach"].sum()
-monthly.sort_values(ascending=False).head(3)
+#| include: false
+plt.rcParams["figure.figsize"] = (8, 1.6)     # display size only, to fit the slide
 ```
 
-Group by a date value, and each month becomes a row: Lecture 5's line chart, as a table. August 2025 is the month of the viral reel. Lecture 9 draws the line.
+```{python}
+insta["non_followers_pct"] = insta["reach_non_followers"] / insta["reach"] * 100
+fig, ax = plt.subplots()
+ax.hist(insta["non_followers_pct"], bins=30, edgecolor="white")
+ax.set_xlabel("Accounts reached that do not follow Loomrow (%)")
+plt.show()
+```
+
+- pandas first: Lecture 7's `non_followers_pct`. Then matplotlib draws it like any column
+- Two humps: carousels and images reach 10 to 47% of non-followers; reels, 60 to almost 100%
+
+## groupby(), Then Plot
+
+```{python}
+likes_per_theme = insta.groupby("theme")["likes"].sum().sort_values()
+fig, ax = plt.subplots()
+ax.barh(likes_per_theme.index, likes_per_theme.values)
+ax.set_xlabel("Likes, all posts together")
+plt.show()
+```
+
+- Lecture 7's `likes_per_theme`, sorted lowest first: `barh()` draws from the bottom up, so the largest ends on top
+- Founder posts collect the most likes, 38,705: also the most posts. A total grows with the count
+
+## pivot_table(), Then Plot
+
+```{python}
+#| include: false
+plt.rcParams["figure.figsize"] = (8, 1.5)     # display size only, to fit the slide
+```
+
+```{python}
+rates = insta.pivot_table(index="product_line", columns="format",
+                          values="engagement_rate", aggfunc="median")
+fig, ax = plt.subplots()
+rates.plot(kind="bar", ax=ax, rot=0)
+ax.set(xlabel="", ylabel="Median rate (%)", ylim=(0, 11))
+ax.legend(ncol=3)
+plt.show()
+```
+
+- Lecture 7's pivot table, drawn by pandas' `.plot()` on your `ax`. `kind=` picks the geometry, a line by default; `rot=0` keeps names level
+- In every product line, carousels engage most: the format matters, not the line
 
 ## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
-### Loomrow over time
+### Table to chart
 
-Type each block in its own code cell, and run it:
+In a new cell, replace each `____` with the missing word, and run it:
+
+1. The median reach of each `"product_line"`, with `.groupby()` and `.median()`
+2. Sorted, the lowest first, with `.sort_values()`
+3. Sideways bars, with `.barh()`, labelled `"Median reach per post"`
 
 ```{.python}
-# 1. the year of each post
-insta["year"] = insta["posted_at"].dt.year
-
-# 2. the reach of each year, then of January to June only
-print(insta.groupby("year")["reach"].sum())
-first_half = insta[insta["posted_at"].dt.month <= 6]
-print(first_half.groupby("year")["reach"].sum())
+medians = insta.groupby(____)["reach"].____()
+medians = medians.____()
+fig, ax = plt.subplots()
+ax.____(medians.index, medians.values)
+ax.set_xlabel(____)
+plt.show()
 ```
 
-::: {#timer8_3 .timer seconds="300" starton="interaction"}
+::: {style="max-width:80%;"}
+You should see Outerwear on top, at about 6,250 accounts.
+:::
+
+::: {#timer8_3 .timer seconds="240" starton="interaction"}
 :::
 
 ## Solution
 
 ```{python}
-print(insta.groupby("year")["reach"].sum())
-first_half = insta[insta["posted_at"].dt.month <= 6]
-print(first_half.groupby("year")["reach"].sum())
+medians = insta.groupby("product_line")["reach"].median()
+medians = medians.sort_values()
+fig, ax = plt.subplots()
+ax.barh(medians.index, medians.values)
+ax.set_xlabel("Median reach per post")
+plt.show()
 ```
 
-Fewer in total, because 2026 stops on 24 June: compare the same months, as in Lecture 5. From January to June, 2026 reached **4.6 times** as many accounts as 2025.
+Outerwear posts reach the most accounts, by a narrow margin: medians of about 4,940 to 6,250, on 78 to 92 posts per line, a gap small enough to be chance.
 
-# 3. Merge Two Files
+## Same Chart, One Line
 
-## Two Files, One Key
+```{python}
+#| include: false
+plt.rcParams["figure.figsize"] = (8, 1.4)     # display size only, to fit the slide
+```
 
-Lecture 4 split the Loomrow data in two, as it arrives from two platforms:
+```{python}
+import seaborn as sns
+fig, ax = plt.subplots()
+sns.scatterplot(data=insta, x="reach", y="engagement_rate", hue="format", ax=ax,
+                hue_order=["carousel", "image", "reel"])
+ax.set(xscale="log", xlabel="Accounts reached (log scale)", ylabel="Engagement rate (%)")
+plt.show()
+```
+
+- **seaborn** draws with matplotlib: the whole table in `data=`, the columns by name, on `ax=ax`
+- `hue="format"` replaces the three layers, in the order of `hue_order`
+
+## What seaborn Computes For You
+
+| Function | Draws | Watch out |
+|:--|:--|:--|
+| `sns.histplot` | a histogram | it chooses the bins |
+| `sns.boxplot` | a box per group | |
+| `sns.scatterplot` | the points | |
+| `sns.barplot` | the **mean** per group | error bars: `errorbar=None` |
+| `sns.lineplot` | the **mean** per x value | a band: `errorbar=None` |
+
+seaborn summarises **before** it draws, as pandas did in this section. If you cannot say what it computed, you cannot defend the chart. AI assistants use it often: section 4.
+
+# 4. Vibe Coding Visualisations
+
+## What Is Vibe Coding?
+
+Describe the chart in plain English, and an AI assistant writes the code.
+
+**1. The prompt:** *"With pandas and matplotlib, using fig, ax: a sorted horizontal bar chart of the median engagement_rate per theme in insta, with labels and a title."*
+
+**2. The code it writes:**
 
 ```{.python}
-posts = pd.read_csv("insta-posts.csv")
-ads = pd.read_csv("meta-ads.csv")
+medians = insta.groupby("theme")["engagement_rate"].median().sort_values()
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.barh(medians.index, medians.values, color="steelblue")
+ax.set_xlabel("Median engagement rate (%)")
+ax.set_title("Median Engagement Rate by Theme")
+plt.tight_layout()
+plt.show()
 ```
 
-```{python}
-print(posts.shape, ads.shape)
-ads.head(3)
-```
+**3. Read every line, then run it:** `plt.tight_layout()` is new: ask what it does. The title names the columns; the finding is that the theme barely moves the rate.
 
-`insta-posts.csv` has the 431 posts, from Instagram; `meta-ads.csv` the 127 boosted posts, from Meta Ads Manager. **The key** they share: `post_id`.
-
-## Inner and Left Merges
+## Check Before You Trust
 
 :::: {layout="[1,1]"}
 ::: {#first-column}
 
-![](./figures/external/tidyexplain_inner_join_nocode.gif)
+**Ask for:**
 
-`how="inner"`: only the keys found in both tables, 1 and 2
+- pandas and matplotlib, with `fig, ax`
+- the table, and its columns
+- the geometry
+- labels and a title
 
 :::
 
 ::: {#second-column}
 
-![](./figures/external/tidyexplain_left_join_nocode.gif)
+**Then check:**
 
-`how="left"`: every row of `x`; 3 has no match, so its `y` is `NaN`
-
-:::
-::::
-
-::: {style="font-size:0.7em;text-align:center;"}
-`pd.merge(x, y, on="id", how=...)`: `x` on the left, `y` on the right, the coloured `id` as the key. Source: Garrick Aden-Buie, tidyexplain [{{< fa link >}}](https://www.garrickadenbuie.com/project/tidyexplain/)
-:::
-
-## Right and Outer Merges
-
-:::: {layout="[1,1]"}
-::: {#first-column}
-
-![](./figures/external/tidyexplain_right_join_nocode.gif)
-
-`how="right"`: every row of `y`; 4 has no match, so its `x` is `NaN`
-
-:::
-
-::: {#second-column}
-
-![](./figures/external/tidyexplain_full_join_nocode.gif)
-
-`how="outer"`: every key of both tables, `NaN` where it has no match
+- do the columns exist?
+- a line you have not seen?
+- a mean you did not ask for?
+- units? A title with the finding?
 
 :::
 ::::
 
-::: {style="font-size:0.7em;text-align:center;"}
-Source: Garrick Aden-Buie, tidyexplain [{{< fa link >}}](https://www.garrickadenbuie.com/project/tidyexplain/)
-:::
-
-## pd.merge()
-
-```{python}
-both = pd.merge(posts, ads, on="post_id", how="left")
-both.shape
-```
-
-- `pd.merge(left, right, ...)`: the two tables, in that order
-- `on="post_id"`: the key, a column present in both
-- `how="left"`: keep every row of the left table, matched or not
-
-The ad columns are added at the end: 23 + 3 = 26 columns, `insta-data.csv` again.
-
-## Which Rows Survive?
-
-:::: {layout="[1,1]"}
-::: {#first-column}
-
-| `how=` | Keeps | Rows |
-|---|---|---|
-| `"inner"` | the keys in **both** | 127 |
-| `"left"` | every row on the **left** | 431 |
-| `"right"` | every row on the **right** | 127 |
-| `"outer"` | every key, from **either** | 431 |
-
-:::
-
-::: {#second-column}
-
-Lecture 4's join types, with the same counts.
-
-`"left"` is almost always the one: keep all your observations, and add information where it exists.
-
-`"inner"`, the default when `how` is left out, drops the 304 organic posts **without a word**.
-
-:::
-::::
-
-## Missing Values After a Merge
-
-A post with no ad has nothing to match in `meta-ads.csv`: its ad columns are **missing**, `NaN`, like the `campaign` of the 225 posts outside any campaign in Lecture 7.
-
-```{python}
-print(both["spend_eur"].isna().sum())
-both["spend_eur"] = both["spend_eur"].fillna(0)
-print(round(both["spend_eur"].sum(), 2))
-```
-
-- `.isna().sum()` counts the missing values: 304, the organic posts
-- `.fillna(0)` replaces them with 0. Right here, because no ad means €0 spent. Wrong for a missing price or a missing age: decide, and say so
-
-## When a Key Appears Twice
-
-:::: {layout="[1,1]"}
-::: {#first-column}
-
-![](./figures/external/tidyexplain_left_join_extra_nocode.gif)
-
-:::
-
-::: {#second-column}
-
-Key 2 appears **twice** in `y`, so the merge copies `x2`: 3 rows become 4.
-
-Every value of `x2` now counts twice, and no error message warns you.
-
-:::
-::::
-
-::: {style="font-size:0.7em;text-align:center;"}
-Source: Garrick Aden-Buie, tidyexplain [{{< fa link >}}](https://www.garrickadenbuie.com/project/tidyexplain/)
-:::
-
-## Check Every Merge: Rows and a Total
-
-Before and after each merge, two checks:
-
-1. **The number of rows**: did it change, and should it have?
-2. **A total you know**: €24,345.78 of spend, as in Meta Ads Manager
-
-`ads-by-country.csv`, Lecture 5's file, has **one row per post and country**:
-
-```{.python}
-countries = pd.read_csv("ads-by-country.csv")
-```
-
-```{python}
-wrong = pd.merge(insta, countries, on="post_id")
-print(countries.shape, wrong.shape)
-print(round(wrong["spend_eur"].sum(), 2))
-```
-
-Each paid post is repeated once per country, and so is its `spend_eur`: Lecture 5's €106,899.36. The code ran without an error. Only the checks catch it.
+Use an assistant's code only if you can **explain every line** of it, and say so: Lecture 1's policy. A `KeyError` names a column that does not exist: `engagementRate` for `engagement_rate`.
 
 ## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 
-### Rebuild the Loomrow file
+### Ask, then check
 
-With `posts` and `ads` read as on the slides, type each block in its own code cell, and run it:
+1. Ask an AI assistant, Gemini in Colab or another: *"With pandas and matplotlib, using fig, ax: from a DataFrame called insta, with the columns format, theme, reach, likes, saves and engagement_rate, a horizontal bar chart of the median saves of each format, sorted, with labels and a title that states the finding."*
+2. Paste its code in a new cell, below the first cell. Check it with the last slide's list **before** you run it
 
-```{.python}
-# 1. keep only the posts found in both files: how many rows?
-pd.merge(posts, ads, on="post_id", how="inner").shape
-
-# 2. keep every post, and count the posts with no ad
-both = pd.merge(posts, ads, on="post_id", how="left")
-print(both.shape)
-print(both["spend_eur"].isna().sum())
-
-# 3. put 0 in the empty ad columns: €24,345.78 spent, €76,928.88 of revenue?
-ad_columns = ["spend_eur", "attributed_purchases", "attributed_revenue_eur"]
-both[ad_columns] = both[ad_columns].fillna(0)
-both[ad_columns].sum()
-
-# 4. save the table, then download it from the Files panel
-both.to_csv("insta-rebuilt.csv", index=False)
-```
-
-::: {#timer8_4 .timer seconds="420" starton="interaction"}
+::: {style="max-width:80%;"}
+You should see three bars, carousels on top, at 49 saves, twice the reels' 24. If not, what did you fix?
 :::
 
-## Solution
+::: {#timer8_4 .timer seconds="300" starton="interaction"}
+:::
+
+## One Answer
 
 ```{python}
-print(pd.merge(posts, ads, on="post_id", how="inner").shape)
-both = pd.merge(posts, ads, on="post_id", how="left")
-print(both.shape, both["spend_eur"].isna().sum())
-ad_columns = ["spend_eur", "attributed_purchases", "attributed_revenue_eur"]
-both[ad_columns] = both[ad_columns].fillna(0)
-print(both[ad_columns].sum())
+saves = insta.groupby("format")["saves"].median().sort_values()
+fig, ax = plt.subplots()
+ax.barh(saves.index, saves.values)
+ax.set_xlabel("Median saves per post")
+ax.set_title("The median carousel is saved twice as often as the median reel", loc="left")
+plt.show()
 ```
 
-```{.python}
-both.to_csv("insta-rebuilt.csv", index=False)
-```
+Whatever the assistant wrote, the checks are the same: the columns exist, the median is a median, and the title says what the founders should take away.
 
-The inner merge keeps only the 127 boosted posts: the 304 organic ones are gone.
+## When a Chart Goes Wrong {.smaller}
+
+| You see | Why | Fix |
+|:---------------------|:--------------|:-------------|
+| `NameError: name 'plt' is not defined` | the first cell has not run | run it: it imports `plt` |
+| `AttributeError: 'Axes' object has no attribute 'histogram'` | no geometry has that name | `ax.hist()`: the Geometries slide |
+| `KeyError: 'engagementRate'` | no column has that exact name | copy it from `insta.columns` |
+| `ValueError: x and y must be the same size` | x and y come from two tables | take both from the same table |
+| two charts on top of each other | one `ax` for both | a new `fig, ax = plt.subplots()` for each |
+| bars in alphabetical order | the result was not sorted | `.sort_values()` before you draw |
+| a line such as `<matplotlib...>` above the chart | `plt.show()` is missing | end the cell with `plt.show()` |
+| labels cut off in the saved file | the figure was saved as it is | `bbox_inches="tight"` |
+
+Read an error from its **last line**: it names the problem, and often the fix.
 
 ## {background="#43464B"}
 

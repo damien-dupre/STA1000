@@ -1,0 +1,547 @@
+---
+title: "STA1000 Python Test MCQs (Lectures 6 to 8)"
+subtitle: "Data Analytics and Metrics"
+author: "Damien Dupré"
+format:
+  html:
+    toc: false
+# false = student paper, the answer key is left out.
+# true = lecturer copy with the key, or render with: quarto render <file> -M answers:true
+answers: false
+---
+
+## Lecture 6: Getting Started with Python (Q1 to Q15)
+
+**Q1.** Which statement about Python and Google Colab is correct?
+
+A.  Colab is the language, and Python is the interface where you type it
+B.  Python is the language and Colab the interface, and in Colab the Python runs on Google's computers
+C.  Colab runs Python on your own laptop, so Python has to be installed on it first
+D.  A Colab notebook is saved as a `.py` file in your laptop's Downloads folder
+
+**Q2.** A Colab code cell contains only these four lines. What appears under the cell when it is run?
+
+```{.python}
+spend = 24345.78
+revenue = 76928.88
+revenue / spend
+spend
+```
+
+A.  Nothing, because the cell has no `print()`
+B.  `3.159834...`, the revenue per euro spent
+C.  `3.159834...` and `24345.78`, on two lines
+D.  `24345.78`
+
+**Q3.** Your Colab runtime is stopped after you leave it idle for too long. You had uploaded `insta-data.csv` and created several variables. What have you lost?
+
+A.  The variables and the uploaded file, but not the code in the cells
+B.  The code in the cells, unless the notebook was downloaded first
+C.  Nothing, because Colab saves your variables and files to Google Drive
+D.  Only the uploaded file, because the variables are stored in the notebook
+
+**Q4.** A notebook has three code cells, one under the other. A student runs cell 1, then cell 2, then cell 2 again, then cell 3. What does cell 3 print?
+
+```{.python}
+# Cell 1
+followers = 5000
+
+# Cell 2
+followers = followers + 1000
+
+# Cell 3
+print(followers)
+```
+
+A.  `6000`
+B.  `7000`
+C.  `5000`
+D.  A `NameError`, because cell 2 was run twice
+
+**Q5.** What does this cell print?
+
+```{.python}
+# spend = 100
+spend = 50  # spend = 200
+# spend = spend * 2
+spend = spend + 10  # * 3
+print(spend)
+```
+
+A.  `180`
+B.  `210`
+C.  `60`
+D.  `120`
+
+**Q6.** What does this cell print?
+
+```{.python}
+spend = 200
+revenue = 600
+roas = revenue / spend
+revenue = 900
+print(roas)
+```
+
+A.  `3.0`
+B.  `4.5`
+C.  `3`
+D.  An error, because `revenue` cannot be given a second value
+
+**Q7.** What does this cell print?
+
+```{.python}
+rate = 1.5536
+print(round(rate, 1), round(rate))
+```
+
+A.  `1.5 1`
+B.  `1.6 1.6`
+C.  `1.55 2`
+D.  `1.6 2`
+
+**Q8.** Each line is run in its own cell. Which one raises a `SyntaxError`?
+
+A.  `spend_2025 = 100`
+B.  `Spend2025 = 100`
+C.  `2025_spend = 100`
+D.  `_spend = 100`
+
+**Q9.** What does this line print?
+
+```{.python}
+print(type("24345.78"))
+```
+
+A.  `<class 'float'>`
+B.  `<class 'str'>`
+C.  `<class 'int'>`
+D.  `<class 'bool'>`
+
+**Q10.** What does this line print?
+
+```{.python}
+print("2" + "3", 2 + 3)
+```
+
+A.  `5 5`
+B.  `23 5`
+C.  `23 23`
+D.  A `TypeError`, because text cannot be added
+
+**Q11.** Copied from the Instagram app, a reach arrives as `reach_text = "535086"`. Which line prints `True` without an error?
+
+A.  `print(reach_text > 518400)`
+B.  `print(int("reach_text") > 518400)`
+C.  `print(int(reach_text) > 518400)`
+D.  `print(reach_text + 1 > 518400)`
+
+**Q12.** What does this cell print?
+
+```{.python}
+post_format = "Reel"
+print(post_format == "reel", post_format != "image")
+```
+
+A.  `True True`
+B.  `False False`
+C.  `True False`
+D.  `False True`
+
+**Q13.** Each line is run in its own cell of a fresh session. Which one raises a `SyntaxError`?
+
+A.  `print("Reach: 5184)`
+B.  `print(Reach)`
+C.  `print("Reach" * "2")`
+D.  `print("Reach: " + 5184)`
+
+**Q14.** Python stops at the first problem it meets. When this cell is run, which error is reported?
+
+```{.python}
+Reach = 535086
+engagements = 8316
+rate = engagements / reach * 100
+print("Rate: " + rate)
+Print(round(rate, 1))
+```
+
+A.  `NameError: name 'Reach' is not defined`
+B.  `TypeError: can only concatenate str (not "float") to str`
+C.  `NameError: name 'Print' is not defined`
+D.  `NameError: name 'reach' is not defined`
+
+**Q15.** `print("Loomrow posted " + 431 + " times")` raises a `TypeError`. Which line fixes it?
+
+A.  `print("Loomrow posted", 431, "times")`
+B.  `print("Loomrow posted " + int(431) + " times")`
+C.  `print("Loomrow posted " + 431, " times")`
+D.  `Print("Loomrow posted " + 431 + " times")`
+
+## Lecture 7: Tables with pandas (Q16 to Q30)
+
+**Q16.** After **Runtime** → **Restart session**, a student runs only the third cell of the notebook and sees `NameError: name 'pd' is not defined`. What is the cause?
+
+A.  pandas is not installed in Colab, so it must be installed with pip
+B.  `insta-data.csv` has not been uploaded to the Files panel again
+C.  The cell with `import pandas as pd` has not been run since the session restarted
+D.  pandas was misspelt as `panda` in the first cell
+
+**Q17.** The Files panel of Colab lists `insta-data.csv`. Which line reads it?
+
+A.  `insta = pd.read_csv(insta-data.csv)`
+B.  `insta = pd.read_csv("insta-data")`
+C.  `insta = pd.read_csv("Insta-data.csv")`
+D.  `insta = pd.read_csv("insta-data.csv")`
+
+**Q18.** `insta` holds the 431 posts and their 26 columns. Which line runs without an error and gives `(431, 26)`?
+
+A.  `insta.shape`
+B.  `insta.shape()`
+C.  `insta.info`
+D.  `insta.size()`
+
+**Q19.** In the output of `insta.info()`, the line for `campaign` reads `206 non-null object`, and the table has 431 rows. What does it tell you?
+
+A.  Loomrow ran 206 different campaigns
+B.  `campaign` holds text, and 225 posts have no value in it
+C.  `campaign` holds numbers, and 206 of them are zero
+D.  206 rows are errors and should be dropped before any analysis
+
+**Q20.** `insta["reach"].describe()` gives a mean of 9,788 and a median of 5,184. Which statement is correct?
+
+A.  Most posts reach about 9,788 accounts
+B.  Half of the posts reach more than 9,788 accounts
+C.  A few posts with a very large reach pull the mean above the median
+D.  The two figures disagree, so the file contains an error
+
+**Q21.** Which line gives a DataFrame with only the two columns `format` and `reach`?
+
+A.  `insta["format", "reach"]`
+B.  `insta[["format", "reach"]]`
+C.  `insta[["format"], ["reach"]]`
+D.  `insta("format", "reach")`
+
+**Q22.** What does this code print?
+
+```{.python}
+posts = pd.DataFrame({"spend_eur": [120.0, 80.5], "reach": [5200, 1000]})
+posts.rename(columns={"spend_eur": "spend"})
+print(list(posts.columns))
+```
+
+A.  `['spend', 'reach']`
+B.  `['spend_eur', 'reach']`
+C.  `['spend_eur', 'spend', 'reach']`
+D.  `['spend']`
+
+**Q23.** What does this code print?
+
+```{.python}
+posts = pd.DataFrame({
+    "format": ["reel", "image", "reel", "carousel", "reel", "image"],
+    "reach": [52000, 1000, 61000, 2000, 1500, 75000],
+})
+both = posts[(posts["format"] == "reel") & (posts["reach"] > 50000)]
+either = posts[(posts["format"] == "reel") | (posts["reach"] > 50000)]
+print(len(both), len(either))
+```
+
+A.  `2 5`
+B.  `3 4`
+C.  `5 2`
+D.  `2 4`
+
+**Q24.** Which line runs without an error and keeps the reels that reached more than 50,000 accounts?
+
+A.  `insta[(insta["format"] == "reel") & (insta["reach"] > 50000)]`
+B.  `insta[insta["format"] == "reel" & insta["reach"] > 50000]`
+C.  `insta[(insta["format"] == "reel") and (insta["reach"] > 50000)]`
+D.  `insta[(insta["format"] = "reel") & (insta["reach"] > 50000)]`
+
+**Q25.** What does this code print?
+
+```{.python}
+posts = pd.DataFrame({
+    "product_line": ["Denim", "Knitwear", "Dresses", "Denim", "Outerwear"],
+    "reach": [1000, 2500, 2000, 1999, 800],
+})
+a = posts[posts["product_line"].isin(["Denim", "Knitwear"])]
+b = posts[posts["reach"].between(1000, 2000)]
+print(len(a), len(b))
+```
+
+A.  `3 1`
+B.  `2 3`
+C.  `3 3`
+D.  `3 2`
+
+**Q26.** In `insta`, 127 of the 431 posts have `True` in the `is_paid` column. What do these lines print?
+
+```{.python}
+paid = insta[insta["is_paid"] == "True"]
+print(len(paid))
+```
+
+A.  `127`
+B.  `0`
+C.  `431`
+D.  A `TypeError`, because `is_paid` holds booleans, not text
+
+**Q27.** After these lines, which statement is true?
+
+```{.python}
+posts = pd.DataFrame({
+    "post_id": ["LR01", "LR02", "LR03", "LR04"],
+    "reach": [5200, 61000, 1500, 9800],
+})
+top = posts.sort_values("reach", ascending=False)
+```
+
+A.  The first row of `top` is LR02, and the first row of `posts` is still LR01
+B.  The first row of `top` is LR03, and the first row of `posts` is still LR01
+C.  The first row of both `top` and `posts` is LR02, because sorting changes the table
+D.  The first row of `top` is LR04, because the index is sorted, not the values
+
+**Q28.** What does this code print?
+
+```{.python}
+posts = pd.DataFrame({"likes": [300, 90], "saves": [60, 10], "reach": [6000, 2000]})
+posts["rate"] = (posts["likes"] + posts["saves"]) / posts["reach"] * 100
+print(posts.shape, posts["rate"].max())
+```
+
+A.  `(2, 3) 6.0`
+B.  `(2, 4) 5.0`
+C.  `(2, 4) 6.0`
+D.  `(3, 4) 6.0`
+
+**Q29.** In `result`, which value is shown next to `reel`?
+
+```{.python}
+posts = pd.DataFrame({
+    "format": ["reel", "image", "reel", "carousel", "reel"],
+    "reach": [5200, 1000, 61000, 2000, 1500],
+})
+result = posts.groupby("format")["reach"].median()
+```
+
+A.  `22566.666667`
+B.  `67700`
+C.  `61000`
+D.  `5200.0`
+
+**Q30.** In `table`, what is in the row `image` and the column `True`?
+
+```{.python}
+posts = pd.DataFrame({
+    "post_id": ["LR01", "LR02", "LR03", "LR04", "LR05", "LR06"],
+    "format": ["reel", "image", "reel", "carousel", "reel", "image"],
+    "is_paid": [True, False, False, True, True, False],
+})
+table = posts.pivot_table(index="format", columns="is_paid",
+                          values="post_id", aggfunc="count")
+```
+
+A.  `NaN`
+B.  `2`
+C.  `False`
+D.  An error, because `post_id` holds text and cannot be counted
+
+## Lecture 8: Figures with matplotlib (Q31 to Q45)
+
+**Q31.** Anscombe's quartet is four small datasets with the same means, standard deviations, correlation and best-fit line. What does it show?
+
+A.  Four datasets with the same summary statistics always look the same on a chart
+B.  The correlation is the only figure worth reporting
+C.  Charts are needed only when the summary statistics differ
+D.  Very different data can share the same summary statistics, so the data must be plotted
+
+**Q32.** After `fig, ax = plt.subplots()`, which statement is correct?
+
+A.  `fig` is the whole figure and `ax` its plotting area, and layers such as `ax.scatter()` are drawn on `ax`
+B.  `fig` holds the data and `ax` the chart drawn from it
+C.  `ax` is the whole figure and `fig` one of its panels
+D.  Nothing can be drawn until `plt.show()` has been run
+
+**Q33.** `ax.scatter(insta["reach"], insta["engagement_rate"])` draws one point per post. Where is each column?
+
+A.  `engagement_rate` across, `reach` up
+B.  `reach` across, `engagement_rate` up
+C.  Both across, side by side
+D.  `reach` as the size of each point, `engagement_rate` as its colour
+
+**Q34.** Which line draws how the engagement rate is spread across the 431 posts?
+
+A.  `ax.histogram(insta["engagement_rate"])`
+B.  `ax.plot(insta["engagement_rate"])`
+C.  `ax.hist(insta["engagement_rate"], bins=30)`
+D.  `ax.bar(insta["engagement_rate"])`
+
+**Q35.** In `insta`, the posts are not in date order. What does this cell draw?
+
+```{.python}
+fig, ax = plt.subplots()
+ax.plot(insta["posted_at"], insta["followers_at_post"])
+plt.show()
+```
+
+A.  A smooth line, because matplotlib sorts the dates before drawing
+B.  A `TypeError`, because dates cannot be drawn on an axis
+C.  A line that zigzags back and forth, because a line joins the rows in the table's order
+D.  One point per post, with no line, because the dates are not sorted
+
+**Q36.** `counts = insta["format"].value_counts()`. Which line draws one bar per format, as tall as its number of posts?
+
+A.  `ax.bar(counts.values, counts.index)`
+B.  `ax.bar(counts.index, counts.values)`
+C.  `ax.bar(insta["format"])`
+D.  `ax.hist(counts)`
+
+**Q37.** You want the points of a scatter plot coloured by format, with a legend. How is it done with matplotlib?
+
+A.  `ax.scatter(insta["reach"], insta["engagement_rate"], color="format")`, then `ax.legend()`
+B.  One `ax.scatter()` and one `plt.show()` per format, in three separate cells
+C.  `ax.scatter(insta["reach"], insta["engagement_rate"])`, then `ax.legend("format")`
+D.  One `ax.scatter()` layer per format, each with its own `label=`, then `ax.legend()`
+
+**Q38.** `insta` includes LR0184. What does this cell show?
+
+```{.python}
+viral = insta[insta["post_id"] == "LR0184"]
+fig, ax = plt.subplots()
+ax.scatter(viral["reach"], viral["engagement_rate"], color="red")
+ax.scatter(insta["reach"], insta["engagement_rate"], color="lightgrey")
+plt.show()
+```
+
+A.  Every post in grey, and LR0184 in red, on top of them
+B.  Every post in grey, LR0184 included: the grey layer is drawn last, on top of the red point
+C.  Only LR0184, in red, because `viral` was drawn first
+D.  An error, because the two layers do not have the same number of rows
+
+**Q39.** After `ax.set_xscale("log")`, which statement about the x-axis is correct?
+
+A.  The distance from 1,000 to 10,000 accounts is the same as from 10,000 to 100,000
+B.  The distance from 1,000 to 2,000 accounts is the same as from 10,000 to 11,000
+C.  The values are divided by 10 before they are drawn
+D.  The posts with a small reach are removed from the chart
+
+**Q40.** A scatter plot shows the reach and engagement rate of each post, coloured by format. Which title follows Lecture 8's advice?
+
+A.  `"Reach vs engagement_rate"`
+B.  `"Scatter plot of insta, coloured by format"`
+C.  `"Carousels engage most, whatever their reach"`
+D.  `"Figure 1"`
+
+**Q41.** Where are the reels drawn?
+
+```{.python}
+fig, axes = plt.subplots(1, 2, sharey=True)
+axes[0].scatter(carousels["reach"], carousels["engagement_rate"])
+axes[1].scatter(reels["reach"], reels["engagement_rate"])
+plt.show()
+```
+
+A.  In the left panel, because panels are counted from 1
+B.  In both panels, on top of the carousels
+C.  In the right panel, on the same y-axis as the carousels
+D.  In the right panel, with its own y-axis, so the heights cannot be compared
+
+**Q42.** A histogram of `likes` carries two vertical lines, drawn with `ax.axvline()`: the mean, 463, in red, and the median, 278, in black. Which statement is correct?
+
+A.  The red line is to the right of the black one, because a few posts with many likes pull the mean up
+B.  The red line is to the left of the black one, because most posts have fewer likes than the mean
+C.  The two lines are horizontal, because `ax.axvline()` draws across the chart
+D.  The two lines overlap, because the mean and the median of a column are always close
+
+**Q43.** Which statement about `fig.savefig("likes.png", dpi=300, bbox_inches="tight")` is correct?
+
+A.  The file is saved in your laptop's Downloads folder
+B.  `bbox_inches="tight"` stops the labels being cut off at the edges of the file
+C.  `dpi=300` is for screens, and `dpi=150` for print
+D.  A screenshot of the chart gives the same result, and redraws itself next month
+
+**Q44.** Which product line ends at the top of this chart?
+
+```{.python}
+medians = insta.groupby("product_line")["reach"].median().sort_values()
+fig, ax = plt.subplots()
+ax.barh(medians.index, medians.values)
+plt.show()
+```
+
+A.  The one with the smallest median reach
+B.  The first one in alphabetical order
+C.  The last one in alphabetical order
+D.  The one with the largest median reach
+
+**Q45.** You asked an AI assistant for a bar chart of the **median** saves of each format. It wrote the line below. What do its bars show?
+
+```{.python}
+sns.barplot(data=insta, x="format", y="saves", ax=ax)
+```
+
+A.  The median saves of each format, as asked
+B.  The total saves of each format
+C.  The number of posts of each format
+D.  The mean saves of each format, with error bars: not what you asked for
+
+::: {.content-visible when-meta="answers"}
+
+{{< pagebreak >}}
+
+## Answer key
+
+Each row gives the keyed letter and the reason, which can also serve as the feedback students see after the test.
+
+45 questions on Lectures 6 to 8, each with four options and one correct answer, with the same level mix as Test 1 of BAA1118 (4 easy, 34 medium, 7 hard). Every code question was run in Python (pandas 3, matplotlib 3.11, seaborn 0.13) to confirm its key, and the Loomrow figures were checked against `insta-data.csv`.
+
+| Q | Answer | Topic | Level | Why |
+|:--|:---|:--------|:---|:------------------------------|
+| 1 | **B** | Language vs interface | Medium | Python is the engine and Colab the dashboard. Colab runs your Python on Google's computers, so nothing is installed on your laptop, and the notebook is a `.ipynb` file in the Colab Notebooks folder of your Google Drive. |
+| 2 | **D** | Notebook output | Medium | A code cell displays the value of its last line only, and the last line is `spend`. To see the ratio as well, wrap it in `print()`. |
+| 3 | **A** | The runtime | Medium | Everything you create lives in the runtime: variables, tables and uploaded files. Your code is safe in the notebook; your results and uploads are not. Upload the file again and rerun from the top. |
+| 4 | **B** | Cells run in the order you run them | Hard | Colab runs cells in the order you click them, not top to bottom. Cell 2 ran twice, adding 1,000 each time: 5,000, then 6,000, then 7,000. **Runtime** → **Restart session and run all** would give 6,000. |
+| 5 | **C** | Comments | Medium | Everything after `#` is ignored, whole lines and ends of lines. Only `spend = 50` and `spend = spend + 10` run. |
+| 6 | **A** | Storing a result | Medium | `roas` was computed once, when its line ran: 600 / 200. Changing `revenue` afterwards does not update it. `/` always gives a decimal, so it prints `3.0`, not `3`. |
+| 7 | **D** | round() | Medium | `round(value, digits)` rounds to that many decimals; without the second value it rounds to a whole number. |
+| 8 | **C** | Naming rules | Easy | A name cannot start with a digit: `spend_2025` works, `2025_spend` fails. Letters, digits and underscores are all allowed elsewhere. |
+| 9 | **B** | Types | Easy | Between quotes, a number is text, a `str`. `float("24345.78")` would make it a decimal. |
+| 10 | **B** | Type decides what works | Medium | `+` joins two strings, `"2"` and `"3"` give `"23"`, and adds two numbers. Same operator, different types, different behaviour. |
+| 11 | **C** | Converting text to a number | Medium | `int()` turns the text into a whole number, which can then be compared: 535,086 is more than 518,400. Text compared with a number, or text plus a number, is a `TypeError`; `int("reach_text")` tries to convert the word itself, a `ValueError`. |
+| 12 | **D** | Comparisons | Medium | Text comparison is case sensitive, so `"Reel" == "reel"` is `False`. `!=` means not equal, and `"Reel"` is not `"image"`. |
+| 13 | **A** | Error types | Medium | The quote is never closed, so Python cannot read the line: a `SyntaxError`. `Reach` never created is a `NameError`; text times text and text plus a number are `TypeError`s. |
+| 14 | **D** | Reading errors | Hard | Python stops at line 3, the first line that fails: it is case sensitive, so `reach` does not exist, only `Reach`. Fixing it would reveal the `TypeError` on line 4, then the `Print` on line 5. |
+| 15 | **A** | Fixing an error | Medium | Commas inside `print()` display several values of any type, with a space between them. `int(431)` is still a number; option C still adds text and a number; `Print` is not `print`. |
+| 16 | **C** | Importing pandas | Medium | A restart empties the runtime, so `pd` exists only once the first cell has run again. pandas is installed in Colab already; a missing file gives a `FileNotFoundError`, and a misspelt `panda` a `ModuleNotFoundError`. |
+| 17 | **D** | Reading a CSV file | Easy | The file name goes between quotes, spelt exactly as in the Files panel, extension included. Colab runs on Linux, where `Insta-data.csv` is another file. |
+| 18 | **A** | Attributes vs methods | Medium | `.shape` is a value the table has, so no brackets: with them, `TypeError: 'tuple' object is not callable`. `insta.info` without brackets shows `<bound method ...>`, and `.size` is also a value, not a method. |
+| 19 | **B** | Missing values | Medium | `object` means text (newer versions of pandas write `str`), and Non-Null Count is the number of values present: 431 - 206 = 225 posts went out outside any campaign. Missing does not mean wrong: find out what it means before you drop or fill it. |
+| 20 | **C** | describe(): mean vs median | Medium | Half of the posts reach less than the median, 5,184. A few huge posts, starting with LR0184 and its 535,086 accounts, pull the mean up to almost twice the median. |
+| 21 | **B** | Selecting columns | Medium | The inner brackets are a list of names; the outer brackets select. One name in one pair of brackets gives a Series; a list gives a DataFrame. |
+| 22 | **B** | rename() returns a new table | Medium | `rename()` returns a renamed copy, and nothing stored it. `posts = posts.rename(...)` would keep it. |
+| 23 | **D** | & and \| | Medium | `&` keeps the rows where both conditions are true: the two reels above 50,000. `|` keeps those where either is: the three reels, plus the image at 75,000. |
+| 24 | **A** | Writing two conditions | Medium | Each condition needs its own round brackets, joined by `&`. Without brackets, Python reads `"reel" & insta["reach"]` first and fails; `and` does not work on columns (`ValueError`); one `=` is a `SyntaxError`. |
+| 25 | **C** | isin() and between() | Hard | `isin()` keeps the two Denim posts and the Knitwear one. `between(1000, 2000)` includes both ends, so 1,000, 2,000 and 1,999 are kept. |
+| 26 | **B** | Booleans are not text | Hard | `True` is a value, like a number, and takes no quotes. No cell holds the text `"True"`, so no row matches: the filter returns an empty table, without an error. |
+| 27 | **A** | Sorting rows | Medium | `ascending=False` puts the largest reach first, LR02 with 61,000. A sort makes a copy: `posts` keeps its order unless the result is stored back in it. |
+| 28 | **C** | Creating a column | Medium | The new name on the left adds a fourth column, and the formula runs on every row: 360 / 6,000 × 100 = 6.0 and 100 / 2,000 × 100 = 5.0. The number of rows does not change. |
+| 29 | **D** | groupby() | Medium | The reels reached 5,200, 61,000 and 1,500: their median is 5,200. 67,700 is their sum and 22,566.7 their mean, pulled up by the 61,000. |
+| 30 | **A** | pivot_table() | Hard | There is no paid image, so the combination has nothing to count, and pandas marks the cell as missing, `NaN`. `count` counts values of any type, text included. |
+| 31 | **D** | Why plot the data | Easy | Anscombe's four datasets share their means, standard deviations, correlation and best-fit line, yet look nothing alike. Only the charts tell them apart. |
+| 32 | **A** | The canvas: fig and ax | Medium | `plt.subplots()` gives back two things: `fig`, the whole figure, and `ax`, its plotting area. Every layer is a method of `ax`; `plt.show()` comes last, to display the result. |
+| 33 | **B** | Mapping x and y | Medium | A geometry's first argument is the x column, across; the second is the y column, up. |
+| 34 | **C** | Choosing a geometry | Medium | A histogram cuts one column into bins and counts the posts in each: the distribution. `ax.histogram` does not exist (`AttributeError`), `ax.plot()` would join the rates in the table's order, and `ax.bar()` needs heights as well as positions. |
+| 35 | **C** | Line charts | Medium | A line joins the rows in the order of the table, not of the x values. Sort first: `by_date = insta.sort_values("posted_at")`. |
+| 36 | **B** | Bar charts from value_counts() | Medium | `value_counts()` gives one count per format, with the formats as its index: `counts.index` for the positions on x, `counts.values` for the heights. Swapped, the code runs but the chart is meaningless; `ax.bar()` without heights is a `TypeError`, and `ax.hist(counts)` counts the counts. |
+| 37 | **D** | Colour by group | Medium | matplotlib colours a layer, not a column: one layer per format, each named with `label=`, and `ax.legend()` lists the names. `color=` takes one colour, not a column name. |
+| 38 | **B** | Layers are drawn in order | Hard | Each line draws on top of the lines above it. LR0184 is in `insta`, so its grey point covers the red one. Draw every post in grey first, then the highlight. |
+| 39 | **A** | Log scales | Medium | On a log axis, each step ×10 covers the same distance, which spreads out a cloud squashed by a few huge posts. Nothing is removed or divided. |
+| 40 | **C** | Titles that state the finding | Medium | The title should tell the reader what to take away, not name the columns or the chart type. |
+| 41 | **C** | Panels | Medium | Panels are counted from 0, so `axes[1]` is the second one, on the right. `sharey=True` gives both panels one y-axis, so the heights compare. |
+| 42 | **A** | Reference lines and skew | Medium | `ax.axvline()` draws a vertical line at a value. The likes are skewed: a few big posts pull the mean (463) to the right of the median (278). |
+| 43 | **B** | Saving a figure | Medium | `bbox_inches="tight"` keeps the labels inside the file. The file appears in the Files panel of Colab, to download; 300 dpi is for print and 150 for a screen. Save with code: the same cell redraws the chart on next month's data. |
+| 44 | **D** | Sorting before barh() | Medium | `sort_values()` puts the smallest first, and `barh()` draws its first bar at the bottom, so the largest median ends on top. |
+| 45 | **D** | Checking AI code: what seaborn computes | Hard | `sns.barplot()` computes the mean of each group before it draws, with error bars. Compute the median with pandas and draw it with `ax.barh()`, or ask why the code does not match the request: only use code you can explain line by line. |
+
+:::

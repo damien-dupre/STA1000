@@ -424,4 +424,4 @@ Regression, as a way of asking which levers move the number when you cannot run
 the experiment.
 
 **Prepare**: bring a table of your conversions and spend by week and channel,
-merged with `pd.merge` and checked as in Lecture 8. We model it.
+merged with `pd.merge` and checked as in Lecture 9. We model it.

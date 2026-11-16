@@ -515,7 +515,7 @@ Print("hello")
 
 Steps 1 to 3 solve most errors in this module, and they take twenty seconds.
 
-**Until Lecture 10, type the code yourself**, and ask an AI assistant to **explain**, not to write: a line you cannot read is a line you cannot check.
+**Until Lecture 8, type the code yourself**, and ask an AI assistant to **explain**, not to write: a line you cannot read is a line you cannot check.
 
 ## {{< fa screwdriver-wrench >}} Your Turn! {background="#43464B"}
 

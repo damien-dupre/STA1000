@@ -8,7 +8,7 @@ subtitle: STA1000 - Data Analytics and Metrics
 Nine sessions. You have used an AI assistant in most of them:
 
 - To clean a messy file (Lecture 2)
-- To critique a chart, then your own figure (Lectures 4 and 9)
+- To critique a chart (Lecture 4), then to write a figure's code, which you checked (Lecture 8)
 - To explain an error, or a line of pandas you could not read (Lectures 6 to 9)
 
 . . .
@@ -323,7 +323,7 @@ Then, without looking at the code:
 . . .
 
 Every one of these is a thing you have learned to worry about: medians and small
-groups in Lectures 3 and 5, the denominator of every rate in Lecture 8.
+groups in Lectures 3 and 5, the denominator of every rate in Lecture 9.
 That is why this lecture is here and not in week one: you can now tell when the
 answer is wrong.
 
